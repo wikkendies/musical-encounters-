@@ -161,11 +161,16 @@ const LEVELS=[
   {name:'Trap omhoog',      path:'M15 92 H 45 V 70 H 80 V 48 H 115 V 26 H 145',           notes:['C4','C4','E4','E4','G4','G4','C5','C5']},
   {name:'Zigzag omhoog',    path:'M12 92 L 32 76 L 50 84 L 70 64 L 88 72 L 108 52 L 126 60 L 148 36', notes:['C4','E4','D4','F4','E4','G4','F4','A4','G4']}
   ]},
-  {name:'Niveau 3',info:'Twee toppen, grote zigzag, pieken, val en klim',mels:[
-  {name:'Twee toppen',      path:'M12 92 L 39 33 L 66 73 L 107 13 L 148 92',              notes:['C4','G4','C5','G4','E4','G4','C5','E5','C5','G4','C4']},
-  {name:'Grote zigzag',     path:'M12 92 L 24 58 L 37 82 L 49 48 L 62 72 L 74 38 L 86 68 L 99 33 L 111 58 L 123 23 L 136 48 L 148 13', notes:['C4','G4','D4','A4','E4','B4','F4','C5','G4','D5','A4','E5']},
-  {name:'Stijgende pieken', path:'M12 92 L 27 72 L 42 92 L 57 58 L 72 92 L 87 38 L 103 92 L 118 23 L 133 92 L 148 13', notes:['C4','E4','C4','G4','C4','B4','C4','D5','C4','E5']},
-  {name:'Val en klim',      path:'M12 33 L 26 92 L 148 13',                              notes:['C5','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5']}
+  {name:'Niveau 3',info:'Sprongboog, sprongdal, pendel, zaagtand',mels:[
+  /* 10–12 noten, vooral sprongen (terts tot kleine decime), bereik C4–E5; lijn volgt de toonhoogte (C4 onderaan y≈92, E5 bovenaan y≈13) */
+  {name:'Sprongboog',  path:'M12 92 L 24 72 L 37 57 L 49 38 L 61 23 L 74 13 L 86 33 L 99 48 L 111 57 L 123 72 L 136 82 L 148 92',
+                       notes:['C4','E4','G4','B4','D5','E5','C5','A4','G4','E4','D4','C4']},
+  {name:'Sprongdal',   path:'M12 13 L 24 33 L 37 48 L 49 67 L 61 82 L 74 92 L 86 72 L 99 57 L 111 38 L 123 33 L 136 23 L 148 13',
+                       notes:['E5','C5','A4','F4','D4','C4','E4','G4','B4','C5','D5','E5']},
+  {name:'Pendel',      path:'M12 13 L 27 92 L 42 23 L 57 82 L 72 33 L 88 72 L 103 38 L 118 67 L 133 48 L 148 57',
+                       notes:['E5','C4','D5','D4','C5','E4','B4','F4','A4','G4']},
+  {name:'Zaagtand',    path:'M12 92 L 24 72 L 37 57 L 49 33 L 61 82 L 74 67 L 86 48 L 99 23 L 111 72 L 123 57 L 136 38 L 148 13',
+                       notes:['C4','E4','G4','C5','D4','F4','A4','D5','E4','G4','B4','E5']}
   ]},
   {name:'Niveau 4',info:'Piramide, dubbele dal, trap omlaag, trechter',mels:[
   {name:'Piramide',         path:'M12 92 L 23 78 L 35 63 L 46 49 L 57 35 L 69 20 L 80 13 L 91 20 L 103 35 L 114 49 L 125 63 L 137 78 L 148 92', notes:['C4','E4','G4','B4','D5','F5','G5','F5','D5','B4','G4','E4','C4']},
