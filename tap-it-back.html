@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tap It Back &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --staff:#7F89A3; --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6; --warm:#D97F06;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:10px 0 0;color:var(--muted);max-width:64ch}
+.levels{display:inline-flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow);margin-top:14px}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:18px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-big{font-size:17px;padding:16px 22px}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+.linkbtn:hover{color:var(--accent)}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.rounds{display:flex;gap:8px}
+.dot{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;border:2px solid var(--line);font-size:14px;font-weight:700;color:var(--muted)}
+.dot.cur{border-color:var(--accent);color:var(--accent)}
+.dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+
+.stage{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;background:var(--surface-2);border-radius:16px;padding:14px 18px}
+.phase{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.1}
+.phase small{display:block;font-family:var(--body);font-weight:600;font-size:14px;color:var(--muted);margin-top:4px}
+.beats{display:flex;gap:10px}
+.beat{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-weight:800;color:var(--muted);transition:background .05s,transform .05s}
+.beat.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);transform:scale(1.1)}
+.beat.you.on{background:var(--warm);border-color:var(--warm);color:#fff}
+
+.pad{touch-action:manipulation;-webkit-user-select:none;user-select:none;width:100%;min-height:150px;border:0;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-family:var(--display);font-weight:800;font-size:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:transform .05s,background .05s}
+.pad small{font-family:var(--body);font-size:14px;font-weight:600;opacity:.8}
+.pad.live{background:var(--warm);color:#fff}
+.pad.hit{transform:scale(.98)}
+.pad:disabled{cursor:default}
+
+.scorebox{background:var(--surface-2);border:1.5px solid var(--line);border-radius:16px;padding:10px 8px;overflow-x:auto}
+#score{display:block;width:100%;min-width:520px;height:auto;color:var(--ink)}
+.switch{display:inline-flex;align-items:center;gap:10px;font-weight:600;cursor:pointer}
+.switch input{appearance:none;-webkit-appearance:none;width:42px;height:24px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;margin:0;transition:background .15s}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{transform:translateX(18px)}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+
+.summary{display:flex;flex-direction:column;gap:8px}
+.sumhead{margin:0;font-family:var(--display);font-size:28px;font-weight:800}
+.sumrow{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;padding:10px 14px;border-radius:12px;border:2px solid var(--line);font-weight:600}
+.sumrow.ok{background:var(--ok-soft);border-color:var(--ok)}
+.sumrow.bad{background:var(--bad-soft);border-color:var(--bad)}
+@media (max-width:560px){.stage{grid-template-columns:1fr}.beat{width:32px;height:32px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="ritme.html">&larr; Let's Make Rhythm</a>
+    <h1>Tap It <span>Back</span></h1>
+    <div class="levels" id="levels" role="group" aria-label="Niveau"></div>
+    <p>Luister naar het ritme en tik het meteen na, op de grote knop of met de <strong>spatiebalk</strong>. De metronoom tikt mee. Daarna zie je hoe goed je op tijd was.</p>
+  </header>
+
+  <section class="panel" id="task">
+    <div class="panel-head">
+      <div>
+        <div class="eyebrow" id="eyebrow">Ritme 1 van 5</div>
+        <h2>Luister &hellip; en tik het na</h2>
+      </div>
+      <div class="rounds" id="rounds" aria-label="Voortgang"></div>
+    </div>
+
+    <div class="stage" aria-live="polite">
+      <div class="phase" id="phase">Klaar?<small id="phaseSub">Druk op Start. Je hoort eerst 1 maat aftellen.</small></div>
+      <div class="beats" id="beats" aria-hidden="true"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary btn-big" id="startBtn" type="button">&#9654; Start</button>
+      <label class="switch"><input type="checkbox" id="showNotes">Toon het ritme vooraf</label>
+    </div>
+
+    <button class="pad" id="pad" type="button" disabled>TIK<small id="padSub">wacht tot het jouw beurt is</small></button>
+
+    <div id="resultBox" hidden>
+      <div class="scorebox"><svg id="score" role="img" aria-label="Het ritme met jouw tikken"></svg></div>
+      <div class="legend" style="margin-top:8px">
+        <span><i style="background:var(--ok)"></i>op tijd</span>
+        <span><i style="background:var(--warm)"></i>iets te vroeg of te laat</span>
+        <span><i style="background:var(--bad)"></i>gemist</span>
+        <span><i style="background:var(--muted)"></i>jouw tikken (onderaan)</span>
+      </div>
+    </div>
+    <div id="previewBox" hidden>
+      <div class="scorebox"><svg id="preview" role="img" aria-label="Het ritme"></svg></div>
+    </div>
+
+    <p class="feedback info" id="feedback"></p>
+
+    <div class="actions">
+      <button class="btn btn-ghost" id="againBtn" type="button" hidden>&#8635; Nog eens proberen</button>
+      <button class="btn btn-primary" id="nextBtn" type="button" hidden>Volgend ritme &rarr;</button>
+      <span style="flex:1"></span>
+      <button class="linkbtn" id="restartBtn" type="button">Nieuwe reeks</button>
+    </div>
+  </section>
+
+  <section class="panel" id="result" hidden>
+    <div class="summary" id="summary"></div>
+    <div class="actions"><button class="btn btn-primary" id="newBtn" type="button">Nieuwe reeks</button></div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* ---------- niveaus ----------
+   Eén maat per ritme. Maatsoort vooraan (standaard 4/4). Tekens (duur in tellen):
+   w hele (4) · h halve (2) · dh gepunteerde halve (3) · q kwart (1) · ee 2 achtsten (1)
+   qr kwartrust (1) · hr halve rust (2) · dq gepunteerde kwart (1,5) · e1 losse achtste (0,5) · er achtste rust (0,5)
+   s4 4 zestienden (1) · es achtste + 2 zestienden (1) · se 2 zestienden + achtste (1)                              */
+const LEVELS=[
+  {name:'Niveau 1', info:'kwart · halve · 2 achtsten · kwartrust', bpm:72, pool:[
+    'q q h','q ee q q','ee ee q q','h ee q','q qr q q','ee q ee q','q ee ee q','h q qr','ee q q q','q q ee ee']},
+  {name:'Niveau 2', info:'+ halve rust · gepunteerde halve · 3/4 en 2/4', bpm:72, pool:[
+    '3/4 q ee q','3/4 h q','2/4 ee q','2/4 q qr','hr q q','dh q','3/4 ee ee q','3/4 q qr q','q ee hr','3/4 dh']},
+  {name:'Niveau 3', info:'+ gepunteerde kwart · losse achtste', bpm:76, pool:[
+    'dq e1 q q','q dq e1 q','dq e1 dq e1','q er e1 ee q','dq e1 h','ee dq e1 q','q q dq e1','er e1 er e1 q q','dq e1 ee q','3/4 dq e1 q']},
+  {name:'Niveau 4', info:'+ zestienden · syncope', bpm:66, pool:[
+    's4 q q q','q s4 ee q','es es q q','se q se q','e1 q e1 q q','q e1 q e1 q','s4 s4 q q','ee es se q','e1 q e1 s4 q','q es q se']}
+];
+const COUNT=5;
+const TOK={
+  w:[[4,0]], h:[[2,0]], dh:[[3,0]], q:[[1,0]], ee:[[.5,0],[.5,0]], qr:[[1,1]], hr:[[2,1]],
+  dq:[[1.5,0]], e1:[[.5,0]], er:[[.5,1]], s4:[[.25,0],[.25,0],[.25,0],[.25,0]], es:[[.5,0],[.25,0],[.25,0]], se:[[.25,0],[.25,0],[.5,0]]
+};
+function parse(str){
+  const parts=str.trim().split(/\s+/); let meter=4;
+  if(/^\d\/4$/.test(parts[0])) meter=+parts.shift()[0];
+  let t=0; const groups=[], ev=[];
+  parts.forEach(k=>{ const g={k,start:t,ev:[]}; TOK[k].forEach(([d,r])=>{ const e={t,d,rest:!!r,k}; g.ev.push(e); ev.push(e); t+=d; }); groups.push(g); });
+  if(Math.abs(t-meter)>1e-6) console.warn('maat niet vol:',str,t,meter);
+  return {meter,groups,ev,notes:ev.filter(e=>!e.rest)};
+}
+
+/* ---------- toestand ---------- */
+let level=0; try{ level=Math.min(LEVELS.length-1,Math.max(0,+(localStorage.getItem('tib-level')||0))); }catch(e){}
+let series=[], idx=0, running=false, taps=[], win=null, tried=false, raf=0;
+const L=()=>LEVELS[level], R=()=>parse(series[idx].str);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+
+function newSeries(){
+  series=shuffle(L().pool).slice(0,COUNT).map(str=>({str,ok:null,first:null}));
+  idx=0; $('task').hidden=false; $('result').hidden=true; renderLevels(); startTask();
+}
+function startTask(){
+  tried=false; taps=[]; win=null;
+  $('resultBox').hidden=true; $('againBtn').hidden=true; $('nextBtn').hidden=true;
+  setFb('','info'); setPhase('Klaar?','Druk op Start. Je hoort eerst 1 maat aftellen.');
+  renderTop(); drawBeats(R().meter); renderPreview();
+}
+function renderTop(){
+  $('eyebrow').textContent=`${L().name} · ritme ${idx+1} van ${series.length}`;
+  $('rounds').innerHTML=series.map((s,i)=>`<span class="dot${s.ok===true?' ok':s.ok===false?' bad':i===idx?' cur':''}">${i+1}</span>`).join('');
+  $('startBtn').disabled=running;
+  $('startBtn').innerHTML=running?'&#9654; Bezig&hellip;':tried?'&#9654; Nog eens beluisteren en tikken':'&#9654; Start';
+}
+function renderPreview(){
+  const show=$('showNotes').checked&&!tried;
+  $('previewBox').hidden=!show;
+  if(show) drawScore($('preview'),R(),null);
+}
+function setPhase(a,b){ $('phase').innerHTML=a+`<small>${b}</small>`; }
+function setFb(t,c){ const f=$('feedback'); f.textContent=t; f.className='feedback '+c; }
+function drawBeats(n){ $('beats').innerHTML=Array.from({length:n},(_,i)=>`<span class="beat" data-b="${i}">${i+1}</span>`).join(''); }
+
+/* ---------- geluid ---------- */
+let ctx=null, master=null;
+function ac(){
+  if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)(); master=ctx.createGain(); master.gain.value=.9; master.connect(ctx.destination); }
+  if(ctx.state==='suspended') ctx.resume();
+  return ctx;
+}
+function click(t,accent){      // metronoom
+  const o=ctx.createOscillator(), g=ctx.createGain();
+  o.type='square'; o.frequency.value=accent?1800:1200;
+  g.gain.setValueAtTime(accent?.12:.07,t); g.gain.exponentialRampToValueAtTime(.0001,t+.04);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t+.05);
+}
+function block(t){             // het ritme (woodblock)
+  [[880,.5],[1320,.25]].forEach(([f,a])=>{ const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(f,t); o.frequency.exponentialRampToValueAtTime(f*.8,t+.08);
+    g.gain.setValueAtTime(a,t); g.gain.exponentialRampToValueAtTime(.0001,t+.14);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t+.15); });
+}
+function tapSound(t){          // eigen tik (lager, zodat je het verschil hoort)
+  const o=ctx.createOscillator(), g=ctx.createGain();
+  o.type='triangle'; o.frequency.setValueAtTime(420,t); o.frequency.exponentialRampToValueAtTime(260,t+.08);
+  g.gain.setValueAtTime(.45,t); g.gain.exponentialRampToValueAtTime(.0001,t+.12);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t+.13);
+}
+/* tijd die de leerling HOORT (rekening houdend met vertraging van de luidspreker) */
+function heardTime(evTimeStamp){
+  if(ctx.getOutputTimestamp){
+    const ts=ctx.getOutputTimestamp();
+    if(ts&&ts.contextTime>0&&ts.performanceTime>0) return ts.contextTime+((evTimeStamp||performance.now())-ts.performanceTime)/1000;
+  }
+  return ctx.currentTime-(ctx.outputLatency||ctx.baseLatency||0);
+}
+
+/* ---------- verloop: aftellen · ritme · aftellen · jouw beurt ---------- */
+function start(){
+  if(running) return;
+  const c=ac(), r=R(), beat=60/L().bpm, B=r.meter*beat, t0=c.currentTime+.2;
+  running=true; taps=[];
+  $('resultBox').hidden=true; $('previewBox').hidden=true; $('againBtn').hidden=true; $('nextBtn').hidden=true; setFb('','info');
+  for(let bar=0;bar<4;bar++) for(let b=0;b<r.meter;b++) click(t0+bar*B+b*beat,b===0);
+  r.notes.forEach(n=>block(t0+B+n.t*beat));
+  win={t0,beat,B,start:t0+3*B,end:t0+4*B,meter:r.meter};
+  renderTop();
+  const tick=()=>{
+    const now=heardTime(), rel=now-t0;
+    const bar=Math.floor(rel/B), b=Math.floor((rel-bar*B)/beat);
+    document.querySelectorAll('.beat').forEach((el,i)=>{ el.classList.toggle('on',rel>=0&&bar<4&&i===b); el.classList.toggle('you',bar===3); });
+    const live=bar===3||(bar===2&&rel>3*B-beat*.4);
+    $('pad').disabled=!live; $('pad').classList.toggle('live',live);
+    $('padSub').textContent=live?'tik nu het ritme':'wacht tot het jouw beurt is';
+    if(rel<0) setPhase('Klaar …','');
+    else if(bar===0) setPhase('Aftellen …','Luister naar de metronoom.');
+    else if(bar===1) setPhase('Luister!','Dit is het ritme.');
+    else if(bar===2) setPhase('Klaar maken …','Nog 1 maat aftellen.');
+    else if(bar===3) setPhase('Jouw beurt!','Tik het ritme na.');
+    if(rel<4*B+.35) raf=requestAnimationFrame(tick);
+    else finish();
+  };
+  raf=requestAnimationFrame(tick);
+}
+function tap(e){
+  if(!running||!win) return;
+  const now=heardTime(e&&e.timeStamp);
+  if(now<win.start-win.beat*.4||now>win.end+.2) return;
+  tapSound(ctx.currentTime+.005);
+  taps.push((now-win.start)/win.beat);           // in tellen t.o.v. het begin van jouw maat
+  const p=$('pad'); p.classList.add('hit'); setTimeout(()=>p.classList.remove('hit'),80);
+}
+
+/* ---------- beoordelen ---------- */
+function judge(r,tp){
+  const notes=r.notes, beat=win.beat;
+  const gaps=notes.map((n,i)=>i<notes.length-1?notes[i+1].t-n.t:r.meter-n.t);
+  const minGap=Math.min(...gaps, 1);
+  const okTol=Math.min(.11, minGap*beat*.4)/beat;      // in tellen
+  const matchTol=Math.min(.26, minGap*beat*.5)/beat;
+  const used=new Set(), res=notes.map(n=>{
+    let best=-1, bd=1e9;
+    tp.forEach((t,i)=>{ if(used.has(i)) return; const d=Math.abs(t-n.t); if(d<bd&&d<=matchTol){bd=d;best=i;} });
+    if(best<0) return {n,st:'miss'};
+    used.add(best); const d=tp[best]-n.t;
+    return {n,st:Math.abs(d)<=okTol?'ok':'near',d};
+  });
+  const extra=tp.filter((_,i)=>!used.has(i));
+  return {res,extra};
+}
+function finish(){
+  running=false; cancelAnimationFrame(raf);
+  document.querySelectorAll('.beat').forEach(el=>el.classList.remove('on'));
+  $('pad').disabled=true; $('pad').classList.remove('live'); $('padSub').textContent='wacht tot het jouw beurt is';
+  const r=R(), j=judge(r,taps), s=series[idx];
+  const ok=j.res.filter(x=>x.st==='ok').length, near=j.res.filter(x=>x.st==='near').length, miss=j.res.filter(x=>x.st==='miss').length;
+  const all=ok===r.notes.length&&j.extra.length===0;
+  const first=!tried; tried=true;
+  if(first){ s.ok=all; s.first={ok,n:r.notes.length}; }
+  drawScore($('score'),r,{j,taps});
+  $('resultBox').hidden=false; $('againBtn').hidden=false; $('nextBtn').hidden=false;
+  $('nextBtn').innerHTML=idx<series.length-1?'Volgend ritme &rarr;':'Bekijk je uitslag &rarr;';
+  setPhase(all?'Knap!':'Bijna …', all?'Alles op tijd.':'Kijk hieronder wat nog beter kan.');
+  let parts=[`${ok} van de ${r.notes.length} noten op tijd`];
+  const early=j.res.filter(x=>x.st==='near'&&x.d<0).length, late=near-early;
+  if(early) parts.push(`${early} iets te vroeg`); if(late) parts.push(`${late} iets te laat`);
+  if(miss) parts.push(`${miss} gemist`); if(j.extra.length) parts.push(`${j.extra.length} tik${j.extra.length>1?'ken':''} te veel`);
+  if(!taps.length) parts=['Je hebt niet getikt. Tik tijdens de oranje maat (“Jouw beurt!”).'];
+  setFb(parts.join(' · ')+(all?'':first?' (Deze eerste poging telt voor je score.)':''),all?'ok':'bad');
+  renderTop();
+}
+
+/* ---------- notenschrift (één lijn, slagwerk) ---------- */
+function qrest(x,y){ return `<path d="M${x-2} ${y-15} l6 7 l-6 6 l6 7 q-8 -3 -4 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`; }
+function erest(x,y){ return `<circle cx="${x-2}" cy="${y-8}" r="2.8" fill="currentColor"/><path d="M${x-2} ${y-6} q5 1 7 -3 l-6 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`; }
+function drawScore(svg,r,judged){
+  const W=720, H=judged?176:120, X0=74, X1=W-24, Y=66, ST=40;
+  const x=t=>X0+14+(t/r.meter)*(X1-X0-28);
+  let h=`<line x1="20" y1="${Y}" x2="${W-14}" y2="${Y}" stroke="var(--staff)" stroke-width="1.5"/>`;
+  h+=`<line x1="${W-14}" y1="${Y-22}" x2="${W-14}" y2="${Y+22}" stroke="currentColor" stroke-width="1.6"/>`;
+  h+=`<text x="44" y="${Y-4}" text-anchor="middle" font-family="Bricolage Grotesque,system-ui" font-weight="800" font-size="24" fill="currentColor">${r.meter}</text><text x="44" y="${Y+20}" text-anchor="middle" font-family="Bricolage Grotesque,system-ui" font-weight="800" font-size="24" fill="currentColor">4</text>`;
+  for(let b=0;b<r.meter;b++) h+=`<text x="${x(b)}" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="var(--muted)">${b+1}</text>`;
+  const col={};
+  if(judged) judged.j.res.forEach(z=>col[z.n.t]=z.st==='ok'?'var(--ok)':z.st==='near'?'var(--warm)':'var(--bad)');
+  r.groups.forEach(g=>{
+    const evs=g.ev, beamed=['ee','s4','es','se'].includes(g.k);
+    evs.forEach((e,i)=>{
+      const cx=x(e.t), c=col[e.t]||'currentColor';
+      if(e.rest){ h+=`<g style="color:var(--ink)">${e.d>=2?`<rect x="${cx-8}" y="${Y-6}" width="16" height="6" fill="currentColor"/>`:e.d>=1?qrest(cx,Y):erest(cx,Y)}</g>`; return; }
+      const hollow=e.d>=2;
+      h+=`<ellipse cx="${cx}" cy="${Y}" rx="7.4" ry="5.4" transform="rotate(-20 ${cx} ${Y})" ${hollow?`fill="none" stroke="${c}" stroke-width="2.2"`:`fill="${c}"`}/>`;
+      if(e.d<4) h+=`<line x1="${cx+6.6}" y1="${Y-1}" x2="${cx+6.6}" y2="${Y-ST}" stroke="${c}" stroke-width="1.9"/>`;
+      if(e.d===1.5||e.d===3) h+=`<circle cx="${cx+14}" cy="${Y-3}" r="2.4" fill="${c}"/>`;
+      if(!beamed&&e.d===.5) h+=`<path d="M${cx+6.6} ${Y-ST} q2 10 10 14 q4 4 1 12" fill="none" stroke="${c}" stroke-width="2.2"/>`;
+    });
+    if(beamed){
+      const xs=evs.map(e=>x(e.t)+6.6), top=Y-ST;
+      h+=`<rect x="${xs[0]-1}" y="${top}" width="${xs[xs.length-1]-xs[0]+2}" height="5" fill="currentColor"/>`;
+      const sec=(a,b)=>h+=`<rect x="${xs[a]-1}" y="${top+8}" width="${xs[b]-xs[a]+2}" height="5" fill="currentColor"/>`;
+      if(g.k==='s4') sec(0,3); if(g.k==='es') sec(1,2); if(g.k==='se') sec(0,1);
+    }
+  });
+  if(judged){
+    const LY=H-30;
+    h+=`<text x="20" y="${LY+4}" font-size="12" font-weight="700" fill="var(--muted)">jij</text>`;
+    h+=`<line x1="${X0}" y1="${LY}" x2="${X1}" y2="${LY}" stroke="var(--line)" stroke-width="2"/>`;
+    for(let b=0;b<=r.meter;b++) h+=`<line x1="${x(b)}" y1="${LY-6}" x2="${x(b)}" y2="${LY+6}" stroke="var(--line)" stroke-width="2"/>`;
+    const ex=new Set(judged.j.extra);
+    judged.taps.forEach(t=>{ const tx=Math.max(X0-10,Math.min(X1+10,x(t)));
+      h+=ex.has(t)?`<g stroke="var(--bad)" stroke-width="2.6" stroke-linecap="round"><line x1="${tx-5}" y1="${LY-5}" x2="${tx+5}" y2="${LY+5}"/><line x1="${tx+5}" y1="${LY-5}" x2="${tx-5}" y2="${LY+5}"/></g>`
+                  :`<circle cx="${tx}" cy="${LY}" r="5.5" fill="var(--muted)"/>`; });
+  }
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.innerHTML=h;
+}
+
+/* ---------- uitslag ---------- */
+function showResult(){
+  const score=series.filter(s=>s.ok).length;
+  $('summary').innerHTML=`<p class="eyebrow">Uitslag &middot; ${L().name}</p><p class="sumhead">${score} / ${series.length}</p>`+
+    series.map((s,i)=>`<div class="sumrow ${s.ok?'ok':'bad'}"><span>Ritme ${i+1}</span><span>${s.first?`${s.first.ok} van de ${s.first.n} noten op tijd`:'niet getikt'}</span></div>`).join('');
+  $('task').hidden=true; $('result').hidden=false;
+}
+
+/* ---------- bediening ---------- */
+$('startBtn').addEventListener('click',start);
+$('pad').addEventListener('pointerdown',e=>{ e.preventDefault(); tap(e); });
+document.addEventListener('keydown',e=>{
+  if(e.repeat) return;
+  if((e.code==='Space'||e.key===' ')&&running){ e.preventDefault(); tap(e); }
+});
+$('againBtn').addEventListener('click',()=>{ $('resultBox').hidden=true; start(); });
+$('nextBtn').addEventListener('click',()=>{ if(idx<series.length-1){ idx++; startTask(); } else showResult(); });
+$('restartBtn').addEventListener('click',()=>{ if(!running) newSeries(); });
+$('newBtn').addEventListener('click',newSeries);
+$('showNotes').addEventListener('change',()=>{ try{localStorage.setItem('tib-show',$('showNotes').checked?1:0)}catch(_){ } if(!running) renderPreview(); });
+try{ $('showNotes').checked=localStorage.getItem('tib-show')==='1'; }catch(_){}
+function renderLevels(){ $('levels').innerHTML=LEVELS.map((x,i)=>`<button type="button" data-l="${i}" aria-pressed="${i===level}">${x.name}<small>${x.info}</small></button>`).join(''); }
+$('levels').addEventListener('click',e=>{ const b=e.target.closest('[data-l]'); if(!b||running) return; level=+b.dataset.l; try{localStorage.setItem('tib-level',level)}catch(_){ } newSeries(); });
+
+/* testhulp: window.__tib.simulate([tellen]) */
+window.__tib={fake:(tp)=>{ ac(); win={beat:60/L().bpm,start:0,end:0,meter:R().meter}; taps=tp.slice(); running=true; finish(); }, cur:()=>series[idx].str, parse,judge:(str,tp)=>{ win={beat:60/L().bpm}; return judge(parse(str),tp); }, all:()=>LEVELS.flatMap(l=>l.pool)};
+newSeries();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}.tempo-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:6px 14px;font-weight:800;font-variant-numeric:tabular-nums}
+</style>
+<title>Rhythm Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --staff:#7F89A3; --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6; --now:rgba(242,169,59,.28); --warm:#E08E12;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --now:rgba(245,184,79,.22); --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --now:rgba(245,184,79,.22); --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* header */
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px}
+.brand h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.brand h1 span{color:var(--accent)}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+.brand p{margin:8px 0 0;color:var(--muted)}
+.levels{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow)}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.levels button:disabled{cursor:not-allowed;opacity:.55}
+
+.steps{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0;padding:0;list-style:none;color:var(--muted);font-size:14px}
+.steps li{display:flex;align-items:center;gap:8px}
+.steps b{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:12px}
+
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.panel h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0;letter-spacing:-.01em}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* exercise chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--surface-2);border-radius:999px;min-width:40px;height:40px;padding:0 12px;font-weight:700;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.chip[aria-current="true"]{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.chip.done:not([aria-current="true"]){border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.chip.done::after{content:"";width:6px;height:10px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-2px)}
+
+/* player */
+.player{display:grid;grid-template-columns:auto 1fr;gap:16px 24px;align-items:center}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-weight:700;display:inline-flex;align-items:center;gap:10px}
+.btn-primary{background:var(--accent);color:var(--accent-ink);font-size:17px;padding:16px 22px}
+.btn-soft{background:var(--accent-soft);color:var(--accent)}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn svg{width:18px;height:18px;flex:none}
+.controls{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+.ctl{display:flex;align-items:center;gap:10px;font-weight:600}
+.ctl output{font-variant-numeric:tabular-nums;min-width:62px;color:var(--muted);font-weight:600}
+input[type=range]{accent-color:var(--accent);width:140px}
+.switch{display:flex;align-items:center;gap:10px;font-weight:600;cursor:pointer}
+.switch input{appearance:none;width:44px;height:26px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;margin:0;transition:background .15s}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{transform:translateX(18px)}
+.switch input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.seg{display:flex;align-items:center;gap:4px;font-weight:600}
+.seg span{margin-right:6px}
+.seg button{border:1.5px solid var(--line);background:var(--surface-2);border-radius:10px;min-width:40px;height:36px;font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.status{grid-column:1/-1;display:flex;align-items:center;gap:0 12px;min-height:44px;padding:10px 14px;border-radius:12px;background:var(--surface-2);color:var(--muted);font-weight:600}
+.status > span:not(.big){display:inline}
+.status .big{font-family:var(--display);font-size:26px;font-weight:800;color:var(--warm);font-variant-numeric:tabular-nums;line-height:1}
+
+/* staff */
+.staff-scroll{overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.staff{display:flex;flex-direction:column;gap:12px;user-select:none;-webkit-user-select:none}
+.staff-line{display:flex;min-width:560px}
+.staffbg{background:
+  linear-gradient(var(--staff),var(--staff)) 0 36px/100% 1.5px no-repeat,
+  linear-gradient(var(--staff),var(--staff)) 0 48px/100% 1.5px no-repeat,
+  linear-gradient(var(--staff),var(--staff)) 0 60px/100% 1.5px no-repeat,
+  linear-gradient(var(--staff),var(--staff)) 0 72px/100% 1.5px no-repeat,
+  linear-gradient(var(--staff),var(--staff)) 0 84px/100% 1.5px no-repeat}
+.clef{flex:none;width:70px;height:120px;color:var(--ink);position:relative}
+.clef::before{content:"";position:absolute;left:0;top:36px;width:2px;height:49.5px;background:var(--ink)}
+.clef svg{display:block;width:70px;height:120px}
+.measure{flex:1 1 0;min-width:240px;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:120px auto;position:relative;border-radius:8px}
+.measure::after{content:"";position:absolute;right:0;top:36px;width:2px;height:49.5px;background:var(--ink);pointer-events:none}
+.measure.last::after{width:9px;background:linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px,var(--ink) 5px 9px)}
+.measure.ok{background-color:var(--ok-soft)}
+.measure.bad{background-color:var(--bad-soft)}
+.zone{grid-row:1;border:0;background:transparent;position:relative;padding:0;margin:0;min-width:0}
+.zone::before{content:"";position:absolute;inset:26px 6px 26px 6px;border:2px dashed var(--line);border-radius:10px;transition:border-color .1s,background .1s}
+.zone.filled::before{border-color:transparent}
+.zone:hover::before,.picking .zone:not(.filled)::before{border-color:var(--accent)}
+.zone.preview::before{border-color:var(--accent);border-style:solid;background:var(--accent-soft)}
+.zone.preview.nofit::before{border-color:var(--bad);background:var(--bad-soft)}
+.zone.now{background:var(--now)}
+.placed{grid-row:1;border:0;background:transparent;padding:0 0 0 10px;position:relative;z-index:2;display:flex;align-items:stretch;color:var(--ink);touch-action:none;min-width:0}
+.placed svg{height:120px;width:auto;flex:none;overflow:visible}
+.placed::after{content:"";position:absolute;left:6px;right:6px;bottom:8px;height:6px;border-radius:3px;background:var(--accent-soft);border-left:3px solid var(--accent)}
+.placed:hover svg{color:var(--accent)}
+.placed.dragging{opacity:.25}
+.measure.ok .placed{color:var(--ok)}
+.measure.ok .placed::after{background:var(--ok);border-color:var(--ok);opacity:.35}
+.measure.bad .placed{color:var(--bad)}
+.measure.bad .placed::after{background:var(--bad);border-color:var(--bad);opacity:.35}
+.count{grid-row:2;text-align:center;font-weight:700;font-size:14px;color:var(--muted);padding:6px 0 2px;font-variant-numeric:tabular-nums;border-radius:6px}
+.count{text-align:left;padding-left:17px}
+.staff.fine .count{padding-left:11px}
+.count.held{opacity:.4}
+.count.off{font-size:12px;font-weight:600}
+.staff.fine .staff-line{min-width:720px}
+.staff.fine .measure{min-width:320px}
+.staff.fine .zone::before{inset:26px 3px 26px 3px;border-radius:8px}
+.staff.fine .placed{padding-left:4px}
+.card{position:relative}
+.card .new{position:absolute;top:8px;right:8px;font-style:normal;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--accent);color:var(--accent-ink);padding:2px 8px;border-radius:999px}
+.count.now{background:var(--now);color:var(--ink)}
+.mlabel{position:absolute;top:2px;left:10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);pointer-events:none}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.actions .spacer{flex:1}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+
+/* bank */
+.bank{display:flex;flex-direction:column;gap:18px}
+.bank-group{display:flex;flex-direction:column;gap:8px}
+.bank-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card.is-rest{background:var(--surface)}
+.count.rest{opacity:.55;font-style:italic}
+.card{border:2px solid var(--line);background:var(--surface-2);border-radius:16px;padding:14px 12px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;touch-action:none;cursor:grab;transition:border-color .12s,transform .12s,background .12s;color:var(--ink)}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-soft)}
+.card svg{height:92px;width:auto}
+.card strong{font-family:var(--display);font-size:18px;font-weight:700}
+.card span{font-size:14px;color:var(--muted);font-weight:600}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.student{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:600;color:var(--muted)}
+.student b{color:var(--ink)}
+.pts{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:4px 12px;font-weight:800;font-variant-numeric:tabular-nums}
+.overlay{position:fixed;inset:0;z-index:60;background:rgba(14,19,34,.55);display:grid;place-items:center;padding:16px}
+.dialog{background:var(--surface);color:var(--ink);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:24px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px}
+.dialog h2{font-family:var(--display);font-size:26px;margin:0}
+.dialog p{margin:0;color:var(--muted);font-size:14px}
+.field{display:flex;flex-direction:column;gap:6px;font-weight:600}
+.field input{font:inherit;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink)}
+.field input:focus{outline:3px solid var(--accent-soft);border-color:var(--accent)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row2>*{min-width:0}
+.field input{width:100%;min-width:0}
+.err{color:var(--bad);font-weight:600;font-size:14px;min-height:20px}
+.ghost{position:fixed;left:0;top:0;z-index:50;pointer-events:none;background:var(--surface);border:2px solid var(--accent);border-radius:14px;padding:6px 10px;box-shadow:0 12px 30px rgba(22,32,58,.25);color:var(--ink)}
+.ghost svg{height:80px;width:auto;display:block}
+
+@media (max-width:720px){
+  .player{grid-template-columns:1fr}
+  .bank-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <a class="back" href="ritme.html">&larr; Let's Make Rhythm</a>
+      <h1>Rhythm <span>Builder</span></h1>
+      <p>Luister naar de piano en bouw het ritme na op de notenbalk.</p>
+    </div>
+    <div class="levels" role="group" aria-label="Niveau">
+      <button id="lvl1" aria-pressed="true">Niveau 1<small>Hele, halve, kwart, achtsten</small></button>
+      <button id="lvl2" aria-pressed="false">Niveau 2<small>Met rusten</small></button>
+      <button id="lvl3" aria-pressed="false">Niveau 3<small>Gepunteerd + losse achtsten</small></button>
+      <button id="lvl4" aria-pressed="false">Niveau 4<small>16de noten &middot; 2 of 4 maten</small></button>
+    </div>
+  </header>
+
+  <div class="student" id="studentBar" hidden><span>Speler: <b id="stName"></b> &middot; klas <b id="stKlas"></b></span><span class="pts" id="stPts">0 punten</span><button class="linkbtn" id="switchBtn">Ander leerling</button></div>
+
+  <ol class="steps">
+    <li><b>1</b>Beluister het ritme</li>
+    <li><b>2</b>Sleep de juiste noten op de juiste tel</li>
+    <li><b>3</b>Controleer je antwoord</li>
+  </ol>
+
+  <section class="panel" aria-labelledby="exTitle">
+    <div class="panel-head">
+      <div>
+        <div class="eyebrow" id="exEyebrow">Niveau 1</div>
+        <h2 id="exTitle">Oefening 1</h2>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="Kies een oefening"></div>
+    </div>
+
+    <div class="player">
+      <button class="btn btn-primary" id="playBtn">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5v13l11-6.5z" fill="currentColor"/></svg>
+        <span>Beluister het ritme</span>
+      </button>
+      <div class="controls">
+        <div class="ctl">Tempo <span class="tempo-badge" id="tempoOut"></span></div>
+        <label class="switch"><input type="checkbox" id="metro" checked>Metronoom</label>
+        <div class="seg" id="barSeg" role="group" aria-label="Aantal maten" hidden><span>Maten</span><button data-n="2" aria-pressed="true">2</button><button data-n="4" aria-pressed="false">4</button></div>
+        <button class="btn btn-ghost" id="mineBtn">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5v13l11-6.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <span>Speel mijn antwoord</span>
+        </button>
+      </div>
+      <div class="status" id="status" aria-live="polite"><span>Druk op <em>Beluister het ritme</em>. Je hoort eerst 4 tikken om af te tellen.</span></div>
+    </div>
+
+    <div class="staff-scroll">
+      <div class="staff" id="staff"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn" style="font-size:16px;padding:12px 20px">Controleer</button>
+      <button class="btn btn-ghost" id="clearBtn">Wis notenbalk</button>
+      <span class="spacer"></span>
+      <button class="linkbtn" id="solveBtn">Toon oplossing</button>
+      <button class="btn btn-soft" id="nextBtn">Volgende oefening</button>
+    </div>
+    <p class="feedback info" id="feedback" aria-live="polite"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="bankTitle">
+    <div class="panel-head">
+      <div>
+        <div class="eyebrow">Ritmebank</div>
+        <h2 id="bankTitle">Sleep een ritme naar de notenbalk</h2>
+      </div>
+    </div>
+    <div class="bank" id="bank"></div>
+    <p class="hint">Op een tablet of laptop zonder muis: tik eerst op een ritme en dan op een tel in de notenbalk. Tik op een geplaatste noot om ze weg te halen.</p>
+  </section>
+</div>
+
+<div class="overlay" id="loginOverlay" hidden>
+  <form class="dialog" id="loginForm" novalidate>
+    <h2>Wie ben jij?</h2>
+    <p>Vul je gegevens in, dan kan je leerkracht je punten zien.</p>
+    <div class="row2">
+      <label class="field" for="inVoornaam">Voornaam<input id="inVoornaam" autocomplete="given-name" maxlength="20" required></label>
+      <label class="field" for="inLetter">1e letter familienaam<input id="inLetter" maxlength="1" required></label>
+    </div>
+    <label class="field" for="inKlas">Klas<input id="inKlas" placeholder="bv. 1B" maxlength="8" required></label>
+    <div class="err" id="loginErr" aria-live="polite"></div>
+    <button class="btn btn-primary" type="submit" style="justify-content:center">Start</button>
+    <p>We bewaren alleen je voornaam, de eerste letter van je familienaam, je klas en je punten.</p>
+  </form>
+</div>
+
+<script>
+(function(){
+/* ---------- testmodus: test.html laadt deze pagina met ?test=1&lvl=N&n=M ---------- */
+const TEST=(()=>{try{const q=new URLSearchParams(location.search);if(q.get('test')!=='1')return null;
+  return {lvl:Math.max(1,parseInt(q.get('lvl'))||1),o:Math.max(0,parseInt(q.get('o'))||0),n:Math.max(1,Math.min(20,parseInt(q.get('n'))||3)),i:0,score:0,max:0,items:[]}}catch(e){return null}})();
+function testSend(m){try{if(window.parent!==window)window.parent.postMessage(Object.assign({lmr:'test'},m),'*')}catch(e){}}
+function testRecord(got,max){got=Math.max(0,Math.min(max,got));TEST.score+=got;TEST.max+=max;TEST.items.push([got,max]);TEST.i++;
+  testSend({type:'progress',i:TEST.i,n:TEST.n,score:TEST.score,max:TEST.max});
+  if(TEST.i>=TEST.n){document.body.classList.add('test-finished');testSend({type:'done',score:TEST.score,max:TEST.max,items:TEST.items});return true}return false}
+function testCheck(fn){document.addEventListener('click',e=>{if(!e.target.closest('#checkBtn'))return;e.stopPropagation();e.preventDefault();fn()},true)}
+function testTitle(el){if(el)el.textContent=`Vraag ${TEST.o+TEST.i+1} van ${TEST.o+TEST.n}`}
+function testShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const TEST_NEXT='Antwoord bewaard. Op naar de volgende vraag.';
+if(TEST){const s=document.createElement('style');s.textContent='.back,.levels,.tabs,.no-test{display:none!important}body{padding-top:6px}header h1{font-size:32px}.test-finished .wrap{opacity:.35;pointer-events:none}';document.head.appendChild(s);document.body.classList.add('testmode')}
+
+/* Plak hier de webadres van je Google Apps Script (eindigt op /exec). Leeg = punten alleen op dit toestel. */
+const SCORE_URL='';
+const LOGIN_ON=false; /* inloggen & punten: later aanzetten */
+const TYPES={
+  W:{dur:4,name:'Hele noot',tel:'4 tellen'},
+  H:{dur:2,name:'Halve noot',tel:'2 tellen'},
+  Q:{dur:1,name:'Kwartnoot',tel:'1 tel'},
+  E:{dur:1,name:'2 achtste noten',tel:'1 tel samen'},
+  RW:{dur:4,name:'Hele rust',tel:'4 tellen stil',rest:true},
+  RH:{dur:2,name:'Halve rust',tel:'2 tellen stil',rest:true},
+  RQ:{dur:1,name:'Kwartrust',tel:'1 tel stil',rest:true},
+  DH:{dur:3,name:'Gepunteerde halve noot',tel:'3 tellen'},
+  DQ:{dur:1.5,name:'Gepunteerde kwartnoot',tel:'1½ tel'},
+  E1:{dur:.5,name:'Achtste noot',tel:'½ tel'},
+  RE:{dur:.5,name:'Achtste rust',tel:'½ tel stil',rest:true},
+  S4:{dur:1,name:'Tiritiri',tel:'4 zestienden · 1 tel',sixteenth:true,hits:[[0,.25],[.25,.25],[.5,.25],[.75,.25]]},
+  S816:{dur:1,name:'Ti-tiri',tel:'achtste + 2 zestienden · 1 tel',sixteenth:true,hits:[[0,.5],[.5,.25],[.75,.25]]},
+  S168:{dur:1,name:'Tiri-ti',tel:'2 zestienden + achtste · 1 tel',sixteenth:true,hits:[[0,.25],[.25,.25],[.5,.5]]}
+};
+TYPES.E.hits=[[0,.5],[.5,.5]];
+const LEVELS={
+  1:{types:['W','H','Q','E'],exercises:[
+    'Q Q Q Q|H H','H Q Q|W','Q Q H|Q Q Q Q','E Q E Q|W',
+    'Q E Q E|H Q Q','H E E|Q Q H','E E Q Q|E E H','Q H Q|E E E E'
+  ]},
+  2:{types:['W','H','Q','E','RW','RH','RQ'],exercises:[
+    'Q Q RQ Q|H RH','Q RQ Q RQ|W','H Q RQ|Q Q H','E Q RQ Q|H H',
+    'RQ Q E Q|H RH','Q Q H|RW','E RQ E RQ|Q Q RH','RH Q Q|E Q RQ Q'
+  ]},
+  3:{types:['W','DH','H','DQ','Q','E','E1','RW','RH','RQ','RE'],fresh:['DH','DQ','E1','RE'],meters:[2,3,4],exercises:[
+    '4/4 DH Q|H H','3/4 DH|Q Q Q','3/4 H Q|DQ E1 Q','2/4 Q Q|H','2/4 DQ E1|E Q',
+    '4/4 DQ E1 Q Q|DH Q','3/4 Q RE E1 Q|DH','4/4 RE E1 Q H|DQ E1 H','2/4 E1 RE Q|DQ E1','3/4 DQ E1 E|H RQ'
+  ]},
+  4:{types:['W','DH','H','DQ','Q','E','E1','S4','S816','S168','RW','RH','RQ','RE'],fresh:['S4','S816','S168'],meters:[2,3,4],barChoice:true,exercises:[
+    '4/4 Q S4 Q Q|S4 S4 H|Q Q S4 Q|W','4/4 S816 Q S816 Q|H S816 Q|E S4 Q Q|DH Q',
+    '4/4 S168 S168 Q Q|S4 Q H|Q S168 Q S816|W','2/4 S4 Q|S816 S168|Q S4|H',
+    '3/4 Q S4 Q|S816 Q Q|S168 S168 Q|DH','4/4 DQ E1 S4 Q|S816 S168 H|E S4 E Q|H RH',
+    '3/4 S4 S4 Q|DQ E1 Q|S816 RQ Q|DH','2/4 S168 E|S4 S816|RE E1 S4|H',
+    '4/4 S816 S816 S168 Q|Q RQ S4 Q|E E S4 S4|W','3/4 S168 Q S816|H Q|Q S4 RQ|DH'
+  ]}
+};
+function stepFor(){return state.level>=3?0.5:1}
+function fmtBeats(x){const w=Math.floor(x),h=x-w>0;return (w?w:'')+(h?'½':'')||'0'}
+const LEVEL_INFO={1:'Hele, halve en kwartnoten + achtsten',2:'Zoals niveau 1, nu met rusten',3:'Gepunteerde noten, achtste noot en rust, 2/4 en 3/4',4:'Zestiende noten: tiritiri, ti-tiri, tiri-ti'};
+function nBars(){return LEVELS[state.level].barChoice?state.barChoice:2}
+
+/* ---------- glyphs ---------- */
+function head(cx,filled){
+  return filled
+    ? `<ellipse cx="${cx}" cy="60" rx="7.2" ry="5.3" transform="rotate(-20 ${cx} 60)" fill="currentColor"/>`
+    : `<ellipse cx="${cx}" cy="60" rx="6.6" ry="4.6" transform="rotate(-20 ${cx} 60)" fill="none" stroke="currentColor" stroke-width="2.2"/>`;
+}
+function glyph(type,crop){
+  let w,body;
+  if(type==='W'){w=30;body=`<ellipse cx="15" cy="60" rx="9.2" ry="5.8" fill="none" stroke="currentColor" stroke-width="3"/>`;}
+  else if(type==='H'){w=26;body=head(12,false)+`<line x1="18.4" y1="58" x2="18.4" y2="22" stroke="currentColor" stroke-width="1.9"/>`;}
+  else if(type==='Q'){w=26;body=head(12,true)+`<line x1="18.6" y1="58" x2="18.6" y2="22" stroke="currentColor" stroke-width="1.9"/>`;}
+  else {w=52;body=head(12,true)+head(38,true)
+    +`<line x1="18.6" y1="58" x2="18.6" y2="24" stroke="currentColor" stroke-width="1.9"/>`
+    +`<line x1="44.6" y1="58" x2="44.6" y2="24" stroke="currentColor" stroke-width="1.9"/>`
+    +`<rect x="17.65" y="21.5" width="27.9" height="5.2" fill="currentColor"/>`;}
+  if(type==='RW'){w=26;body=`<rect x="5" y="48" width="16" height="6.5" fill="currentColor"/>`;}
+  else if(type==='RH'){w=26;body=`<rect x="5" y="53.5" width="16" height="6.5" fill="currentColor"/>`;}
+  else if(type==='RQ'){w=24;body=`<path d="M9 39 L16.8 48.6 C13.2 51.8 12.2 55.6 16.2 61 L17.4 62.6 C13.4 61.2 9.8 62.6 11.2 67.8 C12 70.8 13.6 73.2 14.2 74.8 C9.2 71.8 5.6 66.8 8.6 63.2 C10.2 61.4 12.6 61.2 13.8 61.8 L7.2 53.6 C10.8 50.4 11.8 46.8 9.2 42.8 Z" fill="currentColor"/>`;}
+  if(type==='DH'){w=32;body=head(12,false)+`<line x1="18.4" y1="58" x2="18.4" y2="22" stroke="currentColor" stroke-width="1.9"/><circle cx="26" cy="55" r="2.6" fill="currentColor"/>`;}
+  else if(type==='DQ'){w=32;body=head(12,true)+`<line x1="18.6" y1="58" x2="18.6" y2="22" stroke="currentColor" stroke-width="1.9"/><circle cx="26" cy="55" r="2.6" fill="currentColor"/>`;}
+  else if(type==='E1'){w=32;body=head(12,true)+`<line x1="18.6" y1="58" x2="18.6" y2="22" stroke="currentColor" stroke-width="1.9"/><path d="M18.6 22 C19.5 29 27 32 27.5 40 C28 45 26 49 24.5 51 C26 46.5 26 41 18.6 35.5 Z" fill="currentColor"/>`;}
+  else if(type==='RE'){w=24;body=`<circle cx="9" cy="51" r="3.4" fill="currentColor"/><path d="M8 53.6 C11.5 55.2 15 53.4 17.6 49 L11.6 72" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>`;}
+  if(TYPES[type]&&TYPES[type].sixteenth){
+    const xs=type==='S4'?[10,28,46,64]:type==='S816'?[10,34,54]:[10,28,54];w=xs[xs.length-1]+14;
+    const sx=xs.map(x=>x+6.6);body=xs.map(x=>head(x,true)).join('')+sx.map(x=>`<line x1="${x}" y1="58" x2="${x}" y2="24" stroke="currentColor" stroke-width="1.9"/>`).join('');
+    body+=`<rect x="${sx[0]-.95}" y="21.5" width="${sx[sx.length-1]-sx[0]+1.9}" height="5" fill="currentColor"/>`;
+    if(type==='S4')body+=`<rect x="${sx[0]-.95}" y="29.5" width="${sx[3]-sx[0]+1.9}" height="5" fill="currentColor"/>`;
+    if(type==='S816')body+=`<rect x="${sx[1]-.95}" y="29.5" width="${sx[2]-sx[1]+1.9}" height="5" fill="currentColor"/>`;
+    if(type==='S168')body+=`<rect x="${sx[0]-.95}" y="29.5" width="${sx[1]-sx[0]+1.9}" height="5" fill="currentColor"/>`;
+  }
+  const vb=crop?`-4 14 ${w+8} 64`:`0 0 ${w} 120`;
+  return `<svg viewBox="${vb}" aria-hidden="true">${crop?(type==='RW'?'<line x1="-4" y1="48" x2="'+(w+4)+'" y2="48" stroke="var(--staff)" stroke-width="1.2"/>':'<line x1="-4" y1="60" x2="'+(w+4)+'" y2="60" stroke="var(--staff)" stroke-width="1.2"/>'):''}${body}</svg>`;
+}
+
+/* ---------- state ---------- */
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const state={attempts:0,barChoice:2,beats:4,level:1,ex:0,random:null,bars:[[],[]],selected:null,tempo:80,metro:true,done:new Set(store.get('lmr-done-l1',[]))};
+function loadDone(){state.done=new Set(store.get('lmr-done-l'+state.level,[]))}
+
+function parseEx(str){let beats=4;const mt=str.match(/^(\d)\/4\s+/);if(mt){beats=+mt[1];str=str.slice(mt[0].length)}
+  return {beats,bars:str.split('|').slice(0,nBars()).map(b=>{let s=0;return b.trim().split(/\s+/).map(t=>{const n={type:t,start:s};s+=TYPES[t].dur;return n})})}}
+function exInfo(){return state.random||parseEx(LEVELS[state.level].exercises[state.ex])}
+function answer(){return exInfo().bars}
+function randomEx(){
+  const w={W:1,H:3,Q:4,E:4,RW:1,RH:1.5,RQ:2.5,DH:2,DQ:3,E1:2,RE:1.5,S4:4,S816:3,S168:3};
+  const ms=LEVELS[state.level].meters||[4],beats=ms[Math.floor(Math.random()*ms.length)];
+  const bar=()=>{let rem=beats,out=[];while(rem>0){const opts=LEVELS[state.level].types.filter(t=>TYPES[t].dur<=rem);let tot=opts.reduce((a,t)=>a+w[t],0),r=Math.random()*tot,pick=opts[0];for(const t of opts){r-=w[t];if(r<=0){pick=t;break}}out.push(pick);rem-=TYPES[pick].dur}return out.join(' ')};
+  return parseEx(beats+'/4 '+Array.from({length:nBars()},bar).join('|'));
+}
+
+/* ---------- DOM refs ---------- */
+const $=id=>document.getElementById(id);
+const staffEl=$('staff'),bankEl=$('bank'),chipsEl=$('chips'),fb=$('feedback'),statusEl=$('status');
+
+/* ---------- render ---------- */
+function renderChips(){
+  const n=LEVELS[state.level].exercises.length;
+  let h='';
+  for(let i=0;i<n;i++){
+    const cur=!state.random&&i===state.ex;
+    h+=`<button class="chip${state.done.has(i)?' done':''}" data-ex="${i}" aria-current="${cur}" aria-label="Oefening ${i+1}${state.done.has(i)?' (juist opgelost)':''}">${i+1}</button>`;
+  }
+  h+=`<button class="chip" data-ex="rnd" aria-current="${!!state.random}">Willekeurig</button>`;
+  chipsEl.innerHTML=h;
+  const ts=exInfo().beats;$('exTitle').textContent=(state.random?'Willekeurige oefening':`Oefening ${state.ex+1} van ${n}`)+(state.level>=3?` · ${ts}/4-maat`:'');
+}
+function renderStaff(){
+  const NB=nBars();let h='';
+  for(let m=0;m<NB;m++){
+  if(m%2===0){if(m)h+='</div>';h+=`<div class="staff-line"><div class="clef staffbg"><svg viewBox="0 0 70 120" aria-hidden="true">
+    <rect x="12" y="48" width="4.5" height="24" fill="currentColor"/><rect x="21" y="48" width="4.5" height="24" fill="currentColor"/>
+    <text x="48" y="58.5" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="27" fill="currentColor">${state.beats}</text>
+    <text x="48" y="82.5" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="27" fill="currentColor">4</text></svg></div>`;}
+    const notes=state.bars[m],st=stepFor(),span=st*2;
+    const B=state.beats,occ=new Array(B*2).fill(null);
+    notes.forEach((n,i)=>{for(let k=n.start*2;k<(n.start+TYPES[n.type].dur)*2;k++)occ[k]=i});
+    const telName=b=>Number.isInteger(b)?`tel ${b+1}`:`tel ${Math.floor(b)+1} en`;
+    h+=`<div class="measure staffbg${m===NB-1?' last':''}" data-m="${m}" style="grid-template-columns:repeat(${B*2},1fr);min-width:${B*(st<1?80:60)}px"><span class="mlabel">Maat ${m+1}</span>`;
+    for(let b=0;b<B;b+=st) h+=`<button class="zone${occ[b*2]!==null?' filled':''}" data-m="${m}" data-b="${b}" style="grid-column:${b*2+1} / span ${span}" aria-label="Maat ${m+1}, ${telName(b)}"></button>`;
+    notes.forEach((n,i)=>{const d=TYPES[n.type].dur;
+      h+=`<button class="placed" data-m="${m}" data-i="${i}" style="grid-column:${n.start*2+1} / span ${d*2}" aria-label="${TYPES[n.type].name} op ${telName(n.start)}. Tik om weg te halen.">${glyph(n.type)}</button>`;});
+    for(let b=0;b<B;b+=st){
+      const i=occ[b*2];let txt=Number.isInteger(b)?String(b+1):'en',cls=Number.isInteger(b)?'':' off';
+      if(i!==null){const n=notes[i];
+        if(n.type==='E'&&n.start===b&&st===1)txt=`${b+1} en`;
+        else if(TYPES[n.type].rest&&n.start===b)cls+=' rest';
+        else if(n.start!==b&&!(TYPES[n.type].hits&&TYPES[n.type].hits.some(x=>n.start+x[0]===b)))cls+=' held';}
+      h+=`<div class="count${cls}" data-m="${m}" data-b="${b}" style="grid-column:${b*2+1} / span ${span}">${txt}</div>`;
+    }
+    h+=`</div>`;
+  }
+  h+='</div>';
+  staffEl.innerHTML=h;staffEl.classList.toggle('fine',stepFor()<1);
+}
+function renderBank(){
+  const fresh=LEVELS[state.level].fresh||[];
+  const card=t=>`<button class="card${TYPES[t].rest?' is-rest':''}" data-type="${t}" aria-pressed="${state.selected===t}">${fresh.includes(t)?'<em class="new">Nieuw</em>':''}${glyph(t,true)}<strong>${TYPES[t].name}</strong><span>${TYPES[t].tel}</span></button>`;
+  const types=LEVELS[state.level].types.filter(t=>TYPES[t].dur<=state.beats),notes=types.filter(t=>!TYPES[t].rest&&!TYPES[t].sixteenth),six=types.filter(t=>TYPES[t].sixteenth),rests=types.filter(t=>TYPES[t].rest);
+  bankEl.innerHTML=`<div class="bank-group"><div class="eyebrow">Noten</div><div class="bank-grid">${notes.map(card).join('')}</div></div>`
+    +(six.length?`<div class="bank-group"><div class="eyebrow">Zestiende noten</div><div class="bank-grid">${six.map(card).join('')}</div></div>`:'')
+    +(rests.length?`<div class="bank-group"><div class="eyebrow">Rusten</div><div class="bank-grid">${rests.map(card).join('')}</div></div>`:'');
+  document.body.classList.toggle('picking',!!state.selected);
+}
+function setFeedback(msg,kind){fb.textContent=msg;fb.className='feedback '+(kind||'info')}
+function clearMarks(){staffEl.querySelectorAll('.measure').forEach(m=>m.classList.remove('ok','bad'))}
+
+/* ---------- editing ---------- */
+function place(m,start,type){
+  const d=TYPES[type].dur;
+  const B=state.beats;if(start+d>B)start=B-d;
+  start=Math.max(0,Math.floor(start/stepFor())*stepFor());
+  state.bars[m]=state.bars[m].filter(n=>n.start+TYPES[n.type].dur<=start||n.start>=start+d);
+  state.bars[m].push({type,start});
+  state.bars[m].sort((a,b)=>a.start-b.start);
+  setFeedback('');renderStaff();
+}
+function removeNote(m,i){state.bars[m].splice(i,1);setFeedback('');renderStaff();}
+
+/* ---------- drag & tap ---------- */
+let drag=null;
+function beginPointer(e,type,src,el){
+  if(e.button!==undefined&&e.button!==0)return;
+  drag={type,src,x0:e.clientX,y0:e.clientY,active:false,ghost:null,target:null,el};
+  window.addEventListener('pointermove',onMove);
+  window.addEventListener('pointerup',onUp,{once:true});
+  window.addEventListener('pointercancel',cancelDrag,{once:true});
+}
+function targetAt(x,y){
+  const el=document.elementFromPoint(x,y);const meas=el&&el.closest('.measure');
+  if(!meas)return null;const r=meas.getBoundingClientRect();
+  const st=stepFor();
+  const B=state.beats,b=Math.max(0,Math.min(B-st,Math.floor((x-r.left)/r.width*B/st)*st));
+  return {m:+meas.dataset.m,b};
+}
+function showPreview(t){
+  staffEl.querySelectorAll('.zone.preview').forEach(z=>z.classList.remove('preview','nofit'));
+  if(!t)return;const d=TYPES[drag.type].dur;let s=t.b;const fits=s+d<=state.beats;if(!fits)s=state.beats-d;
+  const st=stepFor();s=Math.floor(s/st)*st;
+  for(let b=s;b<s+d-1e-9;b+=st){const z=staffEl.querySelector(`.zone[data-m="${t.m}"][data-b="${b}"]`);if(z){z.classList.add('preview');if(!fits)z.classList.add('nofit')}}
+}
+function onMove(e){
+  if(!drag)return;
+  if(!drag.active){
+    if(Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)<6)return;
+    drag.active=true;
+    const g=document.createElement('div');g.className='ghost';g.innerHTML=glyph(drag.type,true);document.body.appendChild(g);drag.ghost=g;
+    if(drag.src)drag.el.classList.add('dragging');
+  }
+  drag.ghost.style.transform=`translate(${e.clientX-30}px,${e.clientY-50}px)`;
+  drag.target=targetAt(e.clientX,e.clientY);showPreview(drag.target);
+}
+function onUp(e){
+  window.removeEventListener('pointermove',onMove);
+  const d=drag;drag=null;if(!d)return;
+  if(d.ghost)d.ghost.remove();
+  if(d.active){
+    const t=d.target;
+    if(d.src){state.bars[d.src.m].splice(d.src.i,1)}
+    if(t)place(t.m,t.b,d.type);else{setFeedback('');renderStaff();}
+  }else{
+    if(d.src){
+      if(state.selected){const n=state.bars[d.src.m][d.src.i];place(d.src.m,n.start,state.selected)}
+      else removeNote(d.src.m,d.src.i);
+    }else{state.selected=state.selected===d.type?null:d.type;renderBank();}
+  }
+}
+function cancelDrag(){window.removeEventListener('pointermove',onMove);if(drag&&drag.ghost)drag.ghost.remove();drag=null;renderStaff();}
+
+bankEl.addEventListener('pointerdown',e=>{const c=e.target.closest('.card');if(!c)return;e.preventDefault();beginPointer(e,c.dataset.type,null,c)});
+bankEl.addEventListener('keydown',e=>{const c=e.target.closest('.card');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();state.selected=state.selected===c.dataset.type?null:c.dataset.type;renderBank();bankEl.querySelector(`[data-type="${c.dataset.type}"]`).focus()}});
+staffEl.addEventListener('pointerdown',e=>{
+  const p=e.target.closest('.placed');
+  if(p){e.preventDefault();const m=+p.dataset.m,i=+p.dataset.i;beginPointer(e,state.bars[m][i].type,{m,i},p);}
+});
+staffEl.addEventListener('click',e=>{
+  const z=e.target.closest('.zone');if(!z)return;
+  if(e.detail===0&&document.activeElement!==z)return;
+  if(state.selected)place(+z.dataset.m,+z.dataset.b,state.selected);
+  else setFeedback('Kies eerst een ritme in de ritmebank, of sleep het naar hier.','info');
+});
+staffEl.addEventListener('keydown',e=>{const p=e.target.closest('.placed');if(p&&(e.key==='Enter'||e.key===' '||e.key==='Delete'||e.key==='Backspace')){e.preventDefault();removeNote(+p.dataset.m,+p.dataset.i)}});
+
+/* ---------- checking ---------- */
+function check(){
+  if(state.bars.some(b=>b.length))state.attempts++;
+  const ans=answer();clearMarks();let allOk=true;const msgs=[];let good=0;const okEls=[];
+  for(let m=0;m<nBars();m++){
+    const mine=state.bars[m],el=staffEl.querySelector(`.measure[data-m="${m}"]`);
+    const filled=mine.reduce((a,n)=>a+TYPES[n.type].dur,0);
+    const ok=mine.length===ans[m].length&&mine.every((n,i)=>n.type===ans[m][i].type&&n.start===ans[m][i].start);
+    if(ok){good++;okEls.push(el)}
+    else{allOk=false;
+      const miss=state.beats-filled;if(miss>0)msgs.push(`Maat ${m+1} is nog niet vol: er ${miss===1?'ontbreekt 1 tel':(miss<1?'ontbreekt een halve tel':'ontbreken '+fmtBeats(miss)+' tellen')}.`);}
+  }
+  // geen groen/rood per maat: enkel kleuren als alles juist is
+  if(allOk)okEls.forEach(el=>el.classList.add('ok'));
+  else msgs.unshift(`${good} van de ${nBars()} maten ${good===1?'is':'zijn'} juist. Welke? Dat moet je zelf ontdekken: luister opnieuw, verbeter en controleer opnieuw.`);
+  if(allOk){
+    setFeedback('Helemaal juist! Klaar voor de volgende oefening?','ok');
+    if(state.shown){setFeedback('Juist, maar je hebt de oplossing bekeken. Probeer de volgende eens zonder hulp!','ok');return}
+    if(!state.random){state.done.add(state.ex);store.set('lmr-done-l'+state.level,[...state.done]);renderChips();
+      const pts=state.attempts<=1?10:state.attempts===2?7:5;
+      const key=`N${state.level}-O${state.ex+1}`+(LEVELS[state.level].barChoice?`-${nBars()}m`:'');
+      const best=store.get('lmr-points',{});const gained=Math.max(0,pts-(best[key]||0));
+      if(pts>(best[key]||0)){best[key]=pts;store.set('lmr-points',best);}
+      if(!LOGIN_ON)setFeedback('Helemaal juist! Klaar voor de volgende oefening?','ok');else setFeedback(`Helemaal juist! +${pts} punten${state.attempts>1?` (na ${state.attempts} pogingen)`:''}${gained<pts?' · je had deze al eerder opgelost':''}.`,'ok');
+      if(LOGIN_ON){renderStudent();sendScore({niveau:state.level,oefening:key,punten:pts,pogingen:state.attempts});}
+    }else setFeedback('Helemaal juist! Willekeurige oefeningen zijn om te oefenen en tellen niet mee voor je punten.','ok');
+  }else setFeedback(msgs.join(' '),'bad');
+}
+
+/* ---------- audio ---------- */
+let ctx=null,playing=null;
+function ac(){if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();return ctx}
+function click(t,accent,out){
+  const c=ctx,o=c.createOscillator(),g=c.createGain();
+  o.type='sine';o.frequency.value=accent?1900:1400;
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(accent?0.5:0.32,t+0.002);g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+  o.connect(g).connect(out);o.start(t);o.stop(t+0.07);
+}
+function piano(t,d,out,stac){
+  const c=ctx,f=261.63*2; // C5
+  const g=c.createGain(),lp=c.createBiquadFilter();
+  lp.type='lowpass';lp.frequency.setValueAtTime(5200,t);lp.frequency.exponentialRampToValueAtTime(1400,t+Math.max(0.3,d));
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(stac?0.38:0.34,t+0.005);
+  if(stac||d<0.32){g.gain.exponentialRampToValueAtTime(stac?0.1:0.16,t+d);g.gain.setTargetAtTime(0.0001,t+d,stac?0.012:0.03);}
+  else{g.gain.exponentialRampToValueAtTime(0.16,t+0.25);g.gain.exponentialRampToValueAtTime(0.07,t+Math.max(0.3,d*0.95));
+  g.gain.setTargetAtTime(0.0001,t+d,0.045);}
+  g.connect(lp).connect(out);
+  [[1,1],[2,.42],[3,.2],[4,.11],[5,.05],[0.5,.18]].forEach(([k,a])=>{
+    const o=c.createOscillator(),og=c.createGain();o.type='sine';o.frequency.value=f*k*(k>1?1+0.0006*k:1);og.gain.value=a;
+    o.connect(og).connect(g);o.start(t);o.stop(t+d+0.4);
+  });
+}
+function eventsFrom(bars){const ev=[];bars.forEach((bar,m)=>bar.forEach(n=>{
+  if(TYPES[n.type].rest)return;
+  const o=m*state.beats;if(n.type==='E1'){ev.push({t:o+n.start,d:.5});return}
+  if(TYPES[n.type].hits){TYPES[n.type].hits.forEach(([a,d])=>ev.push({t:o+n.start+a,d,st:TYPES[n.type].sixteenth&&d<=.25}))}else ev.push({t:o+n.start,d:TYPES[n.type].dur})}));return ev}
+function setPlayingUI(which){
+  const pb=$('playBtn'),mb=$('mineBtn');
+  pb.querySelector('span').textContent=which==='answer'?'Stop':'Beluister het ritme';
+  mb.querySelector('span').textContent=which==='mine'?'Stop':'Speel mijn antwoord';
+}
+function clearNow(){staffEl.querySelectorAll('.now').forEach(x=>x.classList.remove('now'))}
+function stop(msg){
+  if(!playing)return;const p=playing;playing=null;cancelAnimationFrame(p.raf);clearTimeout(p.timer);
+  const now=ctx.currentTime;p.master.gain.setTargetAtTime(0.0001,now,0.03);setTimeout(()=>p.master.disconnect(),300);
+  clearNow();setPlayingUI(null);statusEl.innerHTML='<span>'+(msg||'Gestopt. Druk opnieuw op <em>Beluister het ritme</em> om nog eens te luisteren.')+'</span>';
+}
+function play(bars,which){
+  if(playing){const was=playing.which;stop();if(was===which)return;}
+  const c=ac(),master=c.createGain();master.gain.value=0.9;master.connect(c.destination);
+  const B=state.beats,spb=60/state.tempo,t0=c.currentTime+0.15,total=nBars()*B;
+  for(let i=0;i<B;i++)click(t0+i*spb,i===0,master);
+  if(state.metro)for(let i=0;i<total;i++)click(t0+(B+i)*spb,i%B===0,master);
+  eventsFrom(bars).forEach(e=>piano(t0+(B+e.t)*spb,e.st?e.d*spb*0.45:e.d*spb*0.97,master,e.st));
+  playing={master,t0,spb,which,raf:0,timer:setTimeout(()=>stop(which==='answer'?'Klaar. Sleep nu de noten op de juiste tel, of luister nog eens.':'Zo klinkt jouw antwoord. Vergelijk het met het echte ritme.'),((B+total)*spb+0.6)*1000)};
+  setPlayingUI(which);
+  let last='';
+  const tick=()=>{if(!playing)return;
+    const b=(ctx.currentTime-t0)/spb;let key;
+    if(b<B){const n=b<0?1:Math.floor(b)+1;key='c'+n;if(key!==last){clearNow();statusEl.innerHTML=`<span class="big">${n}</span><span>Aftellen…</span>`}}
+    else{const k=b-B,st=stepFor(),m=Math.min(nBars()-1,Math.floor(k/B)),t=Math.floor((k%B)/st)*st;key=m+'-'+t;
+      if(key!==last){clearNow();staffEl.querySelectorAll(`[data-m="${m}"][data-b="${t}"]`).forEach(x=>{if(x.classList.contains('zone')||x.classList.contains('count'))x.classList.add('now')});
+        statusEl.innerHTML=`<span class="big">${Number.isInteger(t)?t+1:'en'}</span><span>Maat ${m+1} &middot; ${which==='answer'?'het ritme speelt':'jouw antwoord speelt'}</span>`}}
+    last=key;playing.raf=requestAnimationFrame(tick)};
+  playing.raf=requestAnimationFrame(tick);
+}
+
+/* ---------- controls ---------- */
+function loadEx(i){
+  stop('');if(i!=='rnd')state.ex=i;state.random=i==='rnd'?randomEx():null;
+  state.beats=exInfo().beats;
+  if(state.selected&&TYPES[state.selected].dur>state.beats)state.selected=null;
+  state.shown=false;state.attempts=0;state.bars=Array.from({length:nBars()},()=>[]);setFeedback('');renderChips();renderStaff();renderBank();
+  statusEl.innerHTML=`<span>Druk op <em>Beluister het ritme</em>. Je hoort eerst ${state.beats} tikken om af te tellen.</span>`;
+}
+chipsEl.addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;loadEx(c.dataset.ex==='rnd'?'rnd':+c.dataset.ex)});
+$('playBtn').addEventListener('click',()=>play(answer(),'answer'));
+$('mineBtn').addEventListener('click',()=>{if(!state.bars.some(b=>b.length)&&!playing){setFeedback('De notenbalk is nog leeg. Sleep eerst een paar noten.','info');return}play(state.bars,'mine')});
+function applyTempo(){state.tempo=({1:80,2:80,3:75,4:70})[state.level]||80;$('tempoOut').textContent=state.tempo+' BPM'}
+$('metro').addEventListener('change',e=>{state.metro=e.target.checked});
+$('checkBtn').addEventListener('click',check);
+$('clearBtn').addEventListener('click',()=>{state.bars=Array.from({length:nBars()},()=>[]);setFeedback('');renderStaff()});
+$('solveBtn').addEventListener('click',()=>{state.shown=true;state.bars=answer().map(b=>b.map(n=>({...n})));renderStaff();setFeedback('Dit is de oplossing. Luister nog eens mee en tel de tellen hardop.','info')});
+$('nextBtn').addEventListener('click',()=>{const n=LEVELS[state.level].exercises.length;loadEx(state.random?'rnd':(state.ex+1)%n)});
+
+/* ---------- leerling & punten ---------- */
+function getStudent(){return store.get('lmr-student',null)}
+function renderStudent(){
+  const st=getStudent();$('studentBar').hidden=!st;if(!st)return;
+  $('stName').textContent=st.naam;$('stKlas').textContent=st.klas;
+  const tot=Object.values(store.get('lmr-points',{})).reduce((a,b)=>a+b,0);
+  $('stPts').textContent=tot+' punten';
+}
+function showLogin(){$('loginOverlay').hidden=false;setTimeout(()=>$('inVoornaam').focus(),50)}
+$('loginForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const v=$('inVoornaam').value.trim(),l=$('inLetter').value.trim(),k=$('inKlas').value.replace(/\s+/g,'').toUpperCase();
+  if(!v||!l||!k){$('loginErr').textContent='Vul alle drie de vakjes in.';return}
+  if(!/^[\p{L}]/u.test(l)){$('loginErr').textContent='Typ bij familienaam alleen de eerste letter.';return}
+  const naam=v.charAt(0).toUpperCase()+v.slice(1).toLowerCase()+' '+l.toUpperCase()+'.';
+  const prev=getStudent();
+  if(!prev||prev.naam!==naam||prev.klas!==k){store.set('lmr-points',{});['1','2','3','4'].forEach(n=>store.set('lmr-done-l'+n,[]));loadDone();renderChips();}
+  store.set('lmr-student',{naam,klas:k});$('loginOverlay').hidden=true;$('loginErr').textContent='';renderStudent();
+});
+$('switchBtn').addEventListener('click',()=>{$('inVoornaam').value='';$('inLetter').value='';$('inKlas').value='';showLogin()});
+function sendScore(ev){
+  const st=getStudent();if(!SCORE_URL||!st)return;
+  const q=store.get('lmr-queue',[]);q.push({...ev,naam:st.naam,klas:st.klas,tijd:new Date().toISOString()});store.set('lmr-queue',q.slice(-200));
+  flushQueue();
+}
+let flushing=false;
+async function flushQueue(){
+  if(flushing||!SCORE_URL)return;flushing=true;
+  try{let q=store.get('lmr-queue',[]);
+    while(q.length){
+      const r=await fetch(SCORE_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(q[0])});
+      if(!r.ok)break;q.shift();store.set('lmr-queue',q);
+    }
+  }catch(e){}finally{flushing=false}
+}
+function setLevel(l){
+  if(!LEVELS[l])return;state.level=l;state.selected=null;loadDone();
+  document.querySelectorAll('.levels button').forEach(b=>b.setAttribute('aria-pressed',String(b.id==='lvl'+l)));
+  $('exEyebrow').textContent='Niveau '+l+' · '+LEVEL_INFO[l];
+  $('barSeg').hidden=!LEVELS[l].barChoice;
+  renderBank();loadEx(0);applyTempo();
+}
+$('lvl1').addEventListener('click',()=>setLevel(1));
+$('lvl2').addEventListener('click',()=>setLevel(2));
+$('lvl3').addEventListener('click',()=>setLevel(3));
+$('lvl4').addEventListener('click',()=>setLevel(4));
+$('barSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;state.barChoice=+b.dataset.n;
+  $('barSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));loadEx(state.random?'rnd':state.ex)});
+$('exEyebrow').textContent='Niveau 1 · '+LEVEL_INFO[1];
+renderChips();renderStaff();renderBank();applyTempo();
+if(LOGIN_ON){renderStudent();if(!getStudent())showLogin();else flushQueue();}
+
+if(TEST){['chips','solveBtn','nextBtn','mineBtn','barSeg','studentBar'].forEach(id=>{const el=$(id);if(el)el.classList.add('no-test')});
+  setLevel(Math.min(4,TEST.lvl));state.barChoice=2;
+  let plays=0;
+  const pl=()=>{const b=$('playBtn');if(!playing)b.querySelector('span').textContent=plays<3?`Beluister het ritme (nog ${3-plays}×)`:'Geen beurten meer';b.disabled=!playing&&plays>=3};
+  const _sp=setPlayingUI;setPlayingUI=function(w){_sp(w);pl()};
+  document.addEventListener('click',e=>{if(!e.target.closest('#playBtn')||playing)return;if(plays>=3){e.stopPropagation();return}plays++},true);
+  const go=()=>{loadEx('rnd');plays=0;pl();$('exTitle').textContent=`Vraag ${TEST.o+TEST.i+1} van ${TEST.o+TEST.n}`+(state.level>=3?` · ${state.beats}/4-maat`:'')};go();
+  testCheck(()=>{if(!state.bars.some(b=>b.length)){setFeedback('Sleep eerst noten op de notenbalk.','bad');return}
+    const ans=answer();let good=0;
+    for(let m=0;m<nBars();m++){const mine=state.bars[m];if(mine.length===ans[m].length&&mine.every((n,i)=>n.type===ans[m][i].type&&n.start===ans[m][i].start))good++}
+    if(testRecord(good,nBars()))return;go();setFeedback(TEST_NEXT,'info')});
+}
+})();
+</script>
+
+</body>
+</html>

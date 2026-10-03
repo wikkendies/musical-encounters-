@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hold the Beat &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF; --warm:#D97F06; --warm-soft:#FDEBD0;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A; --warm:#F5B84F; --warm-soft:#3D2C12;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A; --warm:#F5B84F; --warm-soft:#3D2C12;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--warm)}
+header p{margin:10px 0 0;color:var(--muted);max-width:64ch}
+.levels{display:inline-flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow);margin-top:14px}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--warm);color:#fff}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.9}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn-primary{background:var(--warm);color:#fff}
+.btn-big{font-size:18px;padding:16px 26px}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.rounds{display:flex;gap:8px}
+.dot{min-width:34px;height:34px;padding:0 6px;border-radius:999px;display:inline-grid;place-items:center;border:2px solid var(--line);font-size:13px;font-weight:700;color:var(--muted)}
+.dot.cur{border-color:var(--warm);color:var(--warm)}
+.dot.done{background:var(--warm-soft);border-color:var(--warm);color:var(--warm)}
+
+.stage{display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--surface-2);border-radius:16px;padding:18px}
+.phase{font-family:var(--display);font-weight:800;font-size:28px;text-align:center;line-height:1.1}
+.phase small{display:block;font-family:var(--body);font-size:15px;font-weight:600;color:var(--muted);margin-top:6px}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.bd{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);transition:transform .05s}
+.bd.click{border-color:var(--accent)}
+.bd.click.on{background:var(--accent);transform:scale(1.15)}
+.bd.silent{border-style:dashed;border-color:var(--warm)}
+.bd.tapped{background:var(--warm);border-style:solid}
+.pad{touch-action:manipulation;-webkit-user-select:none;user-select:none;border:0;border-radius:18px;background:var(--warm-soft);color:var(--warm);font-family:var(--display);font-weight:800;font-size:26px;min-height:120px;width:100%;transition:transform .05s}
+.pad.hit{transform:scale(.98);background:var(--warm);color:#fff}
+.pad small{display:block;font-family:var(--body);font-size:14px;font-weight:600;opacity:.85}
+
+.res{display:flex;flex-direction:column;gap:12px}
+.res .big{font-family:var(--display);font-weight:800;font-size:44px;line-height:1;color:var(--warm)}
+.res .big small{font-size:18px;color:var(--muted);font-weight:700}
+.chart{background:var(--surface-2);border-radius:14px;padding:8px}
+.chart svg{display:block;width:100%;height:auto}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fact{background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.fact b{display:block;font-family:var(--display);font-size:22px}
+.fact span{font-size:13px;color:var(--muted);font-weight:600}
+@media (max-width:560px){.facts{grid-template-columns:1fr}}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.summary{display:flex;flex-direction:column;gap:8px}
+.sumhead{margin:0;font-family:var(--display);font-size:30px;font-weight:800}
+.sumrow{display:grid;grid-template-columns:100px 1fr 90px;gap:12px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--surface-2);font-weight:600}
+.stars{color:var(--warm);letter-spacing:2px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="tempo.html">&larr; Let's Make Tempo</a>
+    <h1>Hold the <span>Beat</span></h1>
+    <div class="levels" id="levels" role="group" aria-label="Niveau"></div>
+    <p>De metronoom tikt een paar tellen. Tik mee. Dan valt de metronoom stil &hellip; en moet <strong>jij</strong> alleen verder tikken in <strong>hetzelfde tempo</strong>. Kan jij de tel vasthouden?</p>
+  </header>
+
+  <section class="panel" id="task">
+    <div class="panel-head">
+      <div><div class="eyebrow" id="eyebrow">Ronde 1 van 5</div><h2>Hou de tel vast!</h2></div>
+      <div class="rounds" id="rounds"></div>
+    </div>
+    <div class="stage" aria-live="polite">
+      <div class="phase" id="phase">Klaar?<small>Druk op Start.</small></div>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+    </div>
+    <button class="btn btn-primary btn-big" id="startBtn" type="button">&#9654; Start</button>
+    <button class="pad" id="pad" type="button">TIK<small>knop of spatiebalk</small></button>
+    <div class="res" id="res" hidden></div>
+  </section>
+
+  <section class="panel" id="result" hidden>
+    <div class="summary" id="summary"></div>
+    <div><button class="btn btn-primary" id="againBtn" type="button">Nog een keer</button></div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const LEVELS=[
+  {name:'Niveau 1', info:'8 tellen alleen',  clicks:8, silent:8,  tempos:[[80,100]]},
+  {name:'Niveau 2', info:'12 tellen alleen', clicks:6, silent:12, tempos:[[66,80],[100,120]]},
+  {name:'Niveau 3', info:'16 tellen alleen', clicks:4, silent:16, tempos:[[56,70],[110,132]]}
+];
+const ROUNDS=5;
+let level=0; try{ level=Math.min(LEVELS.length-1,Math.max(0,+(localStorage.getItem('htb-level')||0))); }catch(e){}
+let record=0; try{ record=+(localStorage.getItem('htb-record-'+level)||0); }catch(e){}
+const L=()=>LEVELS[level];
+let rounds=[], ri=0, run=null, raf=0;
+
+/* ---------- geluid ---------- */
+let ctx=null, master=null;
+function ac(){ if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)(); master=ctx.createGain(); master.gain.value=.8; master.connect(ctx.destination); } if(ctx.state==='suspended') ctx.resume(); return ctx; }
+function click(t,hi){ const o=ctx.createOscillator(), g=ctx.createGain(); o.type='square'; o.frequency.value=hi?1700:1150; g.gain.setValueAtTime(.12,t); g.gain.exponentialRampToValueAtTime(.0001,t+.045); o.connect(g); g.connect(master); o.start(t); o.stop(t+.05); }
+function tapSound(){ const t=ctx.currentTime+.003, o=ctx.createOscillator(), g=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(380,t); o.frequency.exponentialRampToValueAtTime(240,t+.07); g.gain.setValueAtTime(.4,t); g.gain.exponentialRampToValueAtTime(.0001,t+.1); o.connect(g); g.connect(master); o.start(t); o.stop(t+.11); }
+function heard(ts){ if(ctx.getOutputTimestamp){ const o=ctx.getOutputTimestamp(); if(o&&o.contextTime>0&&o.performanceTime>0) return o.contextTime+((ts||performance.now())-o.performanceTime)/1000; } return ctx.currentTime-(ctx.outputLatency||ctx.baseLatency||0); }
+
+/* ---------- ronde ---------- */
+function newGame(){
+  const tp=L().tempos;
+  rounds=Array.from({length:ROUNDS},(_,i)=>{ const [a,b]=tp[i%tp.length]; return {bpm:Math.round(a+Math.random()*(b-a)),score:null}; });
+  ri=0; $('task').hidden=false; $('result').hidden=true; renderLevels(); prep();
+}
+function prep(){
+  cancelAnimationFrame(raf); run=null;
+  $('res').hidden=true; $('startBtn').hidden=false; $('startBtn').disabled=false; $('startBtn').innerHTML='&#9654; Start';
+  $('eyebrow').textContent=`${L().name} · ronde ${ri+1} van ${ROUNDS}`;
+  $('rounds').innerHTML=rounds.map((r,i)=>`<span class="dot${r.score!=null?' done':i===ri?' cur':''}">${r.score!=null?r.score:i+1}</span>`).join('');
+  setPhase('Klaar?','Tik mee met de metronoom. Blijf tikken als hij stilvalt.');
+  drawDots(-1,[]);
+}
+function setPhase(a,b){ $('phase').innerHTML=a+`<small>${b}</small>`; }
+function drawDots(cur,tapped){
+  const n=L().clicks+L().silent;
+  $('dots').innerHTML=Array.from({length:n},(_,i)=>`<span class="bd ${i<L().clicks?'click':'silent'}${i<L().clicks&&i===cur?' on':''}${i>=L().clicks&&i<L().clicks+tapped?' tapped':''}"></span>`).join('');
+}
+function start(){
+  ac(); const r=rounds[ri], beat=60/r.bpm, t0=ctx.currentTime+.3;
+  for(let i=0;i<L().clicks;i++) click(t0+i*beat,i%4===0);
+  run={t0,beat,taps:[],silentStart:t0+L().clicks*beat};
+  $('startBtn').hidden=true; $('res').hidden=true;
+  const loop=()=>{
+    if(!run) return;
+    const now=heard(), i=Math.floor((now-run.t0)/beat+.1);
+    const silentTaps=run.taps.filter(t=>t>run.silentStart-beat*.4).length;
+    if(now<run.t0) setPhase('Klaar …','');
+    else if(i<L().clicks){ setPhase(i<L().clicks-2?'Tik mee!':'Bijna stil …', `metronoom: ${L().clicks-i} tellen`); }
+    else setPhase('Alleen verder!', `nog ${Math.max(0,L().silent-silentTaps)} tellen`);
+    drawDots(i<L().clicks?i:-1,silentTaps);
+    if(silentTaps>=L().silent||now>run.silentStart+beat*(L().silent+4)) return finish();
+    raf=requestAnimationFrame(loop);
+  };
+  raf=requestAnimationFrame(loop);
+}
+function tap(e){
+  const p=$('pad'); p.classList.add('hit'); setTimeout(()=>p.classList.remove('hit'),90);
+  if(!run) return; tapSound(); run.taps.push(heard(e&&e.timeStamp));
+}
+function finish(){
+  cancelAnimationFrame(raf);
+  const r=rounds[ri], beat=run.beat, S=run.silentStart;
+  const taps=run.taps.filter(t=>t>S-beat*.4).slice(0,L().silent);
+  const exp=taps.map((_,k)=>S+k*beat);
+  let res;
+  if(taps.length<3){ res={score:0,msg:'Je hebt (bijna) niet getikt tijdens de stilte.'}; }
+  else{
+    const iv=taps.slice(1).map((t,k)=>t-taps[k]);
+    const avg=iv.reduce((a,b)=>a+b,0)/iv.length, bpm=60/avg;
+    const devs=taps.map((t,k)=>t-exp[k]);
+    const drift=devs[devs.length-1];
+    const jitter=Math.sqrt(iv.reduce((a,b)=>a+(b-avg)**2,0)/iv.length)/beat;
+    const tempoErr=Math.abs(bpm-r.bpm)/r.bpm;
+    const missing=L().silent-taps.length;
+    let score=Math.round(100-tempoErr*400-jitter*150-Math.min(40,Math.abs(drift)/beat*40)-missing*8);
+    score=Math.max(0,Math.min(100,score));
+    res={score,bpm:Math.round(bpm),drift,devs,jitter,tempoErr,taps:taps.length};
+  }
+  r.score=res.score; run=null;
+  showRes(r,res);
+}
+function stars(s){ const n=s>=85?3:s>=65?2:s>=40?1:0; return '★'.repeat(n)+'☆'.repeat(3-n); }
+function showRes(r,res){
+  const box=$('res'); box.hidden=false;
+  setPhase(res.score>=85?'Rotsvast!':res.score>=65?'Goed gedaan!':res.score>=40?'Niet slecht!':'Oei, de tel ontsnapte …', '');
+  let h=`<div class="big">${res.score} <small>/ 100 &nbsp;<span class="stars">${stars(res.score)}</span></small></div>`;
+  if(res.devs){
+    const faster=res.bpm>r.bpm+1, slower=res.bpm<r.bpm-1;
+    h+=`<div class="facts">
+      <div class="fact"><b>${r.bpm} &rarr; ${res.bpm}</b><span>tempo van de metronoom &rarr; jouw tempo (BPM)</span></div>
+      <div class="fact"><b>${faster?'sneller':slower?'trager':'gelijk'}</b><span>${faster?'je versnelde (accelerando)':slower?'je vertraagde (ritardando)':'je hield het tempo vast'}</span></div>
+      <div class="fact"><b>${Math.abs(res.drift).toFixed(2)} s</b><span>${res.drift<0?'te vroeg':'te laat'} bij je laatste tik</span></div>
+    </div>`;
+    h+=`<div class="chart">${chart(r,res)}</div><p class="hint">Elk bolletje is een tik. Op de middellijn = precies op tijd. Boven = te laat, onder = te vroeg.</p>`;
+  } else h+=`<p>${res.msg}</p>`;
+  h+=`<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-ghost" id="retry">&#8635; Deze ronde opnieuw</button><button class="btn btn-primary" id="next">${ri<ROUNDS-1?'Volgende ronde &rarr;':'Bekijk je totaal &rarr;'}</button></div>`;
+  box.innerHTML=h;
+  box.querySelector('#retry').onclick=()=>{ r.score=null; prep(); start(); };
+  box.querySelector('#next').onclick=()=>{ if(ri<ROUNDS-1){ ri++; prep(); } else total(); };
+  $('rounds').innerHTML=rounds.map((x,i)=>`<span class="dot${x.score!=null?' done':i===ri?' cur':''}">${x.score!=null?x.score:i+1}</span>`).join('');
+}
+function chart(r,res){
+  const W=700,H=180,pad=30,n=res.devs.length, lim=Math.max(.2,...res.devs.map(Math.abs))*1.15;
+  const x=k=>pad+k*(W-2*pad)/Math.max(1,L().silent-1), y=d=>H/2+d/lim*(H/2-18);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Jouw tikken ten opzichte van de tel">`;
+  s+=`<rect x="0" y="${H/2-10}" width="${W}" height="20" fill="var(--ok-soft)"/><line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="var(--ok)" stroke-width="2"/>`;
+  s+=`<text x="6" y="16" font-size="12" font-weight="700" fill="var(--muted)">te laat</text><text x="6" y="${H-6}" font-size="12" font-weight="700" fill="var(--muted)">te vroeg</text>`;
+  s+=`<polyline fill="none" stroke="var(--warm)" stroke-width="2" points="${res.devs.map((d,k)=>`${x(k)},${y(d)}`).join(' ')}"/>`;
+  res.devs.forEach((d,k)=>{ s+=`<circle cx="${x(k)}" cy="${y(d)}" r="6" fill="${Math.abs(d)<.06?'var(--ok)':'var(--warm)'}"/>`; });
+  return s+'</svg>';
+}
+function total(){
+  const sum=rounds.reduce((a,r)=>a+(r.score||0),0), avg=Math.round(sum/ROUNDS);
+  const isRec=avg>record; if(isRec){ record=avg; try{localStorage.setItem('htb-record-'+level,avg)}catch(_){ } }
+  $('summary').innerHTML=`<p class="eyebrow">${L().name} &middot; gemiddelde score</p><p class="sumhead">${avg} / 100 <span class="stars">${stars(avg)}</span></p>`+
+    `<p class="hint">${isRec?'Nieuw persoonlijk record!':`Jouw record op dit niveau: ${record}`}</p>`+
+    rounds.map((r,i)=>`<div class="sumrow"><span>Ronde ${i+1}</span><span>${r.bpm} BPM</span><span>${r.score} <span class="stars">${stars(r.score)}</span></span></div>`).join('');
+  $('task').hidden=true; $('result').hidden=false;
+}
+function renderLevels(){ $('levels').innerHTML=LEVELS.map((x,i)=>`<button type="button" data-l="${i}" aria-pressed="${i===level}">${x.name}<small>${x.info}</small></button>`).join(''); }
+$('levels').addEventListener('click',e=>{ const b=e.target.closest('[data-l]'); if(!b) return; level=+b.dataset.l; try{localStorage.setItem('htb-level',level); record=+(localStorage.getItem('htb-record-'+level)||0);}catch(_){ } newGame(); });
+$('startBtn').addEventListener('click',start);
+$('pad').addEventListener('pointerdown',e=>{ e.preventDefault(); tap(e); });
+document.addEventListener('keydown',e=>{ if(e.code!=='Space'||e.repeat) return; e.preventDefault(); if(run) tap(e); });
+$('againBtn').addEventListener('click',newGame);
+window.__htb={sim:(offsets)=>{ ac(); const r=rounds[ri]; const beat=60/r.bpm; run={t0:0,beat,taps:offsets.map((o,k)=>L().clicks*beat+k*beat+o),silentStart:L().clicks*beat}; finish(); }};
+newGame();
+})();
+</script>
+</body>
+</html>

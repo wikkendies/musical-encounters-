@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Melody Lines &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:8px 0 0;color:var(--muted);max-width:62ch}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-big{font-size:17px;padding:16px 22px}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.hint{margin:0;color:var(--muted);font-size:14px}
+
+/* vakjes met melodie */
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.slot{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.slot .lab{font-family:var(--display);font-weight:800;font-size:18px;text-align:center}
+.play{border:0;border-radius:10px;padding:9px 10px;font-weight:700;background:var(--accent);color:var(--accent-ink);font-size:14px}
+.play:disabled{opacity:.45;cursor:not-allowed}
+.drop{border:2px dashed var(--line);border-radius:14px;min-height:120px;background:transparent;display:grid;place-items:center;padding:6px;color:var(--muted);font-size:14px;transition:border-color .12s,background .12s}
+.picking .drop:not(.filled){border-color:var(--accent);color:var(--accent);font-weight:700}
+.drop.filled{border-style:solid;border-color:var(--accent);background:var(--accent-soft)}
+.drop.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.drop.bad{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.drop svg{width:100%;height:auto;max-width:180px;color:var(--ink)}
+
+/* lijnkaartjes */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;min-height:124px}
+.card{border:2px solid var(--line);background:var(--surface-2);border-radius:14px;padding:8px;display:grid;place-items:center;transition:border-color .12s,transform .12s,background .12s}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.card svg{width:100%;height:auto;max-width:180px;color:var(--ink)}
+.card.used{visibility:hidden}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.levels{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow);align-self:flex-start}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+@media (max-width:700px){.slots,.cards{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="melodie.html">&larr; Let's Make Melodies</a>
+    <h1>Melody <span>Lines</span></h1>
+    <p>Je hoort vier stukjes melodie na elkaar. Welke lijn volgt elk stukje? Zet de lijnen in de volgorde waarin je de stukjes hoort.</p>
+  </header>
+
+  <div class="levels" role="group" aria-label="Niveau" id="levels"></div>
+
+  <section class="panel">
+    <div>
+      <div class="eyebrow">Opdracht</div>
+      <h2>Beluister en zet de lijnen in de juiste volgorde</h2>
+    </div>
+    <div class="actions"><button class="btn btn-primary btn-big" id="playBtn" type="button">&#9654; Beluister</button></div>
+    <p class="hint">De vier stukjes klinken meteen na elkaar, zonder pauze. Je mag 3 keer beluisteren. Tik op een lijn hieronder en daarna op het juiste vakje. Tik op een geplaatste lijn om ze terug te leggen.</p>
+    <div class="slots" id="slots"></div>
+  </section>
+
+  <section class="panel">
+    <div class="eyebrow">De lijnen</div>
+    <div class="cards" id="cards"></div>
+    <p class="feedback info" id="feedback"></p>
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn" type="button" disabled>Controleer</button>
+      <button class="btn btn-ghost" id="newBtn" type="button">Nieuwe volgorde</button>
+      <button class="linkbtn" id="solBtn" type="button">Toon oplossing</button>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="Pianoklavier">
+    <div>
+      <div class="eyebrow">Hulpmiddel</div>
+      <h2>Pianoklavier</h2>
+    </div>
+    <p class="hint">Speel de noten na op het klavier tot je hoort welke het zijn.</p>
+    <div id="piano"></div>
+  </section>
+</div>
+
+<script src="piano.js"></script>
+<script>window.MEPiano&&MEPiano.mount(document.getElementById('piano'),{names:'sharp',low:60,computerKeys:true});</script>
+<script>
+(function(){
+"use strict";
+/* ---------- testmodus: test.html laadt deze pagina met ?test=1&lvl=N&n=M ---------- */
+const TEST=(()=>{try{const q=new URLSearchParams(location.search);if(q.get('test')!=='1')return null;
+  return {lvl:Math.max(1,parseInt(q.get('lvl'))||1),o:Math.max(0,parseInt(q.get('o'))||0),n:Math.max(1,Math.min(20,parseInt(q.get('n'))||3)),i:0,score:0,max:0,items:[]}}catch(e){return null}})();
+function testSend(m){try{if(window.parent!==window)window.parent.postMessage(Object.assign({lmr:'test'},m),'*')}catch(e){}}
+function testRecord(got,max){got=Math.max(0,Math.min(max,got));TEST.score+=got;TEST.max+=max;TEST.items.push([got,max]);TEST.i++;
+  testSend({type:'progress',i:TEST.i,n:TEST.n,score:TEST.score,max:TEST.max});
+  if(TEST.i>=TEST.n){document.body.classList.add('test-finished');testSend({type:'done',score:TEST.score,max:TEST.max,items:TEST.items});return true}return false}
+function testCheck(fn){document.addEventListener('click',e=>{if(!e.target.closest('#checkBtn'))return;e.stopPropagation();e.preventDefault();fn()},true)}
+function testTitle(el){if(el)el.textContent=`Vraag ${TEST.o+TEST.i+1} van ${TEST.o+TEST.n}`}
+function testShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const TEST_NEXT='Antwoord bewaard. Op naar de volgende vraag.';
+if(TEST){const s=document.createElement('style');s.textContent='.back,.levels,.tabs,.no-test{display:none!important}body{padding-top:6px}header h1{font-size:32px}.test-finished .wrap{opacity:.35;pointer-events:none}';document.head.appendChild(s);document.body.classList.add('testmode')}
+
+const $=id=>document.getElementById(id);
+
+/* ---------- de vier melodieën en hun lijn ---------- */
+const LEVELS=[
+  {name:'Niveau 1',info:'Omhoog, omlaag, boog, golf',mels:[
+  {name:'Boog',  path:'M10 80 C 45 45, 60 30, 80 30 C 100 30, 115 45, 150 80', notes:['C4','E4','G4','A4','C5','A4','G4','E4','C4']},
+  {name:'Golf',  path:'M10 60 C 15 48, 30 48, 60 60 S 120 85, 150 60',         notes:['G4','A4','G4','F4','E4','D4','C4','E4','G4']},
+  {name:'Stijgend', path:'M20 90 L 140 20',                                    notes:['C4','D4','E4','F4','G4','A4','B4','C5']},
+  {name:'Dalend',   path:'M20 20 L 140 90',                                    notes:['D5','C5','B4','A4','G4','F4','E4','D4']}
+  ]},
+  {name:'Niveau 2',info:'Dal, sprong, trap, zigzag',mels:[
+  {name:'Dal',              path:'M10 30 C 45 65, 60 80, 80 80 C 100 80, 115 65, 150 30', notes:['G4','F4','E4','D4','C4','D4','E4','F4','G4']},
+  {name:'Sprong en dalen',  path:'M15 90 L 38 22 L 145 85',                              notes:['C4','C5','B4','A4','G4','F4','E4','D4']},
+  {name:'Trap omhoog',      path:'M15 92 H 45 V 70 H 80 V 48 H 115 V 26 H 145',           notes:['C4','C4','E4','E4','G4','G4','C5','C5']},
+  {name:'Zigzag omhoog',    path:'M12 92 L 32 76 L 50 84 L 70 64 L 88 72 L 108 52 L 126 60 L 148 36', notes:['C4','E4','D4','F4','E4','G4','F4','A4','G4']}
+  ]}
+];
+let level=0;
+try{const v=+localStorage.getItem('ml-level');if(v>=0&&v<LEVELS.length)level=v}catch(e){}
+let MELODIES=LEVELS[level].mels;
+const MIDI={C4:60,D4:62,E4:64,F4:65,G4:67,A4:69,B4:71,C5:72,D5:74};
+const MAXPLAY=3, GAP=.3, PAUSE=0;   // PAUSE = stilte tussen de stukjes (s), bewust 0
+
+/* ---------- toestand ---------- */
+let order=[], cardOrder=[], placed=[], marks=[], plays=0, selected=null, tried=false, done=false, playing=false;
+// marks[i]: resultaat van de laatste controle ('ok'/'bad', niet getoond aan de leerling) of null na een wijziging
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function renderLevels(){$('levels').innerHTML=LEVELS.map((l,i)=>`<button type="button" data-l="${i}" aria-pressed="${i===level}">${l.name}<small>${l.info}</small></button>`).join('')}
+$('levels').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||playing)return;level=+b.dataset.l;MELODIES=LEVELS[level].mels;try{localStorage.setItem('ml-level',level)}catch(e){}renderLevels();newRound()});
+function newRound(){
+  order=shuffle([0,1,2,3]);        // welke melodie onder vakje 1..4
+  cardOrder=shuffle([0,1,2,3]);    // volgorde van de kaartjes
+  placed=[null,null,null,null]; marks=[null,null,null,null]; plays=0; selected=null; tried=false; done=false;
+  setFeedback('','info'); render();
+}
+
+/* ---------- geluid (pianoklank, zoals piano.js) ---------- */
+let ctx,master;
+function ac(){if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();const c=ctx.createDynamicsCompressor();c.threshold.value=-10;c.ratio.value=4;master=ctx.createGain();master.gain.value=.9;master.connect(c);c.connect(ctx.destination);}if(ctx.state==='suspended')ctx.resume();return ctx}
+function note(m,time,dur){const c=ac(),f=440*Math.pow(2,(m-69)/12),g=c.createGain(),lp=c.createBiquadFilter();
+  lp.type='lowpass';lp.Q.value=.7;lp.frequency.setValueAtTime(Math.min(9000,f*14),time);lp.frequency.exponentialRampToValueAtTime(Math.max(700,f*3),time+1.6);
+  g.gain.setValueAtTime(.0001,time);g.gain.exponentialRampToValueAtTime(.32,time+.006);g.gain.exponentialRampToValueAtTime(.12,time+.35);g.gain.setTargetAtTime(.0001,time+.35,1.4);
+  const rel=time+dur;g.gain.cancelScheduledValues(rel);g.gain.setTargetAtTime(.0001,rel,.09);g.connect(lp);lp.connect(master);
+  [[1,1,0],[1,.5,4],[2,.42,0],[3,.2,0],[4,.1,0],[5,.05,0],[6,.03,0]].forEach(([k,a,d])=>{const o=c.createOscillator(),og=c.createGain();o.type='sine';o.frequency.value=f*k*(1+.00035*k*k);o.detune.value=d;og.gain.value=a;o.connect(og);og.connect(g);o.start(time);o.stop(rel+.8)});
+  const len=Math.floor(c.sampleRate*.03),buf=c.createBuffer(1,len,c.sampleRate),dd=buf.getChannelData(0);for(let i=0;i<len;i++)dd[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);
+  const ns=c.createBufferSource(),nf=c.createBiquadFilter(),ng=c.createGain();ns.buffer=buf;nf.type='bandpass';nf.frequency.value=2500;ng.gain.value=.05;ns.connect(nf);nf.connect(ng);ng.connect(master);ns.start(time)}
+function playAll(){
+  if(playing) return;
+  if(!tried){ if(plays>=MAXPLAY) return; plays++; }
+  const c=ac(); let t=c.currentTime+.1; const t0=t;
+  order.forEach((m,j)=>{
+    const mel=MELODIES[m], lastPiece=j===order.length-1;
+    mel.notes.forEach((n,k)=>note(MIDI[n],t+k*GAP,(lastPiece&&k===mel.notes.length-1)?.7:GAP*.92));
+    t+=mel.notes.length*GAP+PAUSE;      // geen aanduiding welk stukje speelt (bewust)
+  });
+  playing=true; render();
+  setTimeout(()=>{playing=false;render()},(t-t0)*1000);
+}
+
+/* ---------- weergave ---------- */
+const lineSVG=m=>`<svg viewBox="0 0 160 110" aria-hidden="true"><path d="${MELODIES[m].path}" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`;
+function setFeedback(t,cls){const f=$('feedback');f.textContent=t;f.className='feedback '+cls}
+function render(){
+  $('slots').innerHTML=order.map((m,i)=>{
+    const p=placed[i];
+    let cls='drop'+(p!=null?' filled':'');
+    if(done) cls+=' ok';                                    // pas kleuren als alles juist is (of oplossing getoond)
+    return `<div class="slot"><div class="lab">Stukje ${i+1}</div>
+      <button type="button" class="${cls}" data-slot="${i}" aria-label="Vakje stukje ${i+1}">${p!=null?lineSVG(p):'Leg hier een lijn'}</button></div>`;
+  }).join('');
+  $('cards').innerHTML=cardOrder.map(m=>`<button type="button" class="card${placed.includes(m)?' used':''}" data-card="${m}" aria-pressed="${selected===m}" aria-label="Lijn ${MELODIES[m].name}" ${done?'disabled':''}>${lineSVG(m)}</button>`).join('');
+  $('slots').classList.toggle('picking',selected!=null);
+  const left=MAXPLAY-plays, pb=$('playBtn');
+  pb.disabled=playing||(!tried&&left<=0);
+  pb.innerHTML=playing?'&#9654; Luister&hellip;':tried?'&#9654; Beluister opnieuw':left>0?`&#9654; Beluister de vier stukjes (nog ${left}&times;)`:'Geen beluisterbeurten meer';
+  const cb=$('checkBtn');
+  cb.disabled=done||placed.includes(null)||marks.every(x=>x!==null);
+  cb.textContent=tried&&!done?'Controleer opnieuw':'Controleer';
+}
+
+/* ---------- bediening ---------- */
+$('cards').addEventListener('click',e=>{
+  const c=e.target.closest('[data-card]'); if(!c||done) return;
+  const m=+c.dataset.card; selected=(selected===m)?null:m; render();
+});
+$('slots').addEventListener('click',e=>{
+  const d=e.target.closest('[data-slot]'); if(!d||done) return;
+  const i=+d.dataset.slot;
+  if(selected!=null){ placed[i]=selected; selected=null; marks[i]=null; }   // lijn plaatsen (vervangt wat er lag)
+  else if(placed[i]!=null){ placed[i]=null; marks[i]=null; }                // lijn terugleggen
+  render();
+});
+$('checkBtn').addEventListener('click',()=>{
+  tried=true;
+  marks=placed.map((p,i)=>p===order[i]?'ok':'bad');
+  const good=marks.filter(x=>x==='ok').length;
+  if(good===4) done=true;
+  setFeedback(good===4?'Alles juist! Je hoort goed hoe de melodie beweegt.':`${good} van de 4 juist. Welke juist zijn, moet je zelf ontdekken: beluister opnieuw, verwissel lijnen en controleer opnieuw.`,good===4?'ok':'bad');
+  render();
+});
+$('newBtn').addEventListener('click',newRound);
+$('playBtn').addEventListener('click',playAll);
+$('solBtn').addEventListener('click',()=>{placed=order.slice();marks=order.map(()=>'ok');selected=null;tried=true;done=true;setFeedback('Dit is de juiste volgorde. Beluister de stukjes nog eens terwijl je naar de lijnen kijkt.','info');render()});
+
+renderLevels();newRound();
+
+/* ---------- testmodus ---------- */
+if(TEST){['newBtn','solBtn'].forEach(id=>$(id).classList.add('no-test'));
+  level=Math.min(LEVELS.length-1,TEST.lvl-1);MELODIES=LEVELS[level].mels;
+  const h2=document.querySelector('.panel h2');const _r=render;render=function(){_r();testTitle(h2)};newRound();
+  testCheck(()=>{if(placed.includes(null))return;const good=placed.filter((p,i)=>p===order[i]).length;
+    if(testRecord(good,4))return;newRound();setFeedback(TEST_NEXT,'info')});
+}
+
+})();
+</script>
+</body>
+</html>

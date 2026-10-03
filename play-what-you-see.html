@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Play What You See &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --staff:#7F89A3; --line:#D3D9E6; --accent:#B5472C; --accent-ink:#FFFFFF; --accent-soft:#F6DDD5;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#FF9B7A; --accent-ink:#1A0E0A; --accent-soft:#4A2A20;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#FF9B7A; --accent-ink:#1A0E0A; --accent-soft:#4A2A20;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:8px 0 0;color:var(--muted)}
+.levels{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow)}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--muted);font-weight:600}
+.steps b{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:13px;margin-right:8px}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:inline-grid;place-items:center;font-weight:700;font-size:13px;color:var(--muted)}
+.chip[aria-current="true"]{border-color:var(--accent);color:var(--accent)}
+.chip.seen{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-soft{background:var(--accent-soft);color:var(--accent)}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.staff-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#staff{display:block;width:100%;min-width:340px;max-width:560px;margin:0 auto;height:auto;color:var(--ink);touch-action:manipulation;-webkit-user-select:none;user-select:none}
+#staff .sl{stroke:var(--staff);stroke-width:1.4}
+#staff .ok{color:var(--ok)}
+#staff .slot{cursor:pointer}
+#staff .slot rect{fill:var(--surface-2);stroke:var(--line);stroke-width:2}
+#staff .slot text{font-family:var(--display);font-weight:800;font-size:22px;fill:var(--ink)}
+#staff .slot.active rect{stroke:var(--accent);stroke-width:3.5;fill:var(--accent-soft)}
+#staff .slot.good rect{fill:var(--ok-soft);stroke:var(--ok)}
+#staff .slot.good text{fill:var(--ok)}
+#staff .slot.locked{cursor:default}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.actions .spacer{flex:1}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.score{font-family:var(--display);font-weight:800;font-size:clamp(40px,9vw,64px);line-height:1;margin:0}
+.score small{font-size:.4em;color:var(--muted);font-weight:700}
+.board{display:flex;gap:10px;flex-wrap:wrap}
+.sc{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:6px 14px;font-weight:800;font-variant-numeric:tabular-nums;font-size:18px;border:2px solid transparent}
+.sc b{font-family:var(--display);font-size:24px;line-height:1}
+.sc small{font-size:13px;font-weight:700}
+.sc.good{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.sc.bad{background:var(--bad-soft);color:var(--bad);border-color:var(--bad)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <a class="back" href="melodie.html">&larr; Let's Make Melodies</a>
+      <h1>Play What <span>You See</span></h1>
+      <p>Lees het melodietje op de notenbalk en speel het na op het pianoklavier.</p>
+    </div>
+    <div class="levels" id="levels" role="group" aria-label="Niveau"></div>
+  </header>
+
+  <ol class="steps" id="steps">
+    <li><b>1</b>Lees de vier noten</li>
+    <li><b>2</b>Speel ze op het klavier, van links naar rechts</li>
+    <li><b>3</b>Controleer je antwoord</li>
+  </ol>
+
+  <section class="panel" id="qPanel">
+    <div class="panel-head">
+      <div>
+        <div class="eyebrow" id="eyebrow">Niveau 1</div>
+        <h2 id="title">Melodie 1</h2>
+      </div>
+      <div class="board" aria-live="polite"><span class="sc good" title="Aantal juiste melodieën"><b id="nGood">0</b><small>juist</small></span><span class="sc bad" title="Aantal foute melodieën"><b id="nBad">0</b><small>fout</small></span></div>
+    </div>
+
+    <div class="staff-scroll"><svg id="staff" role="img" aria-label="Melodie van vier noten met vier vakjes eronder"></svg></div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn" type="button">Controleer</button>
+      <button class="btn btn-ghost" id="clearBtn" type="button">Wis mijn antwoord</button>
+      <button class="btn btn-ghost" id="listenBtn" type="button" hidden>&#9654; Beluister de melodie</button>
+      <span class="spacer"></span>
+      <button class="linkbtn" id="solveBtn" type="button">Toon oplossing</button>
+      <button class="btn btn-soft" id="nextBtn" type="button" hidden>Volgende melodie &rarr;</button>
+      <button class="btn btn-ghost" id="stopBtn" type="button">Stop en bekijk score</button>
+    </div>
+    <p class="feedback info" id="feedback" aria-live="polite"></p>
+    <p class="hint">Elke toets die je indrukt komt in het gemarkeerde vakje. Wil je een noot vervangen? Tik eerst op dat vakje en speel dan de nieuwe toets. Alleen je eerste poging per melodie telt: alles juist = +1 groen, anders +1 rood.</p>
+  </section>
+
+  <section class="panel" id="rPanel" hidden>
+    <div>
+      <div class="eyebrow" id="rEyebrow">Uitslag</div>
+      <h2>Je score</h2>
+    </div>
+    <div class="board"><span class="sc good"><b id="rGood">0</b><small>juist</small></span><span class="sc bad"><b id="rBad">0</b><small>fout</small></span></div>
+    <p class="score" id="score"></p>
+    <p class="hint" id="rHint"></p>
+    <div class="actions">
+      <button class="btn btn-primary" id="againBtn" type="button">Verder oefenen</button>
+      <button class="btn btn-ghost" id="resetBtn" type="button">Opnieuw beginnen met 0</button>
+      <button class="btn btn-soft" id="upBtn" type="button" hidden>Naar het volgende niveau &rarr;</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div>
+      <div class="eyebrow">Je speelt hier</div>
+      <h2>Pianoklavier</h2>
+    </div>
+    <p class="hint">De bolletjes tonen welke noten in dit niveau kunnen voorkomen. Gebruik enkel de witte toetsen.</p>
+    <div id="piano"></div>
+  </section>
+</div>
+
+<script src="piano.js"></script>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* ---------- noten ----------
+   step = plaats op de notenbalk (0 = onderste lijn E4); C4 hangt aan een hulplijntje. C' = hoge C (C5). */
+const NOTE={C:{m:60,step:-2},D:{m:62,step:-1},E:{m:64,step:0},F:{m:65,step:1},G:{m:67,step:2},
+  A:{m:69,step:3},B:{m:71,step:4},"C'":{m:72,step:5}};
+const NAMES=Object.keys(NOTE);
+const BY_MIDI={}; NAMES.forEach(n=>BY_MIDI[NOTE[n].m]=n);
+
+/* ---------- niveaus ----------
+   pool = noten die voorkomen · maxLeap = grootste sprong (in toonladdertrappen) tussen twee noten.
+   Elke melodie = 4 kwartnoten in 4/4, willekeurig gemaakt, nooit twee dezelfde noten na elkaar. */
+const LEVELS=[
+  {name:'Niveau 1', sub:'C, D, E',  pool:['C','D','E'], maxLeap:2},
+  {name:'Niveau 2', sub:'C tot G',  pool:['C','D','E','F','G'], maxLeap:3},
+  {name:'Niveau 3', sub:"C tot C'", pool:['C','D','E','F','G','A','B',"C'"], maxLeap:4}
+];
+const LEN=4, BEAT=.6;
+
+/* ---------- toestand ---------- */
+let lvl=0, cur=null, lastKey='', n=0, nGood=0, nBad=0, counted=false, slots=[], active=0, dirty=false, phase='ask', solved=false, playing=false, piano=null;
+// counted = de eerste poging van deze melodie is al geteld (alles juist = +1 groen, anders +1 rood)
+try{ lvl=Math.min(LEVELS.length-1,Math.max(0,+localStorage.getItem('pw-level')||0)); }catch(e){}
+const pool=()=>LEVELS[lvl].pool, target=()=>cur;
+
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function makeMelody(L,exclude){
+  for(let t=0;t<2000;t++){
+    const m=[];
+    for(let k=0;k<LEN;k++){
+      let n,g=0;
+      do{ n=pick(L.pool); g++; }while(k&&g<50&&(n===m[k-1]||Math.abs(NAMES.indexOf(n)-NAMES.indexOf(m[k-1]))>L.maxLeap));
+      m.push(n);
+    }
+    if(m.some((n,k)=>k&&n===m[k-1])) continue;
+    if(m.some((n,k)=>k&&Math.abs(NAMES.indexOf(n)-NAMES.indexOf(m[k-1]))>L.maxLeap)) continue;
+    if(new Set(m).size<Math.min(3,L.pool.length)) continue;
+    if(exclude.includes(m.join(' '))) continue;
+    return m;
+  }
+  return L.pool.slice(0,LEN);
+}
+function start(){
+  nGood=0; nBad=0; n=0; lastKey=''; cur=null;
+  $('qPanel').hidden=false; $('rPanel').hidden=true; $('steps').hidden=false;
+  loadQ();
+}
+function loadQ(){
+  stopPlay(); cur=makeMelody(LEVELS[lvl],[lastKey]); lastKey=cur.join(' '); n++;
+  slots=new Array(LEN).fill(null); active=0; dirty=false; phase='ask'; solved=false; counted=false;
+  setFeedback('','info'); render();
+}
+
+/* ---------- notenbalk ---------- */
+const GCLEF='M434 2Q464 -103 464 -170Q464 -223 427 -257Q390 -291 337 -291Q287 -291 250 -262Q213 -232 213 -190Q213 -160 234 -134Q254 -107 284 -107Q313 -107 332 -128Q350 -150 350 -178Q350 -240 280 -240Q298 -268 338 -268Q353 -268 368 -264Q384 -259 401 -248Q418 -237 428 -214Q439 -190 439 -157Q439 -136 411 -6Q389 -12 356 -12Q259 -12 190 60Q120 132 120 232Q120 267 132 303Q143 339 158 366Q172 394 200 428Q229 463 248 484Q268 504 303 539Q280 621 280 689Q280 779 313 840Q346 900 379 900Q389 900 402 887Q414 874 426 851Q438 828 446 790Q455 753 455 710Q455 551 342 447L368 329Q384 332 397 332Q458 332 500 282Q542 233 542 162Q542 44 434 2ZM426 746Q426 801 394 801Q358 801 333 748Q308 695 308 630Q308 588 321 557Q359 580 392 640Q426 699 426 746ZM498 128Q498 183 466 216Q434 249 383 249L428 23Q498 52 498 128ZM407 17 361 247Q334 241 312 214Q289 187 289 158Q289 143 295 128Q301 114 310 104Q318 94 327 86Q336 78 342 74Q348 71 348 71L340 66Q307 75 278 106Q248 137 248 184Q248 231 278 270Q307 310 343 323L325 430Q168 299 168 177Q168 104 223 55Q278 6 348 6Q365 6 407 17Z';
+const SP=12, BOT=120, X0=110, BEATW=66, SLOTY=152;
+const yOf=s=>BOT-s*SP/2;
+const xOf=i=>X0+i*BEATW+BEATW/2;
+const WID=X0+LEN*BEATW+34;
+function noteSVG(n,x,cls){
+  const s=NOTE[n].step, y=yOf(s), up=s<4;
+  let g='';
+  if(s<=-2) g+=`<line x1="${x-14}" y1="${yOf(-2)}" x2="${x+14}" y2="${yOf(-2)}" stroke="currentColor" stroke-width="1.6"/>`;
+  g+=`<ellipse cx="${x}" cy="${y}" rx="7.4" ry="5.4" transform="rotate(-20 ${x} ${y})" fill="currentColor"/>`;
+  g+=up?`<line x1="${x+6.8}" y1="${y-1}" x2="${x+6.8}" y2="${y-36}" stroke="currentColor" stroke-width="1.9"/>`
+       :`<line x1="${x-6.8}" y1="${y+1}" x2="${x-6.8}" y2="${y+36}" stroke="currentColor" stroke-width="1.9"/>`;
+  return `<g class="${cls||''}">${g}</g>`;
+}
+function renderStaff(){
+  const tgt=target(), done=phase==='done';
+  let h='';
+  for(let k=0;k<5;k++) h+=`<line class="sl" x1="8" y1="${yOf(2*k)}" x2="${WID-8}" y2="${yOf(2*k)}"/>`;
+  h+=`<path d="${GCLEF}" transform="translate(12 ${BOT-SP}) scale(0.078 -0.078)" fill="currentColor"/>`;
+  const ts=`font-family="Bricolage Grotesque,system-ui,sans-serif" font-weight="800" font-size="26" fill="currentColor" text-anchor="middle"`;
+  h+=`<text x="${X0-38}" y="${yOf(6)+10}" ${ts}>4</text><text x="${X0-38}" y="${yOf(2)+10}" ${ts}>4</text>`;
+  h+=`<line x1="${WID-18}" y1="${yOf(8)}" x2="${WID-18}" y2="${yOf(0)}" stroke="currentColor" stroke-width="1.6"/><rect x="${WID-14}" y="${yOf(8)}" width="5" height="${4*SP}" fill="currentColor"/>`;
+  for(let k=0;k<LEN;k++){
+    const x=xOf(k);
+    h+=noteSVG(tgt[k],x,done?'ok':'');
+    const cls='slot'+(!done&&active===k?' active':'')+(done?' good locked':'');
+    h+=`<g class="${cls}" data-k="${k}"><rect x="${x-26}" y="${SLOTY}" width="52" height="40" rx="10"/><text x="${x}" y="${SLOTY+27}" text-anchor="middle">${slots[k]||''}</text></g>`;
+  }
+  const svg=$('staff'); svg.setAttribute('viewBox',`0 30 ${WID} 170`); svg.innerHTML=h;
+}
+
+/* ---------- weergave ---------- */
+function setFeedback(t,c){const f=$('feedback');f.textContent=t;f.className='feedback '+c}
+function render(){
+  $('levels').innerHTML=LEVELS.map((L,k)=>`<button type="button" data-l="${k}" aria-pressed="${k===lvl}">${L.name}<small>${L.sub}</small></button>`).join('');
+  {
+    $('eyebrow').textContent=LEVELS[lvl].name+' · '+LEVELS[lvl].sub;
+    $('title').textContent=`Melodie ${n}`;
+    $('nGood').textContent=nGood; $('nBad').textContent=nBad;
+    const full=slots.every(Boolean);
+    $('checkBtn').disabled=phase!=='ask'||!full||!dirty;
+    $('checkBtn').textContent=phase==='ask'&&full&&!dirty?'Controleer opnieuw':'Controleer';
+    $('clearBtn').hidden=phase!=='ask'; $('clearBtn').disabled=!slots.some(Boolean);
+    $('solveBtn').hidden=phase!=='ask';
+    $('listenBtn').hidden=phase!=='done'; $('listenBtn').disabled=playing;
+    $('nextBtn').hidden=phase!=='done';
+    renderStaff();
+  }
+  if(piano) piano.mark(pool().map(x=>NOTE[x].m));
+}
+function showResult(){
+  stopPlay();
+  $('qPanel').hidden=true; $('rPanel').hidden=false; $('steps').hidden=true;
+  const tot=nGood+nBad, p=tot?Math.round(100*nGood/tot):0;
+  $('rEyebrow').textContent=LEVELS[lvl].name+' · '+LEVELS[lvl].sub;
+  $('rGood').textContent=nGood; $('rBad').textContent=nBad;
+  $('score').innerHTML=tot?`${p}% <small>van de melodieën was juist</small>`:`<small>Nog niets beantwoord</small>`;
+  $('rHint').textContent=tot?'Alleen je eerste poging per melodie telt: alles juist = groen, anders rood.':'';
+  $('upBtn').hidden=lvl>=LEVELS.length-1||tot<10||p<85;
+}
+
+/* ---------- geluid: melodie afspelen via het klavier ---------- */
+let timers=[];
+function stopPlay(){ timers.forEach(clearTimeout); timers=[]; playing=false; }
+function playMelody(arr){
+  if(!piano||playing) return;
+  playing=true; render();
+  arr.forEach((n,k)=>timers.push(setTimeout(()=>piano.play(NOTE[n].m,BEAT*.9),k*BEAT*1000)));
+  timers.push(setTimeout(()=>{playing=false;render()},arr.length*BEAT*1000+300));
+}
+
+/* ---------- bediening ---------- */
+function nextActive(from){
+  for(let k=from+1;k<LEN;k++) if(!slots[k]) return k;
+  for(let k=0;k<LEN;k++) if(!slots[k]) return k;
+  return null;
+}
+function onKey(m){
+  if(phase!=='ask'||playing) return;
+  const n=BY_MIDI[m];
+  if(!n){ setFeedback('Gebruik enkel de witte toetsen.','info'); return; }
+  if(active==null){ setFeedback('Alle vakjes zijn vol. Tik op een vakje om een noot te vervangen.','info'); return; }
+  slots[active]=n; active=nextActive(active); dirty=true; setFeedback('','info'); render();
+}
+$('levels').addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(!b)return;lvl=+b.dataset.l;try{localStorage.setItem('pw-level',lvl)}catch(_){ }start();});
+$('staff').addEventListener('click',e=>{
+  const g=e.target.closest&&e.target.closest('.slot'); if(!g||phase!=='ask') return;
+  active=+g.dataset.k; renderStaff();
+});
+$('clearBtn').addEventListener('click',()=>{ if(phase!=='ask') return; slots=new Array(LEN).fill(null); active=0; dirty=true; setFeedback('','info'); render(); });
+$('checkBtn').addEventListener('click',()=>{
+  if(phase!=='ask'||!slots.every(Boolean)||!dirty) return;
+  const tgt=target(), good=slots.filter((s,k)=>s===tgt[k]).length;
+  if(!counted){ counted=true; if(good===LEN) nGood++; else nBad++; }   // enkel de eerste poging telt
+  dirty=false;
+  if(good===LEN){
+    phase='done'; setFeedback('Helemaal juist! Beluister je melodie.','ok'); render(); playMelody(tgt);
+  } else {
+    setFeedback(`${good} van de ${LEN} noten juist. Verbeter je antwoord en controleer opnieuw, of kies Toon oplossing.`,'bad'); render();
+  }
+});
+$('solveBtn').addEventListener('click',()=>{
+  if(phase!=='ask') return;
+  if(!counted){ counted=true; nBad++; }
+  slots=target().slice(); solved=true; phase='done'; active=null;
+  setFeedback('Zo moest het: '+target().join(' – ')+'.','info'); render(); playMelody(target());
+});
+$('listenBtn').addEventListener('click',()=>playMelody(target()));
+$('nextBtn').addEventListener('click',()=>{
+  if(phase!=='done') return;
+  stopPlay(); loadQ();
+});
+$('stopBtn').addEventListener('click',showResult);
+$('againBtn').addEventListener('click',()=>{ $('qPanel').hidden=false; $('rPanel').hidden=true; $('steps').hidden=false; loadQ(); });
+$('resetBtn').addEventListener('click',start);
+$('upBtn').addEventListener('click',()=>{ if(lvl<LEVELS.length-1){ lvl++; try{localStorage.setItem('pw-level',lvl)}catch(_){ } start(); } });
+
+/* ---------- pianoklavier (invoer) ---------- */
+piano=window.MEPiano?MEPiano.mount($('piano'),{names:'sharp',low:60,octaves:1,computerKeys:true,onNote:m=>onKey(m)}):null;
+
+start();
+})();
+</script>
+</body>
+</html>

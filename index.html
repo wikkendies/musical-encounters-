@@ -1,0 +1,153 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}</style>
+<title>Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --staff:#7F89A3; --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --accent2:#B5472C; --accent2-soft:#F7E3DA; --accent3:#7A4BD0; --accent4:#0E8A7E; --accent5:#D97F06;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 10px 30px rgba(22,32,58,.08);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0E1322;--surface:#161E33;--surface-2:#1C2640;--ink:#E6EAF5;--muted:#9BA6C3;
+  --staff:#4E5877;--line:#2A3553;--accent:#8198FF;--accent-ink:#0E1322;--accent-soft:#26336A;
+  --accent2:#FF9B7A;--accent2-soft:#3E2A24;--accent3:#B79BFF;--accent4:#4FD1C1;--accent5:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--bg:#0E1322;--surface:#161E33;--surface-2:#1C2640;--ink:#E6EAF5;--muted:#9BA6C3;
+  --staff:#4E5877;--line:#2A3553;--accent:#8198FF;--accent-ink:#0E1322;--accent-soft:#26336A;
+  --accent2:#FF9B7A;--accent2-soft:#3E2A24;--accent3:#B79BFF;--accent4:#4FD1C1;--accent5:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:56px}
+.wrap{max-width:1160px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:48px;min-height:calc(100vh - 112px);justify-content:center}
+
+.hero{position:relative;width:100%;text-align:center}
+.hero h1{position:relative;font-family:var(--display);font-weight:800;font-size:clamp(38px,7vw,64px);line-height:1;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.hero p{position:relative;margin:16px auto 0;max-width:48ch;color:var(--muted);font-size:18px}
+
+.doors{width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.door{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:230px;padding:26px 18px;border-radius:24px;text-decoration:none;color:var(--ink);background:var(--surface);box-shadow:var(--shadow);border:2px solid transparent;transition:transform .15s,border-color .15s}
+.door:hover{transform:translateY(-4px)}
+.door:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.door.rhythm:hover{border-color:var(--accent)}
+.door.melody:hover{border-color:var(--accent2)}
+.door.dynamics:hover{border-color:var(--accent3)}
+.door.dynamics .icon{color:var(--accent3)}
+.door.dynamics h2 span.hl{color:var(--accent3)}
+.door.form:hover{border-color:var(--accent4)}
+.door.form .icon{color:var(--accent4)}
+.door.form h2 span.hl{color:var(--accent4)}
+.door.tempo:hover{border-color:var(--accent5)}
+.door.tempo .icon{color:var(--accent5)}
+.door.tempo h2 span.hl{color:var(--accent5)}
+.door .icon{height:80px;display:flex;align-items:center}
+.door.rhythm .icon{color:var(--accent)}
+.door.melody .icon{color:var(--accent2)}
+.door .icon svg{height:80px;width:auto}
+.door h2{font-family:var(--display);font-weight:800;font-size:25px;margin:0;letter-spacing:-.01em;text-align:center}
+.door h2 span.hl{display:block}
+.door.rhythm h2 span.hl{color:var(--accent)}
+.door.melody h2 span.hl{color:var(--accent2)}
+.door p{margin:0;color:var(--muted);text-align:center;font-size:15px}
+.door .bs{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:-6px}
+.door.soon{background:transparent;box-shadow:none;border:2px dashed var(--line);cursor:default}
+.door.soon:hover{transform:none}
+.door.soon .icon,.door.soon h2 span.hl{color:var(--muted)}
+.door.soon .icon{opacity:.55}
+.door .badge{font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--surface-2);color:var(--muted)}
+@media (max-width:980px){.doors{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:760px){.doors{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.doors{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <h1>Musical <span style="color:var(--accent)">Encounters</span></h1>
+    <p>De zeven bouwstenen van de muziek. Kies waar je vandaag aan wil werken.</p>
+  </header>
+
+  <nav class="doors" aria-label="Kies een onderdeel">
+    <a class="door rhythm" href="ritme.html">
+      <span class="bs">Ritme</span>
+      <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true">
+        <line x1="0" y1="40" x2="110" y2="40" stroke="currentColor" stroke-width="1.2" opacity=".4"/>
+        <ellipse cx="12" cy="40" rx="7.2" ry="5.3" transform="rotate(-20 12 40)" fill="currentColor"/><line x1="18.6" y1="38" x2="18.6" y2="6" stroke="currentColor" stroke-width="2"/>
+        <ellipse cx="46" cy="40" rx="6.6" ry="4.6" transform="rotate(-20 46 40)" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="52.4" y1="38" x2="52.4" y2="6" stroke="currentColor" stroke-width="2"/>
+        <ellipse cx="80" cy="40" rx="7.2" ry="5.3" transform="rotate(-20 80 40)" fill="currentColor"/><line x1="86.6" y1="38" x2="86.6" y2="6" stroke="currentColor" stroke-width="2"/>
+        <rect x="36" y="50" width="20" height="13" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M41 53 L51 60 M51 53 L41 60" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      </svg></div>
+      <h2>Let's Make<span class="hl">Rhythm</span></h2>
+      <p>Kort &ndash; lang</p>
+    </a>
+    <a class="door melody" href="melodie.html">
+      <span class="bs">Melodie</span>
+      <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true">
+        <g stroke="currentColor" stroke-width="1.2" opacity=".4"><line x1="0" y1="20" x2="110" y2="20"/><line x1="0" y1="30" x2="110" y2="30"/><line x1="0" y1="40" x2="110" y2="40"/></g>
+        <ellipse cx="14" cy="34" rx="6.4" ry="4.7" transform="rotate(-20 14 34)" fill="currentColor"/><line x1="20.6" y1="32" x2="20.6" y2="8" stroke="currentColor" stroke-width="2"/>
+        <ellipse cx="40" cy="22" rx="6.4" ry="4.7" transform="rotate(-20 40 22)" fill="currentColor"/><line x1="46.6" y1="20" x2="46.6" y2="8" stroke="currentColor" stroke-width="2"/>
+        <ellipse cx="66" cy="30" rx="6.4" ry="4.7" transform="rotate(-20 66 30)" fill="currentColor"/><line x1="72.6" y1="28" x2="72.6" y2="8" stroke="currentColor" stroke-width="2"/>
+        <ellipse cx="92" cy="16" rx="6.4" ry="4.7" transform="rotate(-20 92 16)" fill="currentColor"/><line x1="98.6" y1="14" x2="98.6" y2="8" stroke="currentColor" stroke-width="2"/>
+        <text x="4" y="56" font-size="20" font-weight="800" fill="currentColor" font-family="sans-serif">&#9839;</text>
+      </svg></div>
+      <h2>Let's Make<span class="hl">Melodies</span></h2>
+      <p>Hoog &ndash; laag &ndash; eenstemmig</p>
+    </a>
+    <a class="door dynamics" href="dynamics.html">
+      <span class="bs">Dynamiek</span>
+      <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true">
+        <text x="4" y="44" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="34" fill="currentColor">p</text>
+        <path d="M84 16 L30 32 L84 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+        <text x="88" y="44" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="34" fill="currentColor">f</text>
+      </svg></div>
+      <h2>Let's Make<span class="hl">Dynamics</span></h2>
+      <p>Zacht &ndash; sterk</p>
+    </a>
+    <a class="door tempo" href="tempo.html">
+      <span class="bs">Tempo</span>
+      <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true"><circle cx="55" cy="34" r="24" fill="none" stroke="currentColor" stroke-width="3"/><path d="M55 34 L55 18 M55 34 L68 40" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></div>
+      <h2>Let's Make<span class="hl">Tempo</span></h2>
+      <p>Langzaam &ndash; snel</p>
+    </a>
+    <div class="door soon" aria-label="Klankkleur (binnenkort)">
+      <span class="bs">Klankkleur</span>
+      <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true"><path d="M8 34 C 20 14, 30 54, 42 34 S 64 14, 76 34 S 98 54, 104 34" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></div>
+      <h2>Let's Make<span class="hl">Colours</span></h2>
+      <p>Nasaal &ndash; schel &ndash; dof &ndash; warm</p>
+      <span class="badge">binnenkort</span>
+    </div>
+    <div class="door soon" aria-label="Samenklank (binnenkort)">
+      <span class="bs">Samenklank</span>
+      <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true"><g stroke="currentColor" stroke-width="1.2" opacity=".5"><line x1="20" y1="14" x2="90" y2="14"/><line x1="20" y1="24" x2="90" y2="24"/><line x1="20" y1="34" x2="90" y2="34"/><line x1="20" y1="44" x2="90" y2="44"/><line x1="20" y1="54" x2="90" y2="54"/></g><ellipse cx="55" cy="49" rx="7" ry="5" fill="currentColor"/><ellipse cx="55" cy="39" rx="7" ry="5" fill="currentColor"/><ellipse cx="55" cy="29" rx="7" ry="5" fill="currentColor"/></svg></div>
+      <h2>Let's Make<span class="hl">Harmony</span></h2>
+      <p>Akkoorden &ndash; meerstemmigheid</p>
+      <span class="badge">binnenkort</span>
+    </div>
+    <a class="door form" href="form.html">
+      <span class="bs">Vorm</span>
+      <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.6"><rect x="6" y="18" width="28" height="30" rx="5"/><rect x="41" y="18" width="28" height="30" rx="5"/><rect x="76" y="18" width="28" height="30" rx="5"/></g><g font-family="sans-serif" font-weight="800" font-size="18" fill="currentColor" text-anchor="middle"><text x="20" y="40">A</text><text x="55" y="40">B</text><text x="90" y="40">A</text></g></svg></div>
+      <h2>Let's Make<span class="hl">Structure</span></h2>
+      <p>Vraag &ndash; antwoord &ndash; thema</p>
+    </a>
+  </nav>
+</div>
+
+</body>
+</html>
+
+</body></html>

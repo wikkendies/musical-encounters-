@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beat Maker &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --hat:#E08E12; --snare:#3257E0; --kick:#B5472C; --now:rgba(50,87,224,.12);
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --hat:#F5B84F; --snare:#8198FF; --kick:#FF9B7A; --now:rgba(129,152,255,.16);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --hat:#F5B84F; --snare:#8198FF; --kick:#FF9B7A; --now:rgba(129,152,255,.16);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:8px 0 0;color:var(--muted);max-width:62ch}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:18px}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--accent);color:var(--accent-ink);font-size:17px;min-width:130px;justify-content:center}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.tempo{display:flex;align-items:center;gap:10px;font-weight:600}
+.tempo input{accent-color:var(--accent);width:150px}
+.tempo output{font-variant-numeric:tabular-nums;min-width:70px;color:var(--muted)}
+
+/* raster */
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.grid{display:grid;grid-template-columns:92px repeat(4,1fr);gap:10px;min-width:640px}
+.beat{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:6px;border-radius:12px;background:var(--surface-2)}
+.lab{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
+.lab i{width:12px;height:12px;border-radius:50%;flex:none}
+.count{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:0 6px;text-align:center;font-weight:700;font-size:13px;color:var(--muted)}
+.count span:first-child{color:var(--ink);font-size:16px}
+.count span.now{color:var(--accent)}
+.cell{aspect-ratio:1/1;min-height:30px;border:2px solid var(--line);border-radius:8px;background:var(--surface);padding:0;transition:background .08s,border-color .08s,transform .08s}
+.cell:hover{border-color:var(--muted)}
+.cell.first{border-width:2.5px}
+.row-hat .cell.on{background:var(--hat);border-color:var(--hat)}
+.row-snare .cell.on{background:var(--snare);border-color:var(--snare)}
+.row-kick .cell.on{background:var(--kick);border-color:var(--kick)}
+.cell.now{box-shadow:0 0 0 3px var(--now);transform:scale(1.06)}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.presets{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.presets span{font-weight:700;color:var(--muted);font-size:14px;margin-right:4px}
+.chip{border:1.5px solid var(--line);background:var(--surface-2);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.cell.now{transform:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="ritme.html">&larr; Let's Make Rhythm</a>
+    <h1>Beat <span>Maker</span></h1>
+    <p>Eén maat van 4 tellen, elke tel in 4 blokjes. Tik op de blokjes om je eigen drumbeat te maken: onderaan de baskick, in het midden de snare, bovenaan de hi-hat.</p>
+  </header>
+
+  <section class="panel">
+    <div class="controls">
+      <button class="btn btn-primary" id="playBtn" type="button">&#9654; Speel</button>
+      <label class="tempo">Tempo <input type="range" id="tempo" min="60" max="140" step="5" value="90"><output id="tempoOut">90 BPM</output></label>
+      <button class="btn btn-ghost" id="clearBtn" type="button">Wis alles</button>
+    </div>
+
+    <div class="scroll">
+      <div class="grid" id="grid"></div>
+    </div>
+
+    <p class="hint">De beat speelt steeds opnieuw (in een lus). Je kan blokjes aan- en uitzetten terwijl hij speelt.</p>
+
+    <div class="presets" id="presets"><span>Voorbeelden:</span></div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* rijen van boven naar onder */
+const ROWS=[
+  {key:'hat',   name:'Hi-hat',   color:'var(--hat)'},
+  {key:'snare', name:'Snare',    color:'var(--snare)'},
+  {key:'kick',  name:'Baskick',  color:'var(--kick)'}
+];
+const STEPS=16;   // 4 tellen x 4 blokjes
+const COUNT=['1','e','+','a'];   // telwoorden per blokje: 1 e + a, 2 e + a, ...
+
+/* voorbeelden: x = aan, . = uit (16 tekens, per tel 4) */
+const PRESETS={
+  'Rock':     {hat:'x.x.x.x.x.x.x.x.', snare:'....x.......x...', kick:'x.......x.x.....'},
+  'Pop':      {hat:'x.x.x.x.x.x.x.x.', snare:'....x.......x...', kick:'x.....x.x.......'},
+  'Disco':    {hat:'..x...x...x...x.', snare:'....x.......x...', kick:'x...x...x...x...'},
+  'Hip-hop':  {hat:'x.x.x.x.x.x.x.x.', snare:'....x.......x...', kick:'x......x..x.....'},
+  '16den':    {hat:'xxxxxxxxxxxxxxxx', snare:'....x.......x...', kick:'x.......x.......'}
+};
+
+let pattern={hat:Array(STEPS).fill(false),snare:Array(STEPS).fill(false),kick:Array(STEPS).fill(false)};
+let bpm=90, playing=false, step=0, nextTime=0, timer=null, ctx=null, master=null;
+const queue=[];   // (stap, tijd) voor de oplichtende blokjes
+
+/* ---------- raster tekenen ---------- */
+function build(){
+  let h='<div></div>';
+  for(let b=0;b<4;b++) h+=`<div class="count">${COUNT.map((c,i)=>`<span data-c="${b*4+i}">${i===0?b+1:c}</span>`).join('')}</div>`;
+  ROWS.forEach(r=>{
+    h+=`<div class="lab"><i style="background:${r.color}"></i>${r.name}</div>`;
+    for(let b=0;b<4;b++){
+      h+=`<div class="beat row-${r.key}">`;
+      for(let i=0;i<4;i++){const s=b*4+i;
+        h+=`<button type="button" class="cell${i===0?' first':''}${pattern[r.key][s]?' on':''}" data-r="${r.key}" data-s="${s}" aria-pressed="${pattern[r.key][s]}" aria-label="${r.name}, tel ${b+1}, blokje ${i+1}"></button>`;}
+      h+='</div>';
+    }
+  });
+  $('grid').innerHTML=h;
+}
+$('grid').addEventListener('click',e=>{
+  const c=e.target.closest('.cell'); if(!c) return;
+  const r=c.dataset.r, s=+c.dataset.s;
+  pattern[r][s]=!pattern[r][s];
+  c.classList.toggle('on',pattern[r][s]); c.setAttribute('aria-pressed',pattern[r][s]);
+  if(pattern[r][s]&&!playing){ ac(); SOUNDS[r](ctx.currentTime+.01); }   // meteen horen
+});
+
+/* ---------- drumklanken (Web Audio) ---------- */
+function ac(){
+  if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();const c=ctx.createDynamicsCompressor();c.threshold.value=-12;c.ratio.value=4;master=ctx.createGain();master.gain.value=.9;master.connect(c);c.connect(ctx.destination);}
+  if(ctx.state==='suspended') ctx.resume();
+  return ctx;
+}
+let noiseBuf=null;
+function noise(){ if(!noiseBuf){const len=ctx.sampleRate;noiseBuf=ctx.createBuffer(1,len,ctx.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;} const s=ctx.createBufferSource(); s.buffer=noiseBuf; return s; }
+const SOUNDS={
+  kick(t){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(45,t+.12);
+    g.gain.setValueAtTime(1,t); g.gain.exponentialRampToValueAtTime(.001,t+.35);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t+.4);
+    const c=ctx.createOscillator(), cg=ctx.createGain(); c.frequency.value=1200;   // korte klik voor de aanzet
+    cg.gain.setValueAtTime(.15,t); cg.gain.exponentialRampToValueAtTime(.001,t+.01); c.connect(cg); cg.connect(master); c.start(t); c.stop(t+.02);
+  },
+  snare(t){
+    const n=noise(), f=ctx.createBiquadFilter(), g=ctx.createGain();
+    f.type='highpass'; f.frequency.value=1200;
+    g.gain.setValueAtTime(.7,t); g.gain.exponentialRampToValueAtTime(.001,t+.18);
+    n.connect(f); f.connect(g); g.connect(master); n.start(t); n.stop(t+.2);
+    const o=ctx.createOscillator(), og=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(220,t); o.frequency.exponentialRampToValueAtTime(160,t+.08);
+    og.gain.setValueAtTime(.5,t); og.gain.exponentialRampToValueAtTime(.001,t+.1); o.connect(og); og.connect(master); o.start(t); o.stop(t+.12);
+  },
+  hat(t){
+    const n=noise(), f=ctx.createBiquadFilter(), g=ctx.createGain();
+    f.type='highpass'; f.frequency.value=7000;
+    g.gain.setValueAtTime(.35,t); g.gain.exponentialRampToValueAtTime(.001,t+.05);
+    n.connect(f); f.connect(g); g.connect(master); n.start(t); n.stop(t+.06);
+  }
+};
+
+/* ---------- afspelen (lus) ---------- */
+const stepDur=()=>60/bpm/4;
+function scheduler(){
+  while(nextTime<ctx.currentTime+.12){
+    ROWS.forEach(r=>{ if(pattern[r.key][step]) SOUNDS[r.key](nextTime); });
+    queue.push({step,time:nextTime});
+    nextTime+=stepDur(); step=(step+1)%STEPS;
+  }
+}
+let lastShown=-1;
+function draw(){
+  if(!playing) return;
+  while(queue.length&&queue[0].time<=ctx.currentTime){ const q=queue.shift(); show(q.step); }
+  requestAnimationFrame(draw);
+}
+function show(s){
+  if(s===lastShown) return; lastShown=s;
+  document.querySelectorAll('.cell.now,.count span.now').forEach(el=>el.classList.remove('now'));
+  if(s<0) return;
+  document.querySelectorAll(`.cell[data-s="${s}"]`).forEach(el=>el.classList.add('now'));
+  const c=document.querySelector(`.count span[data-c="${s}"]`); if(c) c.classList.add('now');
+}
+function start(){
+  ac(); playing=true; step=0; nextTime=ctx.currentTime+.08; queue.length=0;
+  timer=setInterval(scheduler,25); scheduler(); requestAnimationFrame(draw);
+  $('playBtn').innerHTML='&#9632; Stop';
+}
+function stop(){
+  playing=false; clearInterval(timer); queue.length=0; show(-1);
+  $('playBtn').innerHTML='&#9654; Speel';
+}
+$('playBtn').addEventListener('click',()=>playing?stop():start());
+$('tempo').addEventListener('input',e=>{ bpm=+e.target.value; $('tempoOut').textContent=bpm+' BPM'; });
+$('clearBtn').addEventListener('click',()=>{ ROWS.forEach(r=>pattern[r.key].fill(false)); build(); });
+
+/* voorbeelden */
+Object.keys(PRESETS).forEach(name=>{
+  const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=name;
+  b.addEventListener('click',()=>{ const p=PRESETS[name]; ROWS.forEach(r=>pattern[r.key]=p[r.key].split('').map(ch=>ch==='x')); build(); });
+  $('presets').appendChild(b);
+});
+
+build();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sharp Ears &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --staff:#7F89A3; --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6; --warm:#E08E12;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:10px 0 0;color:var(--muted);max-width:62ch}
+.levels{display:inline-flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow);margin-top:14px}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:18px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-big{font-size:17px;padding:16px 22px}
+.btn-soft{background:var(--accent-soft);color:var(--accent)}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+.linkbtn:hover{color:var(--accent)}
+.hint{margin:0;color:var(--muted);font-size:14px}
+
+.rounds{display:flex;gap:8px;align-items:center}
+.dot{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;border:2px solid var(--line);font-size:14px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.dot.cur{border-color:var(--accent);color:var(--accent)}
+.dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+
+.listen{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.listen .btn{flex-direction:column;gap:2px;padding:14px 16px;text-align:center}
+.listen .btn small{font-weight:600;font-size:13px;opacity:.85}
+@media (max-width:560px){.listen{grid-template-columns:1fr}}
+
+.staffbox{background:var(--surface-2);border:1.5px solid var(--line);border-radius:16px;padding:10px 8px 4px;overflow-x:auto}
+#staff{display:block;width:100%;min-width:420px;height:auto;color:var(--ink)}
+#staff .sl{stroke:var(--staff);stroke-width:1.4}
+#staff .hit{fill:transparent;cursor:pointer}
+#staff .col:hover .hit{fill:var(--accent-soft)}
+#staff .col:focus{outline:none}
+#staff .col:focus-visible .hit{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+#staff .col.given .hit,#staff.locked .hit{cursor:default}
+#staff.locked .col:hover .hit{fill:transparent}
+#staff .acc-new{color:var(--accent)}
+#staff .acc-ok{color:var(--ok)}
+#staff .acc-bad{color:var(--bad)}
+#staff .acc-sol{color:var(--ok)}
+#staff .num{fill:var(--muted);font-family:var(--body);font-weight:700;font-size:13px}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+
+.rule{margin:0;padding:12px 14px;border-radius:12px;background:var(--accent-soft);color:var(--ink);font-size:15px}
+.rule b{color:var(--accent)}
+
+.summary{display:flex;flex-direction:column;gap:8px}
+.sumhead{margin:0;font-family:var(--display);font-size:28px;font-weight:800}
+.sumrow{display:grid;grid-template-columns:110px 1fr 1fr;gap:12px;align-items:center;padding:10px 14px;border-radius:12px;border:2px solid var(--line);font-weight:600}
+.sumrow.ok{background:var(--ok-soft);border-color:var(--ok)}
+.sumrow.bad{background:var(--bad-soft);border-color:var(--bad)}
+.sumrow .mel{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:.04em}
+@media (max-width:560px){.sumrow{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="melodie.html">&larr; Let's Make Melodies</a>
+    <h1>Sharp <span>Ears</span></h1>
+    <div class="levels" id="levels" role="group" aria-label="Niveau"></div>
+    <p id="intro"></p>
+  </header>
+
+  <section class="panel" id="task">
+    <div class="panel-head">
+      <div>
+        <div class="eyebrow" id="eyebrow">Melodie 1 van 4</div>
+        <h2 id="question">Welke noot krijgt een kruis?</h2>
+      </div>
+      <div class="rounds" id="rounds" aria-label="Voortgang"></div>
+    </div>
+
+    <div class="listen">
+      <button class="btn btn-soft" id="origBtn" type="button">&#9654; Origineel<small id="origSub">zoals op de notenbalk</small></button>
+      <button class="btn btn-primary" id="mystBtn" type="button">&#9654; Mysterie-melodie<small id="mystSub">nog 5&times;</small></button>
+    </div>
+
+    <div class="staffbox"><svg id="staff" role="group" aria-label="Notenbalk met 6 noten"></svg></div>
+    <p class="hint" id="tapHint"></p>
+
+    <p class="feedback info" id="feedback"></p>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn" type="button" disabled>Controleer</button>
+      <button class="linkbtn" id="solBtn" type="button" hidden>Toon oplossing</button>
+      <button class="btn btn-primary" id="nextBtn" type="button" hidden>Volgende melodie &rarr;</button>
+      <span style="flex:1"></span>
+      <button class="linkbtn" id="restartBtn" type="button">&#8635; Opnieuw beginnen</button>
+    </div>
+  </section>
+
+  <section class="panel" id="result" hidden>
+    <div class="summary" id="summary"></div>
+    <div class="actions"><button class="btn btn-primary" id="againBtn" type="button">Opnieuw</button></div>
+  </section>
+
+  <section class="panel">
+    <div>
+      <div class="eyebrow">Hulpmiddel</div>
+      <h2>Pianoklavier</h2>
+    </div>
+    <p class="hint">Speel de melodie na op het klavier. Probeer bij elke noot de witte en de zwarte toets ernaast: welke klinkt zoals in de mysterie-melodie?</p>
+    <div id="piano"></div>
+  </section>
+</div>
+
+<script src="piano.js"></script>
+<script>
+(function(){
+"use strict";
+/* ---------- testmodus: test.html laadt deze pagina met ?test=1&lvl=N&n=M ---------- */
+const TEST=(()=>{try{const q=new URLSearchParams(location.search);if(q.get('test')!=='1')return null;
+  return {lvl:Math.max(1,parseInt(q.get('lvl'))||1),o:Math.max(0,parseInt(q.get('o'))||0),n:Math.max(1,Math.min(20,parseInt(q.get('n'))||3)),i:0,score:0,max:0,items:[]}}catch(e){return null}})();
+function testSend(m){try{if(window.parent!==window)window.parent.postMessage(Object.assign({lmr:'test'},m),'*')}catch(e){}}
+function testRecord(got,max){got=Math.max(0,Math.min(max,got));TEST.score+=got;TEST.max+=max;TEST.items.push([got,max]);TEST.i++;
+  testSend({type:'progress',i:TEST.i,n:TEST.n,score:TEST.score,max:TEST.max});
+  if(TEST.i>=TEST.n){document.body.classList.add('test-finished');testSend({type:'done',score:TEST.score,max:TEST.max,items:TEST.items});return true}return false}
+function testCheck(fn){document.addEventListener('click',e=>{if(!e.target.closest('#checkBtn'))return;e.stopPropagation();e.preventDefault();fn()},true)}
+function testTitle(el){if(el)el.textContent=`Vraag ${TEST.o+TEST.i+1} van ${TEST.o+TEST.n}`}
+function testShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const TEST_NEXT='Antwoord bewaard. Op naar de volgende vraag.';
+if(TEST){const s=document.createElement('style');s.textContent='.back,.levels,.tabs,.no-test{display:none!important}body{padding-top:6px}header h1{font-size:32px}.test-finished .wrap{opacity:.35;pointer-events:none}';document.head.appendChild(s);document.body.classList.add('testmode')}
+
+const $=id=>document.getElementById(id);
+
+/* ---------- oefeningen ----------
+   notes: 6 noten (C4 = do, C5 = hoge do').
+   pos:   welke noot (0-5) in de mysterie-melodie het teken krijgt.
+   given: enkel niveau 3 – [noot, teken] dat al op de notenbalk staat.
+   Regel: een teken geldt voor de noot zelf en voor alle volgende noten met dezelfde naam (er zijn geen maatstrepen). */
+const LEVELS=[
+  { name:'Niveau 1', info:'Kruisen ♯', acc:'sharp', piano:'sharp',
+    q:'Welke noot krijgt een kruis?',
+    intro:'Je hoort twee keer bijna dezelfde melodie. In de <strong>mysterie-melodie</strong> klinkt één noot een halve toon <strong>hoger</strong>: die noot krijgt een <strong>kruis ♯</strong>. Vergelijk met het origineel en tik op de notenbalk de noot aan die het kruis krijgt.',
+    rule:'Een <b>kruis ♯</b> maakt een noot een halve toon hoger: op het klavier de toets <b>rechts</b> ervan. Het kruis geldt ook voor dezelfde noten die erna komen.',
+    items:[
+      {notes:'G4 F4 G4 F4 G4 F4', pos:3},
+      {notes:'E4 F4 G4 A4 B4 C5', pos:1},
+      {notes:'D4 E4 F4 E4 D4 C4', pos:5},
+      {notes:'A4 G4 F4 G4 A4 C5', pos:2}
+    ]},
+  { name:'Niveau 2', info:'Mollen ♭', acc:'flat', piano:'flat',
+    q:'Welke noot krijgt een mol?',
+    intro:'In de <strong>mysterie-melodie</strong> klinkt één noot een halve toon <strong>lager</strong>: die noot krijgt een <strong>mol ♭</strong>. Vergelijk met het origineel en tik op de notenbalk de noot aan die de mol krijgt.',
+    rule:'Een <b>mol ♭</b> maakt een noot een halve toon lager: op het klavier de toets <b>links</b> ervan. De mol geldt ook voor dezelfde noten die erna komen.',
+    items:[
+      {notes:'A4 B4 A4 B4 A4 B4', pos:3},
+      {notes:'C5 B4 A4 G4 F4 E4', pos:1},
+      {notes:'C4 D4 E4 F4 E4 D4', pos:4},
+      {notes:'G4 E4 C4 E4 G4 A4', pos:5}
+    ]},
+  { name:'Niveau 3', info:'Herstellingsteken ♮', acc:'natural', piano:null,
+    q:'Waar komt het herstellingsteken?',
+    intro:'Op de notenbalk staat al een kruis of een mol. Die geldt voor <strong>alle volgende noten met dezelfde naam</strong>. Maar in de <strong>mysterie-melodie</strong> klinkt één van die noten weer gewoon. Tik de noot aan die een <strong>herstellingsteken ♮</strong> krijgt.',
+    rule:'Een <b>herstellingsteken ♮</b> maakt een kruis of mol ongedaan: je speelt weer de gewone (witte) toets. Het herstellingsteken geldt ook voor dezelfde noten die erna komen.',
+    items:[
+      {notes:'G4 F4 G4 F4 G4 F4', given:[1,'sharp'], pos:3},
+      {notes:'C4 E4 D4 E4 F4 E4', given:[1,'flat'],  pos:5},
+      {notes:'A4 B4 C5 B4 A4 B4', given:[1,'flat'],  pos:3},
+      {notes:'C4 D4 C4 E4 C4 D4', given:[0,'sharp'], pos:2}
+    ]}
+];
+const MAXPLAY=5;                    // mysterie-melodie max. 5x (na Controleer onbeperkt)
+const NOTE_GAP=.75, NOTE_DUR=.68;   // 80 BPM, kwartnoten
+const SHIFT={sharp:1,flat:-1,natural:0};
+const SIGN={sharp:'♯',flat:'♭',natural:'♮'};
+const WORD={sharp:'kruis',flat:'mol',natural:'herstellingsteken'};
+
+const NAT={C:0,D:2,E:4,F:5,G:7,A:9,B:11}, STEP={C:-2,D:-1,E:0,F:1,G:2,A:3,B:4};
+function parse(s){ return s.trim().split(/\s+/).map(t=>{ const l=t[0], o=+t.slice(1);
+  return {l,o,key:t,step:STEP[l]+(o-4)*7,midi:12*(o+1)+NAT[l],name:l+(o>=5?"'":'')}; }); }
+
+/* toonhoogtes volgens de tekens: elk teken geldt vanaf zijn noot voor dezelfde noten erna */
+function pitches(notes,signs){
+  const cur={};
+  return notes.map((n,i)=>{ if(signs[i]) cur[n.key]=signs[i]; return n.midi+(cur[n.key]?SHIFT[cur[n.key]]:0); });
+}
+function signsOf(item,withAnswer){
+  const s=Array(6).fill(null);
+  if(item.given) s[item.given[0]]=item.given[1];
+  if(withAnswer) s[item.pos]=L().acc;
+  return s;
+}
+function nameOf(n,sign){ return n.l+(sign&&sign!=='natural'?SIGN[sign]:'')+(n.o>=5?"'":''); }
+/* hoe de melodie klinkt, als tekst (voor de uitslag) */
+function soundText(item,withAnswer){
+  const notes=parse(item.notes), s=signsOf(item,withAnswer), cur={};
+  return notes.map((n,i)=>{ if(s[i]) cur[n.key]=s[i]; return nameOf(n,cur[n.key]); }).join(' ');
+}
+
+/* ---------- toestand ---------- */
+let level=0; try{ level=Math.min(LEVELS.length-1,Math.max(0,+(localStorage.getItem('se-level')||0))); }catch(e){}
+const L=()=>LEVELS[level];
+let piano=null, series=[], idx=0, choice=null, plays=0, tried=false, done=false, playing=false, showSol=false, lastWrong=null;
+
+function newSeries(){
+  series=L().items.map(it=>({item:it,given:null,ok:null}));
+  idx=0; renderLevels();
+  $('intro').innerHTML=L().intro;
+  $('task').hidden=false; $('result').hidden=true;
+  startTask();
+}
+function startTask(){
+  choice=null; plays=0; tried=false; done=false; showSol=false; lastWrong=null;
+  $('feedback').textContent=''; $('feedback').className='feedback info';
+  const it=series[idx].item;
+  if(piano) piano.setNames(L().piano||(it.given?it.given[1]:'both'));
+  render();
+}
+
+/* ---------- geluid (pianoklank, zelfde synth als piano.js) ---------- */
+let ctx=null, master=null, stopTimer=null;
+function ac(){
+  if(!ctx){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-10; comp.ratio.value=4;
+    master=ctx.createGain(); master.gain.value=.9; master.connect(comp); comp.connect(ctx.destination);
+  }
+  if(ctx.state==='suspended') ctx.resume();
+  return ctx;
+}
+const hz=m=>440*Math.pow(2,(m-69)/12);
+function pianoNote(m,time,dur){
+  const c=ac(), f=hz(m), g=c.createGain(), lp=c.createBiquadFilter();
+  lp.type='lowpass'; lp.Q.value=.7;
+  lp.frequency.setValueAtTime(Math.min(9000,f*14),time);
+  lp.frequency.exponentialRampToValueAtTime(Math.max(700,f*3),time+1.6);
+  g.gain.setValueAtTime(.0001,time);
+  g.gain.exponentialRampToValueAtTime(.32,time+.006);
+  g.gain.exponentialRampToValueAtTime(.12,time+.35);
+  g.gain.setTargetAtTime(.0001,time+.35,1.4);
+  const rel=time+dur; g.gain.cancelScheduledValues(rel); g.gain.setTargetAtTime(.0001,rel,.09);
+  g.connect(lp); lp.connect(master);
+  [[1,1,0],[1,.5,4],[2,.42,0],[3,.2,0],[4,.1,0],[5,.05,0],[6,.03,0]].forEach(([k,a,det])=>{
+    const o=c.createOscillator(), og=c.createGain();
+    o.type='sine'; o.frequency.value=f*k*(1+.00035*k*k); o.detune.value=det;
+    og.gain.value=a; o.connect(og); og.connect(g); o.start(time); o.stop(rel+.8);
+  });
+  const len=Math.floor(c.sampleRate*.03), buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);
+  const ns=c.createBufferSource(), nf=c.createBiquadFilter(), ng=c.createGain();
+  ns.buffer=buf; nf.type='bandpass'; nf.frequency.value=2500; ng.gain.value=.05;
+  ns.connect(nf); nf.connect(ng); ng.connect(master); ns.start(time);
+}
+function play(mystery){
+  if(playing) return;
+  if(mystery&&!tried){ if(plays>=MAXPLAY) return; plays++; }
+  const it=series[idx].item, notes=parse(it.notes), ms=pitches(notes,signsOf(it,mystery));
+  const c=ac(), t0=c.currentTime+.08;
+  ms.forEach((m,i)=>pianoNote(m,t0+i*NOTE_GAP,NOTE_DUR));
+  playing=mystery?'m':'o'; render();
+  clearTimeout(stopTimer);
+  stopTimer=setTimeout(()=>{ playing=false; render(); },(ms.length*NOTE_GAP+.3)*1000);
+}
+
+/* ---------- notenbalk ---------- */
+const GCLEF='M434 2Q464 -103 464 -170Q464 -223 427 -257Q390 -291 337 -291Q287 -291 250 -262Q213 -232 213 -190Q213 -160 234 -134Q254 -107 284 -107Q313 -107 332 -128Q350 -150 350 -178Q350 -240 280 -240Q298 -268 338 -268Q353 -268 368 -264Q384 -259 401 -248Q418 -237 428 -214Q439 -190 439 -157Q439 -136 411 -6Q389 -12 356 -12Q259 -12 190 60Q120 132 120 232Q120 267 132 303Q143 339 158 366Q172 394 200 428Q229 463 248 484Q268 504 303 539Q280 621 280 689Q280 779 313 840Q346 900 379 900Q389 900 402 887Q414 874 426 851Q438 828 446 790Q455 753 455 710Q455 551 342 447L368 329Q384 332 397 332Q458 332 500 282Q542 233 542 162Q542 44 434 2ZM426 746Q426 801 394 801Q358 801 333 748Q308 695 308 630Q308 588 321 557Q359 580 392 640Q426 699 426 746ZM498 128Q498 183 466 216Q434 249 383 249L428 23Q498 52 498 128ZM407 17 361 247Q334 241 312 214Q289 187 289 158Q289 143 295 128Q301 114 310 104Q318 94 327 86Q336 78 342 74Q348 71 348 71L340 66Q307 75 278 106Q248 137 248 184Q248 231 278 270Q307 310 343 323L325 430Q168 299 168 177Q168 104 223 55Q278 6 348 6Q365 6 407 17Z';
+/* tekens als SVG (x,y = midden van het teken) */
+function accSVG(type,x,y,cls){
+  const s='stroke="currentColor"', g=`<g class="${cls||''}" pointer-events="none">`;
+  if(type==='sharp') return g+
+    `<line x1="${x-3}" y1="${y-12}" x2="${x-3}" y2="${y+13}" ${s} stroke-width="1.6"/>`+
+    `<line x1="${x+3}" y1="${y-13}" x2="${x+3}" y2="${y+12}" ${s} stroke-width="1.6"/>`+
+    `<line x1="${x-7}" y1="${y-2}" x2="${x+7}" y2="${y-6}" ${s} stroke-width="3.4"/>`+
+    `<line x1="${x-7}" y1="${y+6}" x2="${x+7}" y2="${y+2}" ${s} stroke-width="3.4"/></g>`;
+  if(type==='flat') return g+
+    `<line x1="${x-4}" y1="${y-17}" x2="${x-4}" y2="${y+5}" ${s} stroke-width="1.7"/>`+
+    `<path d="M${x-4} ${y+5} C ${x+2} ${y+1}, ${x+8} ${y-3}, ${x+5} ${y-6} C ${x+3} ${y-8}, ${x-1} ${y-6}, ${x-4} ${y-2}" fill="none" ${s} stroke-width="2.6" stroke-linejoin="round"/></g>`;
+  return g+ /* herstellingsteken */
+    `<line x1="${x-3.5}" y1="${y-13}" x2="${x-3.5}" y2="${y+6}" ${s} stroke-width="1.6"/>`+
+    `<line x1="${x+3.5}" y1="${y-6}" x2="${x+3.5}" y2="${y+13}" ${s} stroke-width="1.6"/>`+
+    `<line x1="${x-3.5}" y1="${y-3}" x2="${x+3.5}" y2="${y-6}" ${s} stroke-width="3.2"/>`+
+    `<line x1="${x-3.5}" y1="${y+6}" x2="${x+3.5}" y2="${y+3}" ${s} stroke-width="3.2"/></g>`;
+}
+function drawStaff(){
+  const it=series[idx].item, notes=parse(it.notes);
+  const SP=12, BOT=100, X0=92, SLOT=78, W=X0+notes.length*SLOT+14, H=170;
+  const yOf=s=>BOT-s*SP/2;
+  let h='';
+  for(let k=0;k<5;k++) h+=`<line class="sl" x1="8" y1="${BOT-k*SP}" x2="${W-8}" y2="${BOT-k*SP}"/>`;
+  h+=`<path d="${GCLEF}" transform="translate(8 ${BOT-SP}) scale(0.078 -0.078)" fill="currentColor"/>`;
+  notes.forEach((n,i)=>{
+    const cx=X0+i*SLOT+SLOT/2+8, y=yOf(n.step), up=n.step<4;
+    const isGiven=it.given&&it.given[0]===i;
+    const label=`Noot ${i+1}: ${nameOf(n, isGiven?it.given[1]:null)}`;
+    h+=`<g class="col${isGiven?' given':''}" data-i="${i}" ${isGiven||done?'':'tabindex="0" role="button"'} aria-label="${label}">`;
+    h+=`<rect class="hit" x="${cx-SLOT/2-2}" y="8" width="${SLOT-4}" height="${H-34}" rx="10"/>`;
+    if(n.step<=-2) h+=`<line x1="${cx-13}" y1="${yOf(-2)}" x2="${cx+13}" y2="${yOf(-2)}" stroke="currentColor" stroke-width="1.5" pointer-events="none"/>`;
+    h+=`<ellipse cx="${cx}" cy="${y}" rx="7.2" ry="5.3" transform="rotate(-20 ${cx} ${y})" fill="currentColor" pointer-events="none"/>`;
+    h+=up?`<line x1="${cx+6.6}" y1="${y-1}" x2="${cx+6.6}" y2="${y-35}" stroke="currentColor" stroke-width="1.9" pointer-events="none"/>`
+         :`<line x1="${cx-6.6}" y1="${y+1}" x2="${cx-6.6}" y2="${y+35}" stroke="currentColor" stroke-width="1.9" pointer-events="none"/>`;
+    /* tekens */
+    const ax=cx-21;
+    if(isGiven) h+=accSVG(it.given[1],ax,y,'');
+    else if(showSol&&i===it.pos) h+=accSVG(L().acc,ax,y,'acc-sol');
+    else if(choice===i) h+=accSVG(L().acc,ax,y,done?'acc-ok':(lastWrong===i?'acc-bad':'acc-new'));
+    h+=`<text class="num" x="${cx}" y="${H-8}" text-anchor="middle" pointer-events="none">${i+1}</text>`;
+    h+=`</g>`;
+  });
+  const svg=$('staff'); svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.innerHTML=h;
+  svg.classList.toggle('locked',done);
+}
+
+/* ---------- weergave ---------- */
+function render(){
+  const lv=L(), it=series[idx].item;
+  $('eyebrow').textContent=`Melodie ${idx+1} van ${series.length}`;
+  $('question').textContent=lv.q;
+  $('rounds').innerHTML=series.map((s,i)=>`<span class="dot${s.ok===true?' ok':s.ok===false?' bad':i===idx?' cur':''}">${i+1}</span>`).join('');
+
+  $('origSub').textContent=playing==='o'?'luister…':(it.given?'zoals op de notenbalk':'zonder '+WORD[lv.acc]);
+  $('origBtn').disabled=!!playing;
+  const left=MAXPLAY-plays, mb=$('mystBtn');
+  mb.disabled=!!playing||(!tried&&left<=0);
+  $('mystSub').textContent=playing==='m'?'luister…':tried?'onbeperkt':left>0?`nog ${left}×`:'geen beurten meer';
+
+  $('tapHint').innerHTML=done?'':`Tik op de noot die ${lv.acc==='natural'?'het':'een'} <strong>${WORD[lv.acc]} ${SIGN[lv.acc]}</strong> krijgt. Tik op een andere noot om het te verplaatsen.`;
+  drawStaff();
+
+  $('checkBtn').hidden=done;
+  $('checkBtn').disabled=choice==null||choice===lastWrong;
+  $('checkBtn').textContent=tried?'Controleer opnieuw':'Controleer';
+  $('solBtn').hidden=!tried||done;
+  $('nextBtn').hidden=!tried;
+  $('nextBtn').innerHTML=idx<series.length-1?'Volgende melodie &rarr;':'Bekijk je uitslag &rarr;';
+}
+function pick(i){
+  const it=series[idx].item;
+  if(done||(it.given&&it.given[0]===i)) return;
+  choice=(choice===i?null:i);
+  $('feedback').textContent=''; $('feedback').className='feedback info';
+  render();
+}
+function check(){
+  if(choice==null) return;
+  const t=series[idx], first=!tried, ok=choice===t.item.pos, lv=L();
+  if(first){ t.given=choice; t.ok=ok; }
+  tried=true;
+  const n=parse(t.item.notes)[t.item.pos];
+  if(ok){
+    done=true; lastWrong=null;
+    $('feedback').className='feedback ok';
+    $('feedback').textContent=(first?'Juist! ':'Nu is het juist! Voor je score telt je eerste poging. ')+
+      `Noot ${t.item.pos+1} krijgt een ${WORD[lv.acc]}: ${nameOf(n,lv.acc)}.`;
+  } else {
+    lastWrong=choice;
+    $('feedback').className='feedback bad';
+    $('feedback').textContent='Dat is niet de juiste noot.'+(first?' (Deze eerste poging telt voor je score.)':'')+
+      ' Beluister opnieuw en vergelijk, of klik op "Toon oplossing".';
+  }
+  render();
+}
+function solution(){
+  done=true; showSol=true; choice=null;
+  const it=series[idx].item, n=parse(it.notes)[it.pos];
+  $('feedback').className='feedback info';
+  $('feedback').textContent=`Noot ${it.pos+1} krijgt een ${WORD[L().acc]}: ${nameOf(n,L().acc)}. Beluister gerust opnieuw.`;
+  render();
+}
+function next(){ if(idx<series.length-1){ idx++; startTask(); } else showResult(); }
+function showResult(){
+  const score=series.filter(s=>s.ok).length;
+  $('summary').innerHTML=`<p class="eyebrow">Uitslag &middot; ${L().name}</p><p class="sumhead">${score} / ${series.length}</p>`+
+    `<p class="rule">${L().rule}</p>`+
+    series.map((s,i)=>`<div class="sumrow ${s.ok?'ok':'bad'}"><span>Melodie ${i+1}</span>
+      <span>Jij: noot ${s.given!=null?s.given+1:'–'}</span>
+      <span>Juist: noot ${s.item.pos+1} &middot; <span class="mel">${soundText(s.item,true)}</span></span></div>`).join('');
+  $('task').hidden=true; $('result').hidden=false;
+  $('result').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ---------- bediening ---------- */
+$('staff').addEventListener('click',e=>{ const g=e.target.closest('.col'); if(g) pick(+g.dataset.i); });
+$('staff').addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ') return;
+  const g=e.target.closest&&e.target.closest('.col'); if(!g) return;
+  e.preventDefault(); const i=+g.dataset.i; pick(i);
+  const again=$('staff').querySelector(`.col[data-i="${i}"]`); if(again&&again.focus) again.focus();
+});
+$('origBtn').addEventListener('click',()=>play(false));
+$('mystBtn').addEventListener('click',()=>play(true));
+$('checkBtn').addEventListener('click',check);
+$('solBtn').addEventListener('click',solution);
+$('nextBtn').addEventListener('click',next);
+$('againBtn').addEventListener('click',()=>{ newSeries(); window.scrollTo({top:0,behavior:'smooth'}); });
+$('restartBtn').addEventListener('click',()=>{ playing=false; newSeries(); window.scrollTo({top:0,behavior:'smooth'}); });
+
+/* ---------- pianoklavier ---------- */
+piano=window.MEPiano?MEPiano.mount($('piano'),{names:'sharp',low:60,octaves:1,computerKeys:true}):null;
+function renderLevels(){ $('levels').innerHTML=LEVELS.map((x,i)=>`<button type="button" data-l="${i}" aria-pressed="${i===level}">${x.name}<small>${x.info}</small></button>`).join(''); }
+$('levels').addEventListener('click',e=>{ const b=e.target.closest('[data-l]'); if(!b) return; playing=false;
+  level=+b.dataset.l; try{localStorage.setItem('se-level',level)}catch(_){ } newSeries(); });
+
+newSeries();
+
+/* ---------- testmodus ---------- */
+if(TEST){['solBtn','nextBtn','restartBtn','rounds'].forEach(id=>$(id).classList.add('no-test'));
+  level=Math.min(LEVELS.length-1,TEST.lvl-1);newSeries();series=testShuffle(series);idx=0;
+  const _r=render;render=function(){_r();testTitle($('eyebrow'));$('solBtn').hidden=true;$('nextBtn').hidden=true};startTask();
+  testCheck(()=>{if(choice==null)return;const ok=choice===series[idx].item.pos;
+    if(testRecord(ok?1:0,1))return;idx=(idx+1)%series.length;startTask();$('feedback').textContent=TEST_NEXT});
+}
+
+})();
+</script>
+</body>
+</html>

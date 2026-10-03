@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Keep Up! &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF; --warm:#D97F06; --warm-soft:#FDEBD0;
+  --ok:#1C8757; --bad:#C43D2B;
+  --sky1:#BFD8FF; --sky2:#EAF2FF; --ground:#6DB36D; --ground2:#4E9A55;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A; --warm:#F5B84F; --warm-soft:#3D2C12;
+  --ok:#4CC38A; --bad:#FF7B67; --sky1:#1D2B55; --sky2:#2A3A6B; --ground:#2F6B3A; --ground2:#245A2F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A; --warm:#F5B84F; --warm-soft:#3D2C12;
+  --ok:#4CC38A; --bad:#FF7B67; --sky1:#1D2B55; --sky2:#2A3A6B; --ground:#2F6B3A; --ground2:#245A2F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--warm)}
+header p{margin:10px 0 0;color:var(--muted);max-width:64ch}
+.levels{display:inline-flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow);margin-top:14px}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--warm);color:#fff}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.9}
+.levels button .stars{color:var(--warm);font-size:12px;letter-spacing:1px}
+.levels button[aria-pressed="true"] .stars{color:#fff}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:14px}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn-primary{background:var(--warm);color:#fff}
+.btn-big{font-size:18px;padding:16px 26px}
+.hud{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;justify-content:space-between;font-weight:700}
+.hud .hearts{font-size:22px;letter-spacing:2px;color:var(--bad)}
+.hud .score{font-family:var(--display);font-size:26px}
+.hud .streak{color:var(--warm)}
+.hud .tempo{font-family:var(--display);font-style:italic;font-size:20px;color:var(--accent);min-width:130px;text-align:right}
+.scene{position:relative;border-radius:16px;overflow:hidden;background:linear-gradient(var(--sky1),var(--sky2));aspect-ratio:16/7;min-height:220px}
+.scene svg{position:absolute;inset:0;width:100%;height:100%}
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:16px;background:rgba(22,32,58,.35);color:#fff}
+.overlay h2{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,44px);text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.overlay p{margin:0;font-weight:600;max-width:46ch;text-shadow:0 1px 4px rgba(0,0,0,.4)}
+.overlay .big{font-size:40px;letter-spacing:4px;color:#FFD66B}
+.count{position:absolute;top:10px;left:0;right:0;text-align:center;font-family:var(--display);font-weight:800;font-size:44px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.35);pointer-events:none}
+.pad{touch-action:manipulation;-webkit-user-select:none;user-select:none;border:0;border-radius:18px;background:var(--warm-soft);color:var(--warm);font-family:var(--display);font-weight:800;font-size:26px;min-height:110px;width:100%;transition:transform .05s}
+.pad.hit{transform:scale(.98);background:var(--warm);color:#fff}
+.pad small{display:block;font-family:var(--body);font-size:14px;font-weight:600;opacity:.85}
+.hint{margin:0;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="tempo.html">&larr; Let's Make Tempo</a>
+    <h1>Keep <span>Up!</span></h1>
+    <div class="levels" id="levels" role="group" aria-label="Level"></div>
+    <p>Tik op de tel van de muziek, dan loopt je figuurtje. Maar let op: het tempo verandert! Tik je naast de tel of mis je een tel, dan struikel je en verlies je een hartje.</p>
+  </header>
+
+  <section class="panel">
+    <div class="hud">
+      <span class="hearts" id="hearts" aria-label="Levens"></span>
+      <span>Reeks: <span class="streak" id="streak">0</span></span>
+      <span class="score" id="score">0</span>
+      <span class="tempo" id="tempoWord" aria-live="polite"></span>
+    </div>
+    <div class="scene" id="scene">
+      <svg viewBox="0 0 800 350" preserveAspectRatio="xMidYMid slice" id="svg" aria-hidden="true"></svg>
+      <div class="count" id="count"></div>
+      <div class="overlay" id="overlay"></div>
+    </div>
+    <button class="pad" id="pad" type="button">TIK OP DE TEL<small>knop of spatiebalk</small></button>
+    <p class="hint">Tip: gebruik een koptelefoon en tik net op het moment van de bastrom (de diepe &ldquo;boem&rdquo;).</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* ---------- levels: tempoverloop per tel (tel 0 = eerste tel na het aftellen) ---------- */
+const LEVELS=[
+  {name:'Level 1', info:'opwarmen · 80 BPM',     beats:24, curve:[[0,80],[24,80]],                 words:[[0,'a tempo']], pulse:true},
+  {name:'Level 2', info:'accelerando',            beats:32, curve:[[0,80],[8,80],[28,124],[32,124]], words:[[0,'a tempo'],[8,'accelerando'],[28,'allegro']], pulse:true},
+  {name:'Level 3', info:'ritardando',             beats:32, curve:[[0,124],[8,124],[28,72],[32,72]], words:[[0,'allegro'],[8,'ritardando'],[28,'adagio']], pulse:true},
+  {name:'Level 4', info:'sneller én trager',      beats:40, curve:[[0,88],[6,88],[18,132],[24,132],[36,76],[40,76]], words:[[0,'a tempo'],[6,'accelerando'],[18,'allegro'],[24,'ritardando'],[36,'adagio']], pulse:false},
+  {name:'Level 5', info:'verrassing!',            beats:40, curve:[[0,96],[12,96],[12.01,140],[24,140],[24.01,84],[34,84],[40,120]], words:[[0,'moderato'],[12,'subito presto!'],[24,'subito adagio!'],[34,'accelerando']], pulse:false}
+];
+const HEARTS=5;
+let level=0; try{ level=Math.min(LEVELS.length-1,Math.max(0,+(localStorage.getItem('ku-level')||0))); }catch(e){}
+let best={}; try{ best=JSON.parse(localStorage.getItem('ku-best')||'{}')||{}; }catch(e){}
+const L=()=>LEVELS[level];
+function bpmAt(b){ const c=L().curve; if(b<=c[0][0]) return c[0][1];
+  for(let i=1;i<c.length;i++) if(b<=c[i][0]){ const [b0,v0]=c[i-1],[b1,v1]=c[i]; return v0+(v1-v0)*(b-b0)/(b1-b0); }
+  return c[c.length-1][1]; }
+function wordAt(b){ let w=''; L().words.forEach(([x,t])=>{ if(b>=x) w=t; }); return w; }
+
+/* ---------- geluid ---------- */
+let ctx=null, master=null, noiseBuf=null;
+function ac(){
+  if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-16; comp.ratio.value=4; master=ctx.createGain(); master.gain.value=.6; master.connect(comp); comp.connect(ctx.destination);
+    noiseBuf=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate); const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; }
+  if(ctx.state==='suspended') ctx.resume(); return ctx;
+}
+const hz=m=>440*Math.pow(2,(m-69)/12);
+function kick(t,v=1){ const o=ctx.createOscillator(), g=ctx.createGain(); o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(45,t+.12); g.gain.setValueAtTime(1.1*v,t); g.gain.exponentialRampToValueAtTime(.001,t+.33); o.connect(g); g.connect(master); o.start(t); o.stop(t+.35); }
+function snare(t){ const n=ctx.createBufferSource(), f=ctx.createBiquadFilter(), g=ctx.createGain(); n.buffer=noiseBuf; f.type='highpass'; f.frequency.value=1500; g.gain.setValueAtTime(.45,t); g.gain.exponentialRampToValueAtTime(.001,t+.16); n.connect(f); f.connect(g); g.connect(master); n.start(t); n.stop(t+.18); }
+function hat(t,v){ const n=ctx.createBufferSource(), f=ctx.createBiquadFilter(), g=ctx.createGain(); n.buffer=noiseBuf; f.type='highpass'; f.frequency.value=8000; g.gain.setValueAtTime(.12*v,t); g.gain.exponentialRampToValueAtTime(.001,t+.035); n.connect(f); f.connect(g); g.connect(master); n.start(t); n.stop(t+.04); }
+function tone(m,t,d,type,v){ const o=ctx.createOscillator(), g=ctx.createGain(), lp=ctx.createBiquadFilter(); o.type=type; o.frequency.value=hz(m); lp.type='lowpass'; lp.frequency.value=hz(m)*5;
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(v,t+.01); g.gain.setTargetAtTime(.0001,t+d,.05); o.connect(lp); lp.connect(g); g.connect(master); o.start(t); o.stop(t+d+.3); }
+function click(t,hi){ const o=ctx.createOscillator(), g=ctx.createGain(); o.type='square'; o.frequency.value=hi?1600:1100; g.gain.setValueAtTime(.08,t); g.gain.exponentialRampToValueAtTime(.0001,t+.04); o.connect(g); g.connect(master); o.start(t); o.stop(t+.05); }
+function stumbleSound(){ const t=ctx.currentTime+.01, o=ctx.createOscillator(), g=ctx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(300,t); o.frequency.exponentialRampToValueAtTime(90,t+.25); g.gain.setValueAtTime(.12,t); g.gain.exponentialRampToValueAtTime(.001,t+.3); o.connect(g); g.connect(master); o.start(t); o.stop(t+.32); }
+const BASS=[45,45,41,43];     // A1 A1 F1 G1 (per maat)
+function beatMusic(b,t,beat){   // b = teller, t = tijd
+  const bar=Math.floor(b/4), inBar=((b%4)+4)%4;
+  kick(t); if(inBar===1||inBar===3) snare(t);
+  hat(t,1); hat(t+beat/2,.55);
+  const root=BASS[((bar%4)+4)%4];
+  tone(root,t,beat*.45,'triangle',.5); if(inBar===2) tone(root+12,t+beat/2,beat*.3,'triangle',.3);
+}
+/* hoorbare tijd (luidspreker-vertraging) */
+function heard(ts){ if(ctx.getOutputTimestamp){ const o=ctx.getOutputTimestamp(); if(o&&o.contextTime>0&&o.performanceTime>0) return o.contextTime+((ts||performance.now())-o.performanceTime)/1000; } return ctx.currentTime-(ctx.outputLatency||ctx.baseLatency||0); }
+
+/* ---------- spel ---------- */
+let game=null, timer=0, raf=0;
+function start(){
+  ac(); stopGame(false);
+  const t0=ctx.currentTime+.2;
+  game={t0,next:t0,b:-4,beats:[],hearts:HEARTS,score:0,streak:0,hits:0,misses:0,over:false,won:false,x:0,pose:0,stumble:0,lastBeatShown:-99};
+  $('overlay').hidden=true;
+  timer=setInterval(pump,25); pump(); loop();
+}
+function pump(){
+  if(!game) return;
+  while(game.next<ctx.currentTime+.15 && game.b<L().beats){
+    const b=game.b, bpm=bpmAt(Math.max(0,b)), beat=60/bpm, t=game.next;
+    if(b<0) click(t,b===-4); else { beatMusic(b,t,beat); game.beats.push({b,t,beat,hit:false,judged:false}); }
+    game.next+=beat; game.b++;
+  }
+  if(game.b>=L().beats&&!game.endAt) game.endAt=game.next;
+}
+function tap(e){
+  const p=$('pad'); p.classList.add('hit'); setTimeout(()=>p.classList.remove('hit'),90);
+  if(!game||game.over) return;
+  const now=heard(e&&e.timeStamp);
+  if(now<game.t0+3.2*(60/bpmAt(0))) return;      // tijdens het aftellen telt tikken niet
+  let best=null, bd=1e9;
+  game.beats.forEach(x=>{ const d=Math.abs(now-x.t); if(d<bd){bd=d;best=x;} });
+  if(!best) return;
+  const win=Math.min(.14,best.beat*.28);
+  if(bd<=win&&!best.hit){ best.hit=true; best.judged=true; game.hits++; game.streak++; game.score+=10*Math.min(4,1+Math.floor(game.streak/8)); game.pose^=1; game.x+=1; game.flash=performance.now(); if(game.streak%8===0&&game.hearts<HEARTS){ game.hearts++; game.bonus=performance.now(); } }
+  else if(bd<=win&&best.hit){ /* dubbele tik op dezelfde tel: negeren */ }
+  else if(bd>best.beat*.35&&best.b>=4){ lose(); }
+}
+function lose(){ game.hearts--; game.streak=0; game.misses++; game.stumble=performance.now(); stumbleSound(); if(game.hearts<=0) end(false); }
+function end(won){
+  if(!game||game.over) return;
+  game.over=true; game.won=won; clearInterval(timer);
+  const total=game.beats.length||1, pct=Math.round(100*game.hits/L().beats);
+  const stars=won?(game.hearts>=5?3:game.hearts>=3?2:1):0;
+  if(won){ const k='l'+level; best[k]=Math.max(best[k]||0,stars); try{localStorage.setItem('ku-best',JSON.stringify(best))}catch(_){ } renderLevels(); }
+  const ov=$('overlay'); ov.hidden=false;
+  ov.innerHTML=won?`<h2>Gehaald!</h2><div class="big">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div><p>${game.hits} van de ${L().beats} tellen raak · score ${game.score}</p><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button class="btn btn-primary" id="again">Nog eens</button>${level<LEVELS.length-1?'<button class="btn btn-primary" id="nextL">Volgend level &rarr;</button>':''}</div>`
+                 :`<h2>Gestruikeld!</h2><p>Je was de tel kwijt bij het tempo &ldquo;${wordAt(Math.max(0,game.b-2))}&rdquo;. Probeer opnieuw: luister goed naar de bastrom.</p><button class="btn btn-primary" id="again">Opnieuw</button>`;
+  ov.querySelector('#again').onclick=start;
+  const n=ov.querySelector('#nextL'); if(n) n.onclick=()=>{ level++; try{localStorage.setItem('ku-level',level)}catch(_){ } renderLevels(); intro(); };
+}
+function stopGame(){ clearInterval(timer); cancelAnimationFrame(raf); game=null; }
+
+/* ---------- tekenen ---------- */
+function loop(){
+  if(!game) return;
+  const now=heard();
+  // gemiste tellen
+  game.beats.forEach(x=>{ if(!x.judged&&now>x.t+Math.min(.14,x.beat*.28)+.02){ x.judged=true; if(!x.hit&&!game.over&&x.b>=4) lose(); } });
+  if(!game.over&&game.endAt&&now>game.endAt) end(true);
+  // huidige tel
+  let cur=null; game.beats.forEach(x=>{ if(now>=x.t-.02) cur=x; });
+  const b=cur?cur.b:-1;
+  $('tempoWord').textContent=b>=0?wordAt(b):'';
+  const cin=Math.floor((now-game.t0)/(60/bpmAt(0)));
+  $('count').textContent=(now>=game.t0&&cin<4&&b<0)?String(cin+1):'';
+  const pulse=cur&&L().pulse?Math.max(0,1-(now-cur.t)/(cur.beat*.6)):0;
+  draw(pulse);
+  $('hearts').textContent='♥'.repeat(Math.max(0,game.hearts))+'♡'.repeat(HEARTS-Math.max(0,game.hearts));
+  $('score').textContent=game.score; $('streak').textContent=game.streak;
+  if(!game.over||performance.now()-(game.stumble||0)<600) raf=requestAnimationFrame(loop);
+}
+function draw(pulse){
+  const g=game||{x:0,pose:0,stumble:0,flash:0};
+  const st=performance.now()-(g.stumble||0)<450, fl=performance.now()-(g.flash||0);
+  const off=(g.x*60)%800, hillOff=(g.x*14)%800;
+  const hop=fl<180?Math.sin(fl/180*Math.PI)*10:0;
+  let h='';
+  // wolken en heuvels (parallax)
+  [[120,70],[430,50],[690,90]].forEach(([cx,cy])=>{ const x=((cx-g.x*6)%900+900)%900-50; h+=`<g fill="#fff" opacity=".85"><ellipse cx="${x}" cy="${cy}" rx="46" ry="16"/><ellipse cx="${x+26}" cy="${cy-10}" rx="30" ry="14"/></g>`; });
+  for(let k=-1;k<3;k++){ const x=k*400-hillOff; h+=`<path d="M${x} 270 Q${x+100} 170 ${x+200} 270 Q${x+300} 200 ${x+400} 270 Z" fill="var(--ground2)" opacity=".55"/>`; }
+  h+=`<rect x="0" y="262" width="800" height="90" fill="var(--ground)"/>`;
+  for(let k=-1;k<15;k++){ const x=k*60-off; h+=`<rect x="${x}" y="296" width="30" height="6" rx="3" fill="#fff" opacity=".6"/>`; }
+  // pulserende tel-lamp
+  if(L().pulse) h+=`<circle cx="740" cy="60" r="${18+pulse*10}" fill="#FFD66B" opacity="${.35+pulse*.65}"/><text x="740" y="104" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)" opacity=".7">tel</text>`;
+  // figuurtje
+  const x=250, y=262-hop, lean=st?35:0, p=g.pose;
+  const leg1=p?[-14,40]:[12,40], leg2=p?[12,40]:[-14,40], arm1=p?[16,-18]:[-16,-18], arm2=p?[-16,-18]:[16,-18];
+  h+=`<g transform="translate(${x} ${y}) rotate(${lean})" stroke="var(--ink)" stroke-width="7" stroke-linecap="round" fill="none">
+    <line x1="0" y1="-40" x2="${leg1[0]}" y2="0"/><line x1="0" y1="-40" x2="${leg2[0]}" y2="0"/>
+    <line x1="0" y1="-40" x2="0" y2="-80"/>
+    <line x1="0" y1="-72" x2="${arm1[0]}" y2="${-72-arm1[1]}"/><line x1="0" y1="-72" x2="${arm2[0]}" y2="${-72-arm2[1]}"/>
+    <circle cx="0" cy="-96" r="15" fill="var(--warm)" stroke="var(--ink)"/>
+  </g>`;
+  if(g.bonus&&performance.now()-g.bonus<700) h+=`<text x="${x+40}" y="${y-140}" font-size="26" font-weight="800" fill="var(--bad)">+♥</text>`;
+  if(g.bonus&&performance.now()-g.bonus<700) h+=`<text x="${x+40}" y="${y-140}" font-size="26" font-weight="800" fill="var(--bad)">+♥</text>`;
+  if(st) h+=`<text x="${x+30}" y="${y-110}" font-size="30" font-weight="800" fill="var(--bad)">oei!</text>`;
+  if(fl<250&&!st) h+=`<text x="${x-10}" y="${y-120}" font-size="22" font-weight="800" fill="var(--ok)" opacity="${1-fl/250}">+</text>`;
+  $('svg').innerHTML=h;
+}
+function intro(){
+  stopGame(); draw(0);
+  $('hearts').textContent='♥'.repeat(HEARTS); $('score').textContent='0'; $('streak').textContent='0'; $('tempoWord').textContent=''; $('count').textContent='';
+  const ov=$('overlay'); ov.hidden=false;
+  ov.innerHTML=`<h2>${L().name}: ${L().info}</h2><p>Je hoort eerst 4 tikken aftellen. Tik daarna op elke tel. De eerste 4 tellen mag je nog zoeken. Na 8 goede tikken op rij krijg je een hartje terug. ${L().pulse?'Het gele lampje knippert mee op de tel.':'Geen lampje meer: alleen je oren!'}</p><button class="btn btn-primary btn-big" id="go">&#9654; Start</button>`;
+  ov.querySelector('#go').onclick=start;
+}
+function renderLevels(){ $('levels').innerHTML=LEVELS.map((x,i)=>{ const s=best['l'+i]||0; return `<button type="button" data-l="${i}" aria-pressed="${i===level}">${x.name}<small>${x.info}</small><span class="stars">${s?'★'.repeat(s)+'☆'.repeat(3-s):''}</span></button>`; }).join(''); }
+$('levels').addEventListener('click',e=>{ const b=e.target.closest('[data-l]'); if(!b) return; level=+b.dataset.l; try{localStorage.setItem('ku-level',level)}catch(_){ } renderLevels(); intro(); });
+$('pad').addEventListener('pointerdown',e=>{ e.preventDefault(); tap(e); });
+document.addEventListener('keydown',e=>{ if(e.code!=='Space'||e.repeat) return; e.preventDefault(); if(!game||game.over){ const b=document.querySelector('#overlay button'); if(b&&!game) return; } tap(e); });
+renderLevels(); intro();
+})();
+</script>
+</body>
+</html>

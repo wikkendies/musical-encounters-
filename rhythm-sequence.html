@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}</style>
+<title>Rhythm Sequence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --staff:#7F89A3; --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6; --now:rgba(242,169,59,.28); --warm:#E08E12;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --now:rgba(245,184,79,.22); --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --now:rgba(245,184,79,.22); --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:8px 0 0;color:var(--muted)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow);align-self:flex-start}
+.tabs button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.tabs button small{font-weight:500;font-size:12px;color:var(--muted)}
+.tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.tabs button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:18px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn svg{width:18px;height:18px;flex:none}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-big{font-size:17px;padding:16px 22px}
+.btn-soft{background:var(--accent-soft);color:var(--accent)}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.controls{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+.ctl{display:flex;align-items:center;gap:10px;font-weight:600}
+.ctl output{font-variant-numeric:tabular-nums;min-width:62px;color:var(--muted)}
+input[type=range]{accent-color:var(--accent);width:140px}
+.switch{display:flex;align-items:center;gap:10px;font-weight:600;cursor:pointer}
+.switch input{appearance:none;width:44px;height:26px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;margin:0}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{transform:translateX(18px)}
+.status{display:flex;align-items:center;gap:0 12px;min-height:44px;padding:10px 14px;border-radius:12px;background:var(--surface-2);color:var(--muted);font-weight:600}
+.status .big{font-family:var(--display);font-size:26px;font-weight:800;color:var(--warm);line-height:1;font-variant-numeric:tabular-nums}
+
+/* rondes */
+.rounds{display:flex;gap:8px;align-items:center;font-weight:700;color:var(--muted)}
+.dot{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;border:2px solid var(--line);font-size:14px;font-variant-numeric:tabular-nums}
+.dot.cur{border-color:var(--accent);color:var(--accent)}
+.dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.summary{display:flex;flex-direction:column;gap:8px}
+.sumhead{margin:0;font-family:var(--display);font-size:24px;font-weight:800}
+.sumrow{display:grid;grid-template-columns:110px 1fr 1.6fr;gap:12px;align-items:center;padding:12px 14px;border-radius:12px;border:2px solid var(--line)}
+.sumrow.ok{background:var(--ok-soft);border-color:var(--ok)}
+.sumrow.bad{background:var(--bad-soft);border-color:var(--bad)}
+@media (max-width:560px){.sumrow{grid-template-columns:1fr}}
+.dot.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+
+/* kaartjes */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{position:relative;border:2px solid var(--line);background:var(--surface-2);border-radius:16px;padding:10px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ink);touch-action:none;transition:border-color .12s,transform .12s,background .12s;min-width:0}
+.card svg{width:100%;height:auto;max-width:260px;display:block}
+.card .lab{font-family:var(--display);font-weight:800;font-size:18px}
+.card .rh{font-size:13px;color:var(--muted);font-weight:600}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.card.ok{border-color:var(--ok);background:var(--ok-soft)}
+.card.bad{border-color:var(--bad);background:var(--bad-soft)}
+.card.dim{opacity:.35}
+.card.used{display:none}
+
+/* vakjes */
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.slot{border:2px dashed var(--line);border-radius:16px;min-height:150px;display:flex;flex-direction:column;align-items:stretch;padding:8px;gap:6px;background:transparent;transition:border-color .12s,background .12s}
+.slot .pos{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;border-radius:8px;padding:2px 0}
+.slot.now .pos{background:var(--now);color:var(--ink)}
+.slot.over{border-color:var(--accent);background:var(--accent-soft)}
+.picking .slot:has(.empty){border-color:var(--accent)}
+.slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.slot.bad{border-style:solid;border-color:var(--bad);background:var(--bad-soft)}
+.slot .card{flex:1}
+.slot .empty{flex:1;display:grid;place-items:center;color:var(--muted);font-size:14px;text-align:center;border:0;background:none;border-radius:10px}
+.picking .slot .empty{color:var(--accent);font-weight:700}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.actions .spacer{flex:1}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.ghost{position:fixed;left:0;top:0;z-index:50;pointer-events:none;width:200px;background:var(--surface);border:2px solid var(--accent);border-radius:14px;padding:6px;box-shadow:0 12px 30px rgba(22,32,58,.25);color:var(--ink)}
+.ghost svg{width:100%;height:auto;display:block}
+@media (max-width:760px){.cards,.slots{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.levels{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow);align-self:flex-start}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.tempo-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:6px 14px;font-weight:800;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="ritme.html">&larr; Let's Make Rhythm</a>
+    <h1>Rhythm <span>Sequence</span></h1>
+    <p>Vier keer dezelfde melodie, maar de twee achtste noten staan telkens op een andere tel.</p>
+  </header>
+
+  <div class="levels" role="group" aria-label="Niveau" id="tlevels"></div>
+
+  <div class="tabs" role="group" aria-label="Deel">
+    <button id="tab1" aria-pressed="true">1. Opwarmer<small>Welk stukje hoor je?</small></button>
+    <button id="tab2" aria-pressed="false">2. Oefening<small>Leg de volgorde</small></button>
+  </div>
+
+  <section class="panel" aria-labelledby="pTitle">
+    <div class="panel-head">
+      <div><div class="eyebrow" id="pEyebrow">Opwarmer</div><h2 id="pTitle">Welk stukje hoor je?</h2></div>
+      <div class="rounds" id="rounds"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary btn-big" id="playBtn"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5v13l11-6.5z" fill="currentColor"/></svg><span>Beluister</span></button>
+      <div class="ctl">Tempo <span class="tempo-badge" id="tempoOut"></span></div>
+      <label class="switch"><input type="checkbox" id="metro" checked>Metronoom</label>
+    </div>
+    <div class="status" id="status" aria-live="polite"><span></span></div>
+
+    <div id="slotsWrap" hidden>
+      <div class="slots" id="slots"></div>
+    </div>
+
+    <div class="summary" id="summary" hidden></div>
+    <div class="cards" id="cards"></div>
+    <p class="hint" id="hint"></p>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn" hidden>Controleer</button>
+      <button class="btn btn-ghost" id="clearBtn" hidden>Maak vakjes leeg</button>
+      <span class="spacer"></span>
+      <button class="linkbtn" id="solveBtn" hidden>Toon oplossing</button>
+      <button class="btn btn-ghost" id="againBtn" hidden>Opwarmer opnieuw</button>
+      <button class="btn btn-soft" id="nextBtn">Volgende</button>
+    </div>
+    <p class="feedback info" id="feedback" aria-live="polite"></p>
+  </section>
+</div>
+
+<script>
+(function(){
+/* ---------- testmodus: test.html laadt deze pagina met ?test=1&lvl=N&n=M ---------- */
+const TEST=(()=>{try{const q=new URLSearchParams(location.search);if(q.get('test')!=='1')return null;
+  return {lvl:Math.max(1,parseInt(q.get('lvl'))||1),o:Math.max(0,parseInt(q.get('o'))||0),n:Math.max(1,Math.min(20,parseInt(q.get('n'))||3)),i:0,score:0,max:0,items:[]}}catch(e){return null}})();
+function testSend(m){try{if(window.parent!==window)window.parent.postMessage(Object.assign({lmr:'test'},m),'*')}catch(e){}}
+function testRecord(got,max){got=Math.max(0,Math.min(max,got));TEST.score+=got;TEST.max+=max;TEST.items.push([got,max]);TEST.i++;
+  testSend({type:'progress',i:TEST.i,n:TEST.n,score:TEST.score,max:TEST.max});
+  if(TEST.i>=TEST.n){document.body.classList.add('test-finished');testSend({type:'done',score:TEST.score,max:TEST.max,items:TEST.items});return true}return false}
+function testCheck(fn){document.addEventListener('click',e=>{if(!e.target.closest('#checkBtn'))return;e.stopPropagation();e.preventDefault();fn()},true)}
+function testTitle(el){if(el)el.textContent=`Vraag ${TEST.o+TEST.i+1} van ${TEST.o+TEST.n}`}
+function testShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const TEST_NEXT='Antwoord bewaard. Op naar de volgende vraag.';
+if(TEST){const s=document.createElement('style');s.textContent='.back,.levels,.tabs,.no-test{display:none!important}body{padding-top:6px}header h1{font-size:32px}.test-finished .wrap{opacity:.35;pointer-events:none}';document.head.appendChild(s);document.body.classList.add('testmode')}
+
+const GCLEF='M434 2Q464 -103 464 -170Q464 -223 427 -257Q390 -291 337 -291Q287 -291 250 -262Q213 -232 213 -190Q213 -160 234 -134Q254 -107 284 -107Q313 -107 332 -128Q350 -150 350 -178Q350 -240 280 -240Q298 -268 338 -268Q353 -268 368 -264Q384 -259 401 -248Q418 -237 428 -214Q439 -190 439 -157Q439 -136 411 -6Q389 -12 356 -12Q259 -12 190 60Q120 132 120 232Q120 267 132 303Q143 339 158 366Q172 394 200 428Q229 463 248 484Q268 504 303 539Q280 621 280 689Q280 779 313 840Q346 900 379 900Q389 900 402 887Q414 874 426 851Q438 828 446 790Q455 753 455 710Q455 551 342 447L368 329Q384 332 397 332Q458 332 500 282Q542 233 542 162Q542 44 434 2ZM426 746Q426 801 394 801Q358 801 333 748Q308 695 308 630Q308 588 321 557Q359 580 392 640Q426 699 426 746ZM498 128Q498 183 466 216Q434 249 383 249L428 23Q498 52 498 128ZM407 17 361 247Q334 241 312 214Q289 187 289 158Q289 143 295 128Q301 114 310 104Q318 94 327 86Q336 78 342 74Q348 71 348 71L340 66Q307 75 278 106Q248 137 248 184Q248 231 278 270Q307 310 343 323L325 430Q168 299 168 177Q168 104 223 55Q278 6 348 6Q365 6 407 17Z';
+/* De melodie: do – sol – mi' – re' – do'. Stukje k heeft de twee achtste noten op tel k. */
+const MEL=[{n:'C4',step:-2,midi:60},{n:'G4',step:1,midi:67},{n:'E5',step:7,midi:76},{n:'D5',step:6,midi:74},{n:'C5',step:5,midi:72}];
+const LABELS=['A','B','C','D'];
+const RH=['ti-ti ta ta ta','ta ti-ti ta ta','ta ta ti-ti ta','ta ta ta ti-ti'];
+function events(k){ // k = 0..3 : tel met de achtsten
+  const ev=[];let t=0,i=0;
+  for(let beat=0;beat<4;beat++){
+    if(beat===k){ev.push({t,d:.5,m:MEL[i++].midi},{t:t+.5,d:.5,m:MEL[i++].midi})}
+    else ev.push({t,d:1,m:MEL[i++].midi});
+    t+=1;
+  }
+  return ev;
+}
+
+/* ---------- notatie ---------- */
+const BOT=80,SP=12;
+function yOf(s){return BOT-s*(SP/2)}
+function fragSVG(k){
+  const W=250,H=118;let h='';
+  for(let l=0;l<5;l++)h+=`<line x1="4" y1="${BOT-l*SP}" x2="${W-4}" y2="${BOT-l*SP}" stroke="var(--staff)" stroke-width="1.3"/>`;
+  h+=`<path d="${GCLEF}" transform="translate(2 ${BOT-SP}) scale(0.068 -0.068)" fill="currentColor"/>`;
+  h+=`<line x1="${W-4}" y1="${BOT-4*SP}" x2="${W-4}" y2="${BOT}" stroke="currentColor" stroke-width="2"/>`;
+  const X0=58,BW=47;let i=0;
+  for(let beat=0;beat<4;beat++){
+    const bx=X0+beat*BW;
+    if(beat===k){
+      const a=MEL[i++],b=MEL[i++],xa=bx,xb=bx+22,ya=yOf(a.step),yb=yOf(b.step);
+      const up=(a.step+b.step)/2<4;
+      h+=head(xa,ya)+head(xb,yb)+ledger(xa,a.step)+ledger(xb,b.step);
+      if(up){const by=Math.min(ya,yb)-30;h+=stem(xa+6.6,ya-1,by)+stem(xb+6.6,yb-1,by)+`<rect x="${xa+5.6}" y="${by-2}" width="${xb-xa+2}" height="5" fill="currentColor"/>`}
+      else{const by=Math.max(ya,yb)+30;h+=stem(xa-6.6,ya+1,by)+stem(xb-6.6,yb+1,by)+`<rect x="${xa-7.6}" y="${by-3}" width="${xb-xa+2}" height="5" fill="currentColor"/>`}
+    }else{
+      const a=MEL[i++],x=bx+8,y=yOf(a.step),up=a.step<4;
+      h+=head(x,y)+ledger(x,a.step)+(up?stem(x+6.6,y-1,y-34):stem(x-6.6,y+1,y+34));
+    }
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true" fill="currentColor">${h}</svg>`;
+}
+function head(x,y){return `<ellipse cx="${x}" cy="${y}" rx="6.6" ry="4.9" transform="rotate(-20 ${x} ${y})" fill="currentColor"/>`}
+function stem(x,y1,y2){return `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="currentColor" stroke-width="1.8"/>`}
+function ledger(x,s){let h='';for(let q=-2;q>=s;q-=2)h+=`<line x1="${x-11}" y1="${yOf(q)}" x2="${x+11}" y2="${yOf(q)}" stroke="currentColor" stroke-width="1.4"/>`;return h}
+function cardHTML(k,extra){return `<button class="card${extra||''}" data-k="${k}" aria-label="Stukje ${LABELS[k]}: ${RH[k]}">${fragSVG(k)}<span class="lab">${LABELS[k]}</span><span class="rh">${RH[k]}</span></button>`}
+
+/* ---------- state ---------- */
+const $=id=>document.getElementById(id);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const MAXPLAY=3;
+function playsLeft(){return state.phase===2&&state.e&&state.e.tried?99:MAXPLAY-state.plays}   // deel 2: na de eerste controle onbeperkt
+const state={plays:0,phase:1,tempo:90,metro:true,
+  w:{order:shuffle([0,1,2,3]),round:0,choices:[null,null,null,null],finished:false,heard:false},
+  e:{order:shuffle([0,1,2,3]),slots:[null,null,null,null],selected:null,checked:false,shown:false}};
+
+function setFeedback(m,k){$('feedback').textContent=m;$('feedback').className='feedback '+(k||'info')}
+function setStatus(html){$('status').innerHTML='<span>'+html+'</span>'}
+
+/* ---------- render ---------- */
+function render(){
+  const P=state.phase;
+  $('tab1').setAttribute('aria-pressed',String(P===1));$('tab2').setAttribute('aria-pressed',String(P===2));
+  $('slotsWrap').hidden=P!==2;if(P===2){$('summary').hidden=true;$('cards').hidden=false;$('playBtn').hidden=false;$('againBtn').hidden=true}$('checkBtn').hidden=P!==2;$('clearBtn').hidden=P!==2;$('solveBtn').hidden=P!==2;
+  if(P===1){
+    const w=state.w;
+    $('pEyebrow').textContent='Opwarmer';$('pTitle').textContent=w.finished?'Jouw resultaat':'Welk stukje hoor je?';
+    $('rounds').innerHTML='<span>Ronde</span>'+[0,1,2,3].map(r=>{let c='';
+      if(w.finished)c=w.choices[r]===w.order[r]?' ok':' bad';else if(r<w.round)c=' done';else if(r===w.round)c=' cur';
+      return `<span class="dot${c}">${r+1}</span>`}).join('');
+    $('summary').hidden=!w.finished;
+    if(w.finished){
+      const n=w.choices.filter((k,r)=>k===w.order[r]).length;
+      $('summary').innerHTML=`<p class="sumhead">${n} van de 4 juist${n===4?' – top!':''}</p>`+[0,1,2,3].map(r=>{const ok=w.choices[r]===w.order[r];
+        return `<div class="sumrow ${ok?'ok':'bad'}"><b>Ronde ${r+1}</b><span>Jij koos <b>${LABELS[w.choices[r]]}</b></span><span>${ok?'Juist':'Het was <b>'+LABELS[w.order[r]]+'</b> ('+RH[w.order[r]]+')'}</span></div>`}).join('');
+    }
+    $('cards').hidden=w.finished;
+    $('cards').innerHTML=[0,1,2,3].map(k=>cardHTML(k).replace('<button class="card','<button aria-pressed="'+(w.choices[w.round]===k)+'" class="card')).join('');
+    $('hint').textContent=w.finished?'Je kan de opwarmer opnieuw doen, of beginnen aan de oefening.':'Beluister het stukje en klik op het kaartje dat je hoort. Je hoort pas op het einde wat juist was.';
+    $('playBtn').hidden=w.finished;
+    $('playBtn').querySelector('span').textContent=playing?'Stop':(playsLeft()>0?`Beluister stukje ${w.round+1} van 4 (nog ${playsLeft()}×)`:'Geen beluisterbeurten meer');
+    $('playBtn').disabled=!playing&&playsLeft()<=0;
+    $('againBtn').hidden=!w.finished;
+    $('nextBtn').textContent=w.finished?'Start de oefening →':(w.round>=3?'Toon mijn resultaat':'Volgende ronde');
+    $('nextBtn').disabled=false;
+  }else{
+    const e=state.e;
+    $('pEyebrow').textContent='Oefening';$('pTitle').textContent='Leg de vier stukjes in de juiste volgorde';
+    $('rounds').innerHTML='';
+    $('slots').innerHTML=[0,1,2,3].map(p=>{const k=e.slots[p];let c='';
+      if(e.checked&&k!==null&&(e.shown||e.slots.every((x,q)=>x===e.order[q])))c=' ok';   // geen groen/rood per vakje
+      return `<div class="slot${c}" data-p="${p}"><div class="pos">${p+1}e</div>${k===null?`<button class="empty" data-p="${p}">${state.e.selected!==null?'Tik om hier te leggen':'Sleep een kaartje hierheen'}</button>`:cardHTML(k)}</div>`}).join('');
+    $('cards').innerHTML=[0,1,2,3].map(k=>cardHTML(k,e.slots.includes(k)?' used':'').replace('<button class="card','<button aria-pressed="'+(e.selected===k)+'" class="card')).join('');
+    document.body.classList.toggle('picking',e.selected!==null);
+    $('hint').textContent='Sleep elk kaartje naar het juiste vakje, of tik eerst op een kaartje en dan op een vakje. Tik op een kaartje in een vakje om het terug te leggen.';
+    $('playBtn').querySelector('span').textContent=playing?'Stop':(state.e&&state.e.tried?'Beluister opnieuw':playsLeft()>0?`Beluister de vier stukjes (nog ${playsLeft()}×)`:'Geen beluisterbeurten meer');
+    $('playBtn').disabled=!playing&&playsLeft()<=0;
+    $('nextBtn').textContent='Nieuwe volgorde';$('nextBtn').disabled=false;
+  }
+}
+
+/* ---------- opwarmer ---------- */
+$('cards').addEventListener('click',e=>{
+  const c=e.target.closest('.card');if(!c||state.phase!==1)return;
+  const w=state.w,k=+c.dataset.k;if(w.finished)return;
+  if(!w.heard){setFeedback('Beluister eerst het stukje.','info');return}
+  w.choices[w.round]=k;setFeedback(`Je koos stukje ${LABELS[k]}. Je mag nog veranderen. Klik daarna op ${w.round>=3?'Toon mijn resultaat':'Volgende ronde'}.`,'info');
+  render();
+});
+function nextWarm(){
+  const w=state.w;
+  if(w.finished){goPhase(2);return}
+  if(w.choices[w.round]===null){setFeedback(w.heard?'Klik eerst op het kaartje dat je gehoord hebt (A, B, C of D).':'Druk eerst op Beluister en klik dan op het kaartje dat je hoort.','bad');return}
+  stop();
+  if(w.round>=3){w.finished=true;setFeedback('');setStatus('Klaar! Hieronder zie je wat juist was.');render();return}
+  w.round++;w.heard=false;state.plays=0;setFeedback('');render();
+  setStatus('Druk op <em>Beluister</em> voor het volgende stukje.');
+}
+/* ---------- oefening: slepen & tikken ---------- */
+let drag=null;
+function place(p,k){const e=state.e;const old=e.slots.indexOf(k);if(old>=0)e.slots[old]=null;
+  if(e.slots[p]!==null&&old>=0)e.slots[old]=e.slots[p];
+  e.slots[p]=k;e.selected=null;e.checked=false;setFeedback('');render()}
+$('cards').addEventListener('pointerdown',ev=>{if(state.phase!==2)return;const c=ev.target.closest('.card');if(!c||c.classList.contains('used'))return;ev.preventDefault();begin(ev,+c.dataset.k,c,false)});
+$('slots').addEventListener('pointerdown',ev=>{const c=ev.target.closest('.card');if(!c)return;ev.preventDefault();begin(ev,+c.dataset.k,c,true)});
+$('slots').addEventListener('click',ev=>{const b=ev.target.closest('.empty');if(!b)return;
+  if(state.e.selected!==null)place(+b.dataset.p,state.e.selected);else setFeedback('Kies eerst een kaartje, of sleep het naar een vakje.','info')});
+function begin(ev,k,el,fromSlot){drag={k,el,fromSlot,x0:ev.clientX,y0:ev.clientY,active:false,ghost:null,p:null};
+  window.addEventListener('pointermove',move);window.addEventListener('pointerup',up,{once:true})}
+function slotAt(x,y){const el=document.elementFromPoint(x,y);const s=el&&el.closest('.slot');return s?+s.dataset.p:null}
+function move(ev){if(!drag)return;
+  if(!drag.active){if(Math.hypot(ev.clientX-drag.x0,ev.clientY-drag.y0)<6)return;drag.active=true;
+    const g=document.createElement('div');g.className='ghost';g.innerHTML=fragSVG(drag.k);document.body.appendChild(g);drag.ghost=g;drag.el.style.opacity='.3'}
+  drag.ghost.style.transform=`translate(${ev.clientX-100}px,${ev.clientY-50}px)`;
+  document.querySelectorAll('.slot.over').forEach(s=>s.classList.remove('over'));
+  drag.p=slotAt(ev.clientX,ev.clientY);if(drag.p!==null)document.querySelector(`.slot[data-p="${drag.p}"]`).classList.add('over')}
+function up(){window.removeEventListener('pointermove',move);const d=drag;drag=null;if(!d)return;
+  if(d.ghost)d.ghost.remove();
+  const e=state.e;
+  if(d.active){
+    if(d.p!==null)place(d.p,d.k);
+    else if(d.fromSlot){e.slots[e.slots.indexOf(d.k)]=null;e.checked=false;render()}
+    else render();
+  }else{
+    if(d.fromSlot){e.slots[e.slots.indexOf(d.k)]=null;e.checked=false;setFeedback('');render()}
+    else{e.selected=e.selected===d.k?null:d.k;render()}
+  }}
+$('checkBtn').addEventListener('click',()=>{const e=state.e;
+  if(e.slots.includes(null)){setFeedback('Leg eerst in elk vakje een kaartje.','bad');return}
+  e.checked=true;e.tried=true;const good=e.slots.filter((k,p)=>k===e.order[p]).length;render();
+  if(good===4)setFeedback(e.shown?'Juist, maar je hebt de oplossing bekeken. Probeer een nieuwe volgorde!':'Helemaal juist! Klik op "Nieuwe volgorde" voor een nieuwe reeks.','ok');
+  else setFeedback(`${good} van de 4 vakjes zijn juist. Welke juist zijn, moet je zelf ontdekken: luister opnieuw, verwissel kaartjes en controleer opnieuw.`,'bad')});
+$('clearBtn').addEventListener('click',()=>{const e=state.e;e.slots=[null,null,null,null];e.checked=false;e.selected=null;setFeedback('');render()});
+$('solveBtn').addEventListener('click',()=>{const e=state.e;e.slots=e.order.slice();e.shown=true;e.checked=true;render();setFeedback('Dit is de juiste volgorde. Luister nog eens mee.','info')});
+
+/* ---------- fases ---------- */
+function goPhase(p){stop();state.plays=0;state.phase=p;setFeedback('');
+  if(p===2){state.e={order:shuffle([0,1,2,3]),slots:[null,null,null,null],selected:null,checked:false,shown:false};
+    setStatus('Druk op <em>Beluister</em>: je hoort 4 stukjes na elkaar, zonder pauze.')}
+  else{state.w={order:shuffle([0,1,2,3]),round:0,choices:[null,null,null,null],finished:false,heard:false};
+    setStatus('Druk op <em>Beluister</em>. Je hoort eerst 4 tikken, dan één stukje.')}
+  render()}
+$('tab1').addEventListener('click',()=>goPhase(1));
+$('againBtn').addEventListener('click',()=>goPhase(1));
+$('tab2').addEventListener('click',()=>goPhase(2));
+$('nextBtn').addEventListener('click',()=>{if(state.phase===1)nextWarm();else goPhase(2)});
+/* ---------- niveaus: het verschil zit in het tempo ---------- */
+const TEMPI=[80, 100, 120],LVL_INFO=['Rustig','Vlot','Snel'];
+let tlevel=0;try{tlevel=Math.min(2,+(localStorage.getItem('rs-level')||0))}catch(e){}
+function renderLevels(){state.tempo=TEMPI[tlevel];$('tempoOut').textContent=state.tempo+' BPM';
+  $('tlevels').innerHTML=TEMPI.map((t,i)=>`<button data-l="${i}" aria-pressed="${i===tlevel}">Niveau ${i+1}<small>${LVL_INFO[i]} · ${t} BPM</small></button>`).join('')}
+$('tlevels').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;stop();tlevel=+b.dataset.l;try{localStorage.setItem('rs-level',tlevel)}catch(e){}renderLevels()});
+renderLevels();
+$('metro').addEventListener('change',e=>{state.metro=e.target.checked});
+
+/* ---------- audio ---------- */
+let ctx=null,playing=null;
+function ac(){if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();return ctx}
+function click(t,accent,out){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=accent?1900:1400;
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(accent?0.45:0.28,t+0.002);g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+  o.connect(g).connect(out);o.start(t);o.stop(t+0.07)}
+function piano(t,d,midi,out){
+  const f=440*Math.pow(2,(midi-69)/12),g=ctx.createGain(),lp=ctx.createBiquadFilter();
+  lp.type='lowpass';lp.frequency.setValueAtTime(5200,t);lp.frequency.exponentialRampToValueAtTime(1400,t+Math.max(0.3,d));
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.32,t+0.006);
+  if(d<0.32){g.gain.exponentialRampToValueAtTime(0.16,t+d);g.gain.setTargetAtTime(0.0001,t+d,0.03)}
+  else{g.gain.exponentialRampToValueAtTime(0.16,t+0.25);g.gain.exponentialRampToValueAtTime(0.08,t+Math.max(0.3,d*0.95));g.gain.setTargetAtTime(0.0001,t+d,0.045)}
+  g.connect(lp).connect(out);
+  [[1,1],[2,.42],[3,.2],[4,.11],[5,.05],[0.5,.18]].forEach(([k,a])=>{const o=ctx.createOscillator(),og=ctx.createGain();
+    o.frequency.value=f*k*(k>1?1+0.0006*k:1);og.gain.value=a;o.connect(og).connect(g);o.start(t);o.stop(t+d+0.4)});
+}
+function stop(){if(!playing)return;const p=playing;playing=null;cancelAnimationFrame(p.raf);clearTimeout(p.timer);
+  p.master.gain.setTargetAtTime(0.0001,ctx.currentTime,0.03);setTimeout(()=>p.master.disconnect(),300);
+  document.querySelectorAll('.slot.now').forEach(s=>s.classList.remove('now'));render()}
+function play(){
+  if(playing){stop();return}
+  if(playsLeft()<=0){setFeedback('Je mag maximaal 3 keer beluisteren.','info');return}
+  state.plays++;
+  const c=ac(),master=c.createGain();master.gain.value=0.9;master.connect(c.destination);
+  const spb=60/state.tempo,t0=c.currentTime+0.15;
+  const seq=state.phase===1?[state.w.order[state.w.round]]:state.e.order;
+  for(let i=0;i<4;i++)click(t0+i*spb,i===0,master);
+  seq.forEach((k,bar)=>{events(k).forEach(ev=>piano(t0+(4+bar*4+ev.t)*spb,ev.d*spb*0.95,ev.m,master));
+    if(state.metro)for(let i=0;i<4;i++)click(t0+(4+bar*4+i)*spb,i===0,master)});
+  const total=4+seq.length*4;
+  if(state.phase===1)state.w.heard=true;
+  playing={master,raf:0,timer:setTimeout(()=>{stop();setStatus(state.phase===1?'Welk stukje was het? Klik op een kaartje. Je mag het ook opnieuw beluisteren.':'Klaar. Leg de kaartjes in de juiste volgorde, of luister nog eens.')},(total*spb+0.5)*1000)};
+  render();let last='';
+  const tick=()=>{if(!playing)return;const b=(ctx.currentTime-t0)/spb;let key;
+    if(b<4){const n=b<0?1:Math.floor(b)+1;key='c'+n;if(key!==last)setStatus(`</span><span class="big">${n}</span><span>Aftellen…`)}
+    else{const bar=Math.floor((b-4)/4);key='b'+bar;
+      if(key!==last){if(state.phase===2){document.querySelectorAll('.slot.now').forEach(s=>s.classList.remove('now'));const s=document.querySelector(`.slot[data-p="${bar}"]`);if(s)s.classList.add('now');setStatus(`</span><span class="big">${bar+1}e</span><span>stukje speelt…`)}
+        else setStatus('Het stukje speelt… Waar zitten de twee snelle noten?')}}
+    last=key;playing.raf=requestAnimationFrame(tick)};
+  playing.raf=requestAnimationFrame(tick);
+}
+$('playBtn').addEventListener('click',play);
+
+goPhase(1);
+
+if(TEST){['solveBtn','nextBtn','againBtn'].forEach(id=>$(id).classList.add('no-test'));
+  tlevel=Math.min(2,TEST.lvl-1);renderLevels();
+  const _r=render;render=function(){_r();if(state.phase===2)testTitle($('pTitle'))};
+  const go=()=>goPhase(2);go();
+  testCheck(()=>{const e=state.e;if(e.slots.includes(null)){setFeedback('Leg eerst in elk vakje een kaartje.','bad');return}
+    const good=e.slots.filter((k,p)=>k===e.order[p]).length;
+    if(testRecord(good,4))return;go();setFeedback(TEST_NEXT,'info')});
+}
+})();
+</script>
+
+</body>
+</html>

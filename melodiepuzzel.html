@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}</style>
+<title>Melodiepuzzel &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --color-bg:#EAEEF5;
+    --color-surface:#FFFFFF;
+    --color-surface-muted:#F3F5FA;
+    --color-text:#16203A;
+    --color-text-soft:#58637F;
+    --color-border:#D3D9E6;
+    --color-accent:#3257E0;
+    --color-accent-deep:#2544B8;
+    --color-accent-ink:#FFFFFF;
+    --color-good:#1C8757;
+    --color-good-bg:#E1F3EA;
+    --color-bad:#C43D2B;
+    --color-bad-bg:#FBE6E2;
+    --color-staff:#16203A;
+    --shadow:0 1px 2px rgba(22,32,58,.06),0 10px 30px rgba(22,32,58,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --color-bg:#0E1322;
+      --color-surface:#161E33;
+      --color-surface-muted:#1C2640;
+      --color-text:#E6EAF5;
+      --color-text-soft:#9BA6C3;
+      --color-border:#2A3553;
+      --color-accent:#8198FF;
+      --color-accent-deep:#A5B5FF;
+      --color-accent-ink:#0E1322;
+      --color-good:#5CC98F;
+      --color-good-bg:#173A2A;
+      --color-bad:#FF8A75;
+      --color-bad-bg:#3E2420;
+      --color-staff:#C9D2E8;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --color-bg:#0E1322;
+    --color-surface:#161E33;
+    --color-surface-muted:#1C2640;
+    --color-text:#E6EAF5;
+    --color-text-soft:#9BA6C3;
+    --color-border:#2A3553;
+    --color-accent:#8198FF;
+    --color-accent-deep:#A5B5FF;
+    --color-accent-ink:#0E1322;
+    --color-good:#5CC98F;
+    --color-good-bg:#173A2A;
+    --color-bad:#FF8A75;
+    --color-bad-bg:#3E2420;
+    --color-staff:#C9D2E8;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--color-bg);
+    color:var(--color-text);
+    font-family:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+    padding:0 16px;
+  }
+  .page{
+    max-width:760px;
+    margin:0 auto;
+    padding-block:36px 56px;
+  }
+  h1,h2,h3{
+    font-family:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+    text-wrap:balance;
+    margin:0;
+  }
+  .hero{
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:28px;
+  }
+  .eyebrow{
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--color-accent-deep);
+    margin:0;
+  }
+  .hero h1{
+    font-size:clamp(34px,6vw,52px);
+    font-weight:800;
+    letter-spacing:-.02em;
+    color:var(--color-text);
+  }
+  .lede{
+    font-size:16px;
+    color:var(--color-text-soft);
+    max-width:46ch;
+    margin:0 auto;
+    line-height:1.5;
+  }
+
+  .rounds{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+  }
+  .round-pill{
+    font-family:"Figtree",system-ui,sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:9px 16px;
+    border-radius:999px;
+    border:1px solid var(--color-border);
+    background:var(--color-surface);
+    color:var(--color-text-soft);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .round-pill:hover{ border-color:var(--color-accent); color:var(--color-text); }
+  .round-pill:focus-visible{ outline:2px solid var(--color-accent); outline-offset:2px; }
+  .round-pill[aria-current="true"]{
+    background:var(--color-text);
+    border-color:var(--color-text);
+    color:var(--color-surface);
+  }
+  .round-pill .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--color-good);
+    display:none;
+  }
+  .round-pill.solved .dot{ display:inline-block; }
+
+  .back{display:inline-block;margin-bottom:20px;color:var(--color-text-soft);font-weight:700;text-decoration:none}
+  .back:hover{color:var(--color-accent)}
+
+  .round-card{
+    background:var(--color-surface);
+    border:1px solid var(--color-border);
+    border-radius:20px;
+    box-shadow:var(--shadow);
+    padding:clamp(20px,4vw,36px);
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+  }
+
+  .round-head .set-count{ margin:0 0 4px; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--color-text-soft); }
+  .round-head h2{
+    font-size:22px;
+    color:var(--color-text);
+    margin-bottom:6px;
+  }
+  .round-head p{
+    margin:0;
+    color:var(--color-text-soft);
+    font-size:15px;
+    line-height:1.5;
+  }
+
+  .play-full{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:"Figtree",system-ui,sans-serif;
+    font-weight:700;
+    font-size:15px;
+    border:none;
+    border-radius:12px;
+    padding:12px 20px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:transform .1s ease, background .15s ease, opacity .15s ease;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn:focus-visible{ outline:2px solid var(--color-accent-deep); outline-offset:2px; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn-primary{ background:var(--color-accent); color:var(--color-accent-ink); }
+  .btn-primary:hover:not(:disabled){ background:var(--color-accent-deep); }
+  .btn-ghost{ background:var(--color-surface-muted); color:var(--color-text); }
+  .btn-ghost:hover:not(:disabled){ background:var(--color-border); }
+  .btn-text{ background:transparent; color:var(--color-text-soft); padding:8px 6px; }
+  .btn-text:hover:not(:disabled){ color:var(--color-text); }
+
+  .wave{ display:flex; align-items:flex-end; gap:3px; height:22px; }
+  .wave span{
+    width:3px; background:var(--color-accent-deep); border-radius:2px; height:6px;
+    animation:none;
+  }
+  .wave.playing span{ animation:bar 0.9s ease-in-out infinite; }
+  .wave span:nth-child(1){ animation-delay:0s; }
+  .wave span:nth-child(2){ animation-delay:.12s; }
+  .wave span:nth-child(3){ animation-delay:.24s; }
+  .wave span:nth-child(4){ animation-delay:.36s; }
+  @keyframes bar{ 0%,100%{ height:6px; } 50%{ height:20px; } }
+  @media (prefers-reduced-motion: reduce){
+    .wave.playing span{ animation:none; height:14px; }
+  }
+
+  .frag-grid{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .frag-card{
+    flex:1 1 150px;
+    min-width:150px;
+    background:var(--color-surface-muted);
+    border:2px solid var(--color-border);
+    border-radius:14px;
+    padding:12px 10px 14px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    position:relative;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .frag-card:hover{ border-color:var(--color-accent); }
+  .frag-card:focus-visible{ outline:2px solid var(--color-accent-deep); outline-offset:2px; }
+  .frag-card.selected{ border-color:var(--color-accent-deep); background:var(--color-surface); }
+  .frag-card.correct{ border-color:var(--color-good); }
+  .frag-card.incorrect{ border-color:var(--color-bad); }
+  .frag-card .label{
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:.04em;
+    color:var(--color-text-soft);
+  }
+  .frag-card .badge{
+    position:absolute;
+    top:-10px; right:-10px;
+    width:26px; height:26px;
+    border-radius:50%;
+    background:var(--color-accent-deep);
+    color:var(--color-accent-ink);
+    font-weight:700;
+    font-size:14px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 4px rgba(0,0,0,.2);
+  }
+  .frag-card svg{ color:var(--color-staff); display:block; }
+  .frag-card .mini-play{
+    font-size:12px;
+    font-weight:700;
+    color:var(--color-accent-deep);
+    background:none;
+    border:1px solid var(--color-accent-deep);
+    border-radius:8px;
+    padding:4px 10px;
+    cursor:pointer;
+  }
+  .frag-card .mini-play:hover{ background:var(--color-accent); color:var(--color-accent-ink); border-color:var(--color-accent); }
+  .frag-card.playing{ animation:pulse 0.5s ease; }
+  @keyframes pulse{ 0%{ transform:scale(1); } 40%{ transform:scale(1.04); } 100%{ transform:scale(1); } }
+  @media (prefers-reduced-motion: reduce){ .frag-card.playing{ animation:none; } }
+
+  .answer-strip{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .answer-strip .caption{
+    font-size:13px;
+    font-weight:700;
+    color:var(--color-text-soft);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    width:100%;
+  }
+  .slot{
+    width:64px; height:64px;
+    border-radius:12px;
+    border:2px dashed var(--color-border);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-weight:600;
+    font-size:22px;
+    color:var(--color-text-soft);
+    background:var(--color-surface-muted);
+  }
+  .slot.filled{ border-style:solid; border-color:var(--color-accent-deep); color:var(--color-text); background:var(--color-surface); }
+  .slot.correct{ border-color:var(--color-good); background:var(--color-good-bg); color:var(--color-good); }
+  .slot.incorrect{ border-color:var(--color-bad); background:var(--color-bad-bg); color:var(--color-bad); }
+  .arrow{ color:var(--color-border); font-size:18px; }
+
+  .actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .feedback{
+    border-radius:12px;
+    padding:12px 16px;
+    font-size:14px;
+    font-weight:600;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.good{ background:var(--color-good-bg); color:var(--color-good); }
+  .feedback.bad{ background:var(--color-bad-bg); color:var(--color-bad); }
+
+  .foot{
+    text-align:center;
+    margin-top:28px;
+    font-size:12px;
+    color:var(--color-text-soft);
+  }
+
+  @media (max-width:420px){
+    .slot{ width:52px; height:52px; font-size:18px; }
+  }
+  .piano-card{margin-top:24px;gap:14px}
+  .piano-card h2{font-size:22px;margin:4px 0 0;color:var(--color-text)}
+  .piano-eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-soft)}
+  .piano-hint{margin:0;color:var(--color-text-soft);font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <a class="back" href="melodie.html">&larr; Let's Make Melodies</a>
+  <header class="hero">
+    <p class="eyebrow">Let's Make Melodies · Melodisch dictee</p>
+    <h1>Melodiepuzzel</h1>
+    <p class="lede">Luister naar de melodie en ontdek uit welke drie stukjes ze is opgebouwd. Zet de fragmenten in de juiste volgorde.</p>
+  </header>
+
+  <nav class="rounds" id="roundNav" aria-label="Rondes"></nav>
+
+  <main class="round-card" id="roundStage"></main>
+
+  <section class="round-card piano-card" aria-label="Pianoklavier">
+    <div>
+      <div class="piano-eyebrow">Hulpmiddel</div>
+      <h2>Pianoklavier</h2>
+    </div>
+    <p class="piano-hint">Speel de noten na op het klavier tot je hoort welke het zijn.</p>
+    <div id="piano"></div>
+  </section>
+
+  <p class="foot">Muzikale Ontmoetingen · Wies De Smet</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+/* ---------- testmodus: test.html laadt deze pagina met ?test=1&lvl=N&n=M ---------- */
+const TEST=(()=>{try{const q=new URLSearchParams(location.search);if(q.get('test')!=='1')return null;
+  return {lvl:Math.max(1,parseInt(q.get('lvl'))||1),o:Math.max(0,parseInt(q.get('o'))||0),n:Math.max(1,Math.min(20,parseInt(q.get('n'))||3)),i:0,score:0,max:0,items:[]}}catch(e){return null}})();
+function testSend(m){try{if(window.parent!==window)window.parent.postMessage(Object.assign({lmr:'test'},m),'*')}catch(e){}}
+function testRecord(got,max){got=Math.max(0,Math.min(max,got));TEST.score+=got;TEST.max+=max;TEST.items.push([got,max]);TEST.i++;
+  testSend({type:'progress',i:TEST.i,n:TEST.n,score:TEST.score,max:TEST.max});
+  if(TEST.i>=TEST.n){document.body.classList.add('test-finished');testSend({type:'done',score:TEST.score,max:TEST.max,items:TEST.items});return true}return false}
+function testCheck(fn){document.addEventListener('click',e=>{if(!e.target.closest('#checkBtn'))return;e.stopPropagation();e.preventDefault();fn()},true)}
+function testTitle(el){if(el)el.textContent=`Vraag ${TEST.o+TEST.i+1} van ${TEST.o+TEST.n}`}
+function testShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const TEST_NEXT='Antwoord bewaard. Op naar de volgende vraag.';
+if(TEST){const s=document.createElement('style');s.textContent='.back,.levels,.tabs,.no-test{display:none!important}body{padding-top:6px}header h1{font-size:32px}.test-finished .wrap{opacity:.35;pointer-events:none}';document.head.appendChild(s);document.body.classList.add('testmode')}
+
+
+  var NOTE_Y = { C4:130, D4:121, E4:112, F4:103, G4:94, A4:85, B4:76, C5:67 };
+  var NOTE_FREQ = { C4:261.63, D4:293.66, E4:329.63, F4:349.23, G4:392.00, A4:440.00, B4:493.88, C5:523.25 };
+  var STAFF_LINES_Y = [40,58,76,94,112];
+  var MID_Y = 76; // B4 line: stems above this go down, at/below go up
+
+  // Elke ronde heeft meerdere oefeningen (sets). Een set = 3 fragmenten van 4 noten,
+  // in de volgorde waarin ze in de melodie klinken (= de juiste oplossing).
+  // Noten van C4 tot C5. Nieuwe oefening toevoegen = een set toevoegen aan sets.
+  var ROUNDS = [
+    {
+      title: "Ronde 1 — Hoog of laag",
+      blurb: "Eén stukje klinkt laag, één in het midden en één hoog, maar niet altijd in die volgorde. Luister goed waar elk stukje ligt.",
+      sets: [
+        [["C4","D4","E4","D4"], ["E4","F4","G4","A4"], ["G4","A4","B4","C5"]],   // laag, midden, hoog
+        [["C5","B4","A4","B4"], ["C4","D4","E4","C4"], ["E4","F4","G4","F4"]],   // hoog, laag, midden
+        [["E4","G4","F4","E4"], ["A4","B4","C5","A4"], ["D4","C4","D4","C4"]],   // midden, hoog, laag
+        [["C5","A4","B4","C5"], ["G4","F4","A4","G4"], ["E4","D4","C4","D4"]],   // hoog, midden, laag
+        [["C4","E4","D4","C4"], ["B4","C5","A4","B4"], ["F4","G4","E4","F4"]]    // laag, hoog, midden
+      ]
+    },
+    {
+      title: "Ronde 2 — Vorm en hoogte",
+      blurb: "Elk fragment heeft nu een ander verloop. Let zowel op de hoogte als op de vorm van de melodie (omhoog, omlaag, golvend).",
+      sets: [
+        [["C4","E4","D4","C4"], ["F4","G4","F4","A4"], ["A4","C5","B4","C5"]],
+        [["G4","F4","E4","D4"], ["C4","E4","G4","A4"], ["F4","A4","G4","F4"]],   // omlaag, omhoog, golf
+        [["E4","G4","E4","G4"], ["A4","G4","F4","E4"], ["C4","D4","E4","G4"]],   // zigzag, omlaag, omhoog
+        [["C5","G4","A4","B4"], ["C4","E4","D4","F4"], ["G4","E4","F4","D4"]]    // dal dan omhoog, zigzag omhoog, zigzag omlaag
+      ]
+    },
+    {
+      title: "Ronde 3 — Scherp luisteren",
+      blurb: "De fragmenten hebben dezelfde vorm en liggen dicht bij elkaar. Luister de volledige melodie gerust een paar keer voor je een keuze maakt.",
+      sets: [
+        [["D4","F4","E4","D4"], ["E4","G4","F4","E4"], ["F4","A4","G4","F4"]],
+        [["G4","B4","A4","G4"], ["F4","A4","G4","F4"], ["E4","G4","F4","E4"]],   // telkens een toon lager
+        [["E4","D4","F4","E4"], ["G4","F4","A4","G4"], ["F4","E4","G4","F4"]],   // start E, G, F
+        [["F4","G4","A4","F4"], ["D4","E4","F4","D4"], ["E4","F4","G4","E4"]],   // start F, D, E
+        [["A4","G4","F4","G4"], ["G4","F4","E4","F4"], ["B4","A4","G4","A4"]]    // start A, G, B
+      ]
+    }
+  ];
+  function motifsOf(i){ return ROUNDS[i].sets[roundStates[i].set||0]; }
+
+  var LABELS = ["A","B","C"];
+  var roundStates = ROUNDS.map(function(){ return { order:null, sequence:[], solved:false, revealed:false }; });
+  var current = 0;
+  var audioCtx = null;
+  var isPlaying = false;
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+
+  function ensureOrder(idx){
+    var st = roundStates[idx];
+    if(!st.order){ st.order = shuffle([0,1,2]); }
+  }
+
+  // ---------- notation ----------
+  function svgForMotif(notes){
+    var w = 168, h = 150;
+    var xs = [34,74,114,154];
+    var parts = [];
+    parts.push('<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="120" role="img" aria-hidden="true">');
+    STAFF_LINES_Y.forEach(function(y){
+      parts.push('<line x1="14" y1="'+y+'" x2="'+(w-14)+'" y2="'+y+'" stroke="currentColor" stroke-width="1.3" opacity="0.55"/>');
+    });
+    notes.forEach(function(note, i){
+      var x = xs[i];
+      var y = NOTE_Y[note];
+      if(note === "C4"){
+        parts.push('<line x1="'+(x-11)+'" y1="'+y+'" x2="'+(x+11)+'" y2="'+y+'" stroke="currentColor" stroke-width="1.3" opacity="0.7"/>');
+      }
+      var stemUp = y >= MID_Y;
+      var stemX = stemUp ? x+6.5 : x-6.5;
+      var stemY2 = stemUp ? y-32 : y+32;
+      parts.push('<line x1="'+stemX+'" y1="'+y+'" x2="'+stemX+'" y2="'+stemY2+'" stroke="currentColor" stroke-width="1.6"/>');
+      parts.push('<ellipse cx="'+x+'" cy="'+y+'" rx="7" ry="5.4" fill="currentColor" transform="rotate(-18 '+x+' '+y+')"/>');
+    });
+    parts.push('</svg>');
+    return parts.join('');
+  }
+
+  // ---------- audio ----------
+  // Pianoklank (zelfde synth als het pianoklavier van de site, piano.js)
+  var master = null;
+  function getCtx(){
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var comp = audioCtx.createDynamicsCompressor(); comp.threshold.value = -10; comp.ratio.value = 4;
+      master = audioCtx.createGain(); master.gain.value = .9;
+      master.connect(comp); comp.connect(audioCtx.destination);
+    }
+    if(audioCtx.state === "suspended"){ audioCtx.resume(); }
+    return audioCtx;
+  }
+
+  function scheduleNote(ctx, freq, time, dur){
+    var g = ctx.createGain(), lp = ctx.createBiquadFilter();
+    lp.type = "lowpass"; lp.Q.value = .7;
+    lp.frequency.setValueAtTime(Math.min(9000, freq*14), time);
+    lp.frequency.exponentialRampToValueAtTime(Math.max(700, freq*3), time+1.6);
+    g.gain.setValueAtTime(.0001, time);
+    g.gain.exponentialRampToValueAtTime(.32, time+.006);
+    g.gain.exponentialRampToValueAtTime(.12, time+.35);
+    g.gain.setTargetAtTime(.0001, time+.35, 1.4);
+    // loslaten (demping) na de nootduur
+    var rel = time + dur;
+    g.gain.cancelScheduledValues(rel);
+    g.gain.setTargetAtTime(.0001, rel, .09);
+    g.connect(lp); lp.connect(master);
+    [[1,1,0],[1,.5,4],[2,.42,0],[3,.2,0],[4,.1,0],[5,.05,0],[6,.03,0]].forEach(function(h){
+      var o = ctx.createOscillator(), og = ctx.createGain();
+      o.type = "sine"; o.frequency.value = freq*h[0]*(1+.00035*h[0]*h[0]); o.detune.value = h[2];
+      og.gain.value = h[1]; o.connect(og); og.connect(g);
+      o.start(time); o.stop(rel+.8);
+    });
+    // korte hamertik
+    var len = Math.floor(ctx.sampleRate*.03), buf = ctx.createBuffer(1,len,ctx.sampleRate), d = buf.getChannelData(0);
+    for(var i=0;i<len;i++){ d[i] = (Math.random()*2-1)*Math.pow(1-i/len,3); }
+    var ns = ctx.createBufferSource(), nf = ctx.createBiquadFilter(), ng = ctx.createGain();
+    ns.buffer = buf; nf.type = "bandpass"; nf.frequency.value = 2500; ng.gain.value = .05;
+    ns.connect(nf); nf.connect(ng); ng.connect(master); ns.start(time);
+  }
+
+  var MAXPLAY = 3;
+  // na de eerste controle mag je onbeperkt opnieuw luisteren
+  function playsLeft(){ var st=roundStates[current]; return st.tried ? 99 : MAXPLAY - (st.plays||0); }
+  function playLabel(){ if(roundStates[current].tried) return "▶ Speel de volledige melodie opnieuw"; return playsLeft()>0 ? "▶ Speel de volledige melodie (nog "+playsLeft()+"×)" : "Geen beluisterbeurten meer"; }
+  function filledCount(st){ return [0,1,2].filter(function(i){ return st.sequence[i]!=null; }).length; }
+  function marksOf(st){ return st.marks || [null,null,null]; }
+
+  var NOTE_DUR = 0.40, NOTE_GAP = 0.46, MOTIF_GAP = 0.18;
+
+  function playCard(motifIdx, cardEl){
+    if(isPlaying) return;
+    var st = roundStates[current];
+    var notes = motifsOf(current)[motifIdx];
+    var ctx = getCtx();
+    var t0 = ctx.currentTime + 0.05;
+    notes.forEach(function(n,i){ scheduleNote(ctx, NOTE_FREQ[n], t0 + i*NOTE_GAP, NOTE_DUR); });
+    setPlayingCard(cardEl, notes.length*NOTE_GAP);
+  }
+
+  function setPlayingCard(cardEl, seconds){
+    if(!cardEl) return;
+    cardEl.classList.add("playing");
+    setTimeout(function(){ cardEl.classList.remove("playing"); }, seconds*1000);
+  }
+
+  function playFull(free){
+    if(isPlaying) return;
+    var st = roundStates[current];
+    if(free !== true){
+      if(playsLeft() <= 0) return;
+      st.plays = (st.plays||0) + 1;
+    }
+    var round = ROUNDS[current];
+    var ctx = getCtx();
+    var t0 = ctx.currentTime + 0.08;
+    var t = t0;
+    isPlaying = true;
+    var waveEl = document.getElementById("waveIndicator");
+    var btn = document.getElementById("playFullBtn");
+    if(waveEl) waveEl.classList.add("playing");
+    if(btn){ btn.disabled = true; btn.textContent = "▶ Luister…"; }
+
+    motifsOf(current).forEach(function(notes, motifIdx){
+      // bewust geen visuele aanduiding van welk fragment speelt (anders verklapt het de volgorde)
+      notes.forEach(function(n,i){ scheduleNote(ctx, NOTE_FREQ[n], t + i*NOTE_GAP, NOTE_DUR); });
+      t += notes.length*NOTE_GAP + MOTIF_GAP;
+    });
+
+    var totalMs = (t - t0) * 1000;
+    setTimeout(function(){
+      isPlaying = false;
+      if(waveEl) waveEl.classList.remove("playing");
+      if(btn){ btn.textContent = playLabel(); btn.disabled = playsLeft() <= 0; }
+    }, totalMs);
+  }
+
+  // ---------- rendering ----------
+  function renderNav(){
+    var nav = document.getElementById("roundNav");
+    nav.innerHTML = "";
+    ROUNDS.forEach(function(r, i){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "round-pill" + (roundStates[i].solved ? " solved" : "");
+      btn.setAttribute("aria-current", i === current ? "true" : "false");
+      btn.innerHTML = '<span class="dot"></span>' + "Ronde " + (i+1);
+      btn.addEventListener("click", function(){
+        current = i;
+        ensureOrder(current);
+        renderNav();
+        renderRound();
+      });
+      nav.appendChild(btn);
+    });
+  }
+
+  function renderRound(){
+    ensureOrder(current);
+    var st = roundStates[current];
+    var round = ROUNDS[current];
+    var stage = document.getElementById("roundStage");
+
+    var cardsHtml = st.order.map(function(motifIdx, pos){
+      var label = LABELS[pos];
+      var seqPos = st.sequence.indexOf(motifIdx);
+      var stateClass = "";
+      var mk = marksOf(st);
+      var allOk = mk.every(function(x){ return x==='ok'; });
+      if(st.revealed || allOk){ stateClass = seqPos > -1 ? "correct" : ""; }   // enkel kleuren als alles juist is
+      var selectedClass = seqPos > -1 ? "selected" : "";
+      var badge = seqPos > -1 ? '<span class="badge">'+(seqPos+1)+'</span>' : "";
+      return (
+        '<div class="frag-card '+selectedClass+' '+stateClass+'" data-pos="'+pos+'" data-motif="'+motifIdx+'" tabindex="0" role="button" aria-pressed="'+(seqPos>-1)+'" aria-label="Fragment '+label+', klik om te plaatsen">'+
+          badge+
+          '<span class="label">Fragment '+label+'</span>'+
+          svgForMotif(motifsOf(current)[motifIdx])+
+        '</div>'
+      );
+    }).join("");
+
+    var slotsHtml = [0,1,2].map(function(i){
+      var motifIdx = st.sequence[i];
+      var filled = motifIdx != null;
+      var cls = "slot";
+      var content = "";
+      if(filled){
+        cls += " filled";
+        var pos = st.order.indexOf(motifIdx);
+        content = LABELS[pos];
+        if(st.revealed || marksOf(st).every(function(x){ return x==='ok'; })){ cls += " correct"; }
+      }
+      return '<div class="'+cls+'" aria-label="Plaats '+(i+1)+'">'+content+'</div>';
+    }).join('<span class="arrow">→</span>');
+
+    var feedbackHtml = "";
+    if(st.tried && !st.revealed){
+      var mk2 = marksOf(st), good = mk2.filter(function(x){ return x==='ok'; }).length;
+      var correct = good===3;
+      feedbackHtml = '<p class="feedback show '+(correct?"good":"bad")+'">' +
+        (correct ? "Helemaal juist! Je hoort de opbouw van de melodie mooi terug." : good+" van de 3 juist. Welke juist zijn, moet je zelf ontdekken: luister opnieuw, verander de volgorde en controleer opnieuw.") +
+        '</p>';
+    }
+    var mk3 = marksOf(st);
+    var checkDisabled = filledCount(st)<3 || st.revealed || mk3.every(function(x){ return x!==null; });
+    var checkLabel = (st.tried && !mk3.every(function(x){ return x==='ok'; })) ? "Controleer opnieuw" : "Controleer";
+
+    stage.innerHTML =
+      '<div class="round-head"><p class="set-count">Oefening '+((st.set||0)+1)+' van '+round.sets.length+'</p><h2>'+round.title+'</h2><p>'+round.blurb+'</p></div>' +
+      '<div class="play-full">' +
+        '<button type="button" class="btn btn-primary" id="playFullBtn" '+(playsLeft()<=0?"disabled":"")+'>'+playLabel()+'</button>' +
+        '<span class="wave" id="waveIndicator"><span></span><span></span><span></span><span></span></span>' +
+      '</div>' +
+      '<div class="frag-grid">'+cardsHtml+'</div>' +
+      '<div class="answer-strip"><span class="caption">Jouw volgorde</span>'+slotsHtml+'</div>' +
+      feedbackHtml +
+      '<div class="actions">' +
+        '<button type="button" class="btn btn-ghost" id="checkBtn" '+(checkDisabled?"disabled":"")+'>'+checkLabel+'</button>' +
+        '<button type="button" class="btn btn-ghost" id="retryBtn">Opnieuw schudden</button>' +
+        '<button type="button" class="btn btn-text" id="solutionBtn">Toon oplossing</button>' +
+        '<button type="button" class="btn btn-primary" id="nextSetBtn">Nieuwe oefening →</button>' +
+      '</div>';
+
+    document.getElementById("playFullBtn").addEventListener("click", function(){ playFull(); });
+    document.getElementById("checkBtn").addEventListener("click", checkAnswer);
+    document.getElementById("retryBtn").addEventListener("click", retryRound);
+    document.getElementById("solutionBtn").addEventListener("click", showSolution);
+    document.getElementById("nextSetBtn").addEventListener("click", nextSet);
+
+    stage.querySelectorAll(".frag-card").forEach(function(card){
+      card.addEventListener("click", function(e){
+        toggleSelect(parseInt(card.getAttribute("data-motif"),10));
+      });
+      card.addEventListener("keydown", function(e){
+        if(e.key==="Enter" || e.key===" "){
+          e.preventDefault();
+          toggleSelect(parseInt(card.getAttribute("data-motif"),10));
+        }
+      });
+    });
+  }
+
+  function toggleSelect(motifIdx){
+    var st = roundStates[current];
+    var mk = st.marks = marksOf(st).slice();
+    if(st.revealed || mk.every(function(x){ return x==='ok'; })) return;   // afgerond
+    var i = st.sequence.indexOf(motifIdx);
+    if(i > -1){
+      st.sequence[i] = null; mk[i] = null;   // fragment terugnemen, de andere blijven op hun plaats
+    } else {
+      var j = [0,1,2].filter(function(k){ return st.sequence[k]==null; })[0];
+      if(j === undefined) return;
+      st.sequence[j] = motifIdx; mk[j] = null;
+    }
+    renderRound();
+  }
+
+  function checkAnswer(){
+    var st = roundStates[current];
+    if(filledCount(st) < 3) return;
+    st.tried = true;
+    st.marks = [0,1,2].map(function(i){ return st.sequence[i]===i ? 'ok' : 'bad'; });
+    var correct = st.marks.every(function(x){ return x==='ok'; });
+    if(correct){ st.solved = true; }
+    renderNav();
+    renderRound();
+  }
+
+  function retryRound(){
+    roundStates[current] = { order: shuffle([0,1,2]), sequence: [], marks:[null,null,null], tried:false, solved: roundStates[current].solved, revealed:false, plays:0, set: roundStates[current].set||0 };
+    renderRound();
+  }
+
+  function nextSet(){
+    var n = ROUNDS[current].sets.length, st = roundStates[current];
+    roundStates[current] = { order: shuffle([0,1,2]), sequence: [], marks:[null,null,null], tried:false, solved: st.solved, revealed:false, plays:0, set: ((st.set||0)+1) % n };
+    renderRound();
+  }
+
+  function showSolution(){
+    var st = roundStates[current];
+    st.sequence = [0,1,2];
+    st.revealed = true;
+    st.marks = [null,null,null];
+    renderRound();
+    playFull(true);
+  }
+
+  // ---------- hot reload state ----------
+  function snapshot(){
+    return { current: current, roundStates: roundStates };
+  }
+  function boot(data){
+    if(data && data.roundStates){
+      roundStates = data.roundStates;
+      current = data.current || 0;
+    }
+    ensureOrder(current);
+    renderNav();
+    renderRound();
+    if(window.claude && window.claude.hot && window.claude.hot.snapshot){
+      window.claude.hot.snapshot(snapshot);
+    }
+  }
+  if(window.claude && window.claude.hot && window.claude.hot.ready){
+    window.claude.hot.ready(boot);
+  } else {
+    boot(window.claude && window.claude.hot ? window.claude.hot.data : null);
+  }
+
+  /* ---------- testmodus ---------- */
+  if(TEST){
+    var ts=document.createElement('style');ts.textContent='#roundNav,#retryBtn,#solutionBtn,#nextSetBtn,.foot{display:none!important}.test-finished .page{opacity:.35;pointer-events:none}';document.head.appendChild(ts);
+    current=Math.min(ROUNDS.length-1,TEST.lvl-1);
+    var tq=testShuffle(ROUNDS[current].sets.map(function(_,i){return i}));
+    var fresh=function(k){roundStates[current]={order:shuffle([0,1,2]),sequence:[],marks:[null,null,null],tried:false,solved:false,revealed:false,plays:0,set:tq[k%tq.length]}};
+    fresh(0);
+    var _rr=renderRound;renderRound=function(){_rr();testTitle(document.querySelector('.set-count'))};
+    renderNav();renderRound();
+    testCheck(function(){var st=roundStates[current];if(filledCount(st)<3)return;
+      var good=[0,1,2].filter(function(i){return st.sequence[i]===i}).length;
+      if(testRecord(good,3))return;fresh(TEST.i);renderRound();});
+  }
+
+})();
+</script>
+<script src="piano.js"></script>
+<script>window.MEPiano&&MEPiano.mount(document.getElementById('piano'),{names:'sharp',low:60,octaves:1,computerKeys:true});</script>
+
+</body>
+</html>

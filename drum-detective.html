@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Drum Detective &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --hat:#E08E12; --snare:#3257E0; --kick:#B5472C;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --hat:#F5B84F; --snare:#8198FF; --kick:#FF9B7A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --hat:#F5B84F; --snare:#8198FF; --kick:#FF9B7A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:8px 0 0;color:var(--muted);max-width:64ch}
+
+/* delen */
+.parts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.part{border:2px solid transparent;background:var(--surface);box-shadow:var(--shadow);border-radius:16px;padding:12px 14px;text-align:left;display:flex;flex-direction:column;gap:2px}
+.part b{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.part span{font-family:var(--display);font-weight:800;font-size:19px;line-height:1.15}
+.part small{color:var(--muted);font-size:13px}
+.part[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.part[aria-pressed="true"] b{color:var(--accent)}
+@media (max-width:760px){.parts{grid-template-columns:repeat(2,1fr)}}
+
+.levels{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow);align-self:flex-start}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.85}
+
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.task-text{margin:4px 0 0;color:var(--muted)}
+.dots{display:flex;gap:6px}
+.dot{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;border:2px solid var(--line);font-size:13px;font-weight:700;color:var(--muted)}
+.dot.cur{border-color:var(--accent);color:var(--accent)}
+.dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-big{font-size:17px;padding:14px 20px}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.badge{display:inline-flex;align-items:center;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:6px 14px;font-weight:800;font-variant-numeric:tabular-nums}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+.hint{margin:0;color:var(--muted);font-size:14px}
+
+/* raster */
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.grid{display:grid;grid-template-columns:86px repeat(4,1fr);gap:8px;min-width:600px}
+.grid.small{grid-template-columns:60px repeat(4,1fr);gap:4px;min-width:0}
+.beat{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:5px;border-radius:10px;background:var(--surface-2)}
+.small .beat{gap:2px;padding:3px;border-radius:7px}
+.lab{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14px}
+.small .lab{font-size:11px;gap:4px}
+.lab i{width:11px;height:11px;border-radius:50%;flex:none}
+.small .lab i{width:8px;height:8px}
+.count{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 5px;text-align:center;font-weight:700;font-size:12px;color:var(--muted)}
+.count span:first-child{color:var(--ink);font-size:15px}
+.small .count{font-size:9px;padding:0 3px;gap:2px}.small .count span:first-child{font-size:11px}
+.cell{aspect-ratio:1/1;min-height:26px;border:2px solid var(--line);border-radius:7px;background:var(--surface);padding:0;position:relative}
+.small .cell{min-height:0;border-width:1.5px;border-radius:4px}
+button.cell:hover{border-color:var(--muted)}
+.cell.off-row{opacity:.35}
+.r-hat .cell.on{background:var(--hat);border-color:var(--hat)}
+.r-snare .cell.on{background:var(--snare);border-color:var(--snare)}
+.r-kick .cell.on{background:var(--kick);border-color:var(--kick)}
+.cell.target{border-style:dashed;border-color:var(--accent)}
+.cell.marked::after{content:"";position:absolute;inset:-2px;border:3px solid var(--ink);border-radius:7px}
+.cell.good::after{content:"";position:absolute;inset:-3px;border:3px solid var(--ok);border-radius:8px}
+.cell.wrong::after{content:"";position:absolute;inset:-3px;border:3px solid var(--bad);border-radius:8px}
+.cell.missed::after{content:"";position:absolute;inset:-3px;border:3px dashed var(--bad);border-radius:8px}
+
+/* keuzes */
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:760px){.choices{grid-template-columns:1fr}}
+.choice{border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px;text-align:left}
+.choice .lt{font-family:var(--display);font-weight:800;font-size:18px}
+.choice:hover{border-color:var(--accent)}
+.choice[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.choice.ok{border-color:var(--ok);background:var(--ok-soft)}
+.choice.bad{border-color:var(--bad);background:var(--bad-soft)}
+
+.summary{display:flex;flex-direction:column;gap:10px}
+.sumhead{margin:0;font-family:var(--display);font-size:30px;font-weight:800}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="ritme.html">&larr; Let's Make Rhythm</a>
+    <h1>Drum <span>Detective</span></h1>
+    <p>Luister naar de drumbeat: baskick (onder), snare (midden) en hi-hat (boven). Begin bij deel 1 en werk je op naar deel 4 &ndash; elk deel is een stap moeilijker.</p>
+  </header>
+
+  <nav class="parts" id="parts" aria-label="Kies een deel"></nav>
+  <div class="levels" id="levels" role="group" aria-label="Niveau"></div>
+
+  <section class="panel" id="task">
+    <div class="panel-head">
+      <div>
+        <div class="eyebrow" id="eyebrow"></div>
+        <h2 id="title"></h2>
+        <p class="task-text" id="taskText"></p>
+      </div>
+      <div class="dots" id="dots"></div>
+    </div>
+
+    <div class="row">
+      <button class="btn btn-primary btn-big" id="playBtn" type="button"></button>
+      <button class="btn btn-ghost" id="mineBtn" type="button" hidden>&#9654; Speel mijn raster</button>
+      <span class="badge" id="tempo"></span>
+    </div>
+    <p class="hint">Je hoort eerst 4 tikken om af te tellen. Daarna speelt de beat 2 keer na elkaar.</p>
+
+    <div id="stage"></div>
+
+    <p class="feedback info" id="feedback"></p>
+    <div class="row">
+      <button class="btn btn-primary" id="checkBtn" type="button">Controleer</button>
+      <button class="btn btn-ghost" id="clearBtn" type="button">Wis</button>
+      <button class="linkbtn" id="solBtn" type="button" hidden>Toon oplossing</button>
+      <button class="btn btn-primary" id="nextBtn" type="button" hidden>Volgende &rarr;</button>
+      <span style="flex:1"></span>
+      <button class="linkbtn" id="restartBtn" type="button">&#8635; Opnieuw beginnen</button>
+    </div>
+  </section>
+
+  <section class="panel" id="result" hidden>
+    <div class="summary" id="summary"></div>
+    <div class="row">
+      <button class="btn btn-primary" id="againBtn" type="button">Nieuwe reeks</button>
+      <button class="btn btn-ghost" id="nextPartBtn" type="button">Volgend deel &rarr;</button>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+
+const ROWS=[{key:'hat',name:'Hi-hat',color:'var(--hat)'},{key:'snare',name:'Snare',color:'var(--snare)'},{key:'kick',name:'Baskick',color:'var(--kick)'}];
+const ROWNAME={hat:'hi-hat',snare:'snare',kick:'baskick'};
+const STEPS=16, COUNT=['1','e','+','a'], TASKS=5;
+
+/* ---------- beats maken per moeilijkheid (1 = eenvoudig, 3 = moeilijk) ---------- */
+const HATS={
+  1:['x.x.x.x.x.x.x.x.'],
+  2:['x.x.x.x.x.x.x.x.','x...x...x...x...','..x...x...x...x.'],
+  3:['x.x.x.x.x.x.x.x.','xxxxxxxxxxxxxxxx','x.x.x.xxx.x.x.xx','..x...x...x...x.','x.xxx.xxx.xxx.xx']
+};
+const KICKPOS={1:[2,6,8,10,14], 2:[2,6,8,10,14], 3:[2,3,6,7,8,9,10,11,14,15]};
+const KICKN={1:[1,2], 2:[2,3], 3:[2,4]};
+const GHOST={1:[], 2:[14,10], 3:[7,9,15,14]};
+const arr=s=>s.split('').map(c=>c==='x');
+function gen(d){
+  const kick=Array(STEPS).fill(false); kick[0]=true;
+  const [a,b]=KICKN[d]; pick(KICKPOS[d],a+rnd(b-a+1)).forEach(s=>kick[s]=true);
+  const snare=Array(STEPS).fill(false); snare[4]=snare[12]=true;
+  if(GHOST[d].length&&Math.random()<.6) snare[GHOST[d][rnd(GHOST[d].length)]]=true;
+  const hat=arr(HATS[d][rnd(HATS[d].length)]);
+  return {hat,snare,kick};
+}
+const clone=p=>({hat:p.hat.slice(),snare:p.snare.slice(),kick:p.kick.slice()});
+const key=p=>ROWS.map(r=>p[r.key].map(v=>v?1:0).join('')).join('|');
+const empty=()=>({hat:Array(STEPS).fill(false),snare:Array(STEPS).fill(false),kick:Array(STEPS).fill(false)});
+function mutate(p,n,rows,d){   // verplaats/wijzig n noten zodat een andere beat ontstaat
+  const q=clone(p);
+  for(let i=0;i<n;i++){
+    const r=rows[rnd(rows.length)];
+    if(r==='kick'){ const on=q.kick.map((v,s)=>v&&s!==0?s:-1).filter(s=>s>=0), free=KICKPOS[d].filter(s=>!q.kick[s]);
+      if(on.length&&free.length&&Math.random()<.7){ q.kick[on[rnd(on.length)]]=false; q.kick[free[rnd(free.length)]]=true; }
+      else if(free.length) q.kick[free[rnd(free.length)]]=true; }
+    else if(r==='snare'){ const cand=[2,6,7,9,10,14,15].filter(s=>!q.snare[s]); q.snare[cand[rnd(cand.length)]]=true; }
+    else { const alt=HATS[Math.max(2,d)].filter(h=>h!==q.hat.map(v=>v?'x':'.').join('')); q.hat=arr(alt[rnd(alt.length)]); }
+  }
+  return q;
+}
+
+/* ---------- de 4 delen (van makkelijk naar moeilijk) en hun niveaus ---------- */
+const PARTS=[
+  {name:'Kies de beat', info:'Welk raster hoor je?', max:3,
+   levels:[{name:'Niveau 1',info:'Verschil in de baskick',d:1,rows:['kick']},{name:'Niveau 2',info:'Verschil in baskick of snare',d:2,rows:['kick','snare']},{name:'Niveau 3',info:'Alles kan anders zijn',d:3,rows:['kick','snare','hat']}],
+   text:()=>'Luister en kies het raster dat je hoort.'},
+  {name:'Zoek de fout', info:'Wat klinkt anders?', max:3,
+   levels:[{name:'Niveau 1',info:'1 fout in de baskick',d:1,n:1,rows:['kick']},{name:'Niveau 2',info:'2 fouten (baskick, snare)',d:2,n:2,rows:['kick','snare']},{name:'Niveau 3',info:'3 fouten, overal',d:3,n:3,rows:['kick','snare','hat']}],
+   text:t=>`Het raster klopt niet helemaal met wat je hoort. Tik op de ${t.n===1?'blokje dat':t.n+' blokjes die'} anders ${t.n===1?'is':'zijn'}.`},
+  {name:'Vul aan', info:'Eén instrument invullen', max:3,
+   levels:[{name:'Niveau 1',info:'Baskick invullen',d:1,rows:['kick']},{name:'Niveau 2',info:'Baskick of snare',d:2,rows:['kick','snare']},{name:'Niveau 3',info:'Ook de hi-hat',d:3,rows:['kick','snare','hat']}],
+   text:t=>`Twee instrumenten staan er al. Vul de ${ROWNAME[t.row]} in.`},
+  {name:'Bouw na', info:'De hele beat zelf', max:5,
+   levels:[{name:'Niveau 1',info:'Baskick (hi-hat + snare staan er al)',d:1,show:['kick']},{name:'Niveau 2',info:'Snare + baskick (hi-hat staat er al)',d:2,show:['snare','kick']},{name:'Niveau 3',info:'Alle drie',d:2,show:['hat','snare','kick']},{name:'Niveau 4',info:'Met 16den (e en a)',d:3,show:['hat','snare','kick']}],
+   text:t=>t.show.length===1?'Hi-hat en snare staan er al. Bouw de baskick na.':t.show.length===2?'De hi-hat staat er al. Bouw de snare en de baskick na.':'Bouw de hele beat na: hi-hat, snare en baskick.'}
+];
+const TEMPO=[80,90,95,100];   // per niveau
+
+/* ---------- toestand ---------- */
+let part=0, level=0, tasks=[], idx=0, cur=null, plays=0, checked=false, tried=false, lastSig=null, playing=false;
+// tried = al eens gecontroleerd (1ste poging telt voor de score) · checked = opdracht afgerond (juist of oplossing getoond)
+try{ const s=JSON.parse(localStorage.getItem('dd-pos')||'{}'); if(s.part>=0&&s.part<4){part=s.part; level=Math.min(PARTS[part].levels.length-1,s.level||0);} }catch(e){}
+const L=()=>PARTS[part].levels[level];
+const bpm=()=>TEMPO[level]||90;
+
+function makeTask(){
+  const lv=L(), t={};
+  if(part===3){ // bouw na: de rijen in show bouw je zelf, de andere staan er al kant-en-klaar
+    t.target=gen(lv.d); t.show=lv.show; }
+  else t.target=gen(lv.d);
+  if(part===0){
+    const opts=[t.target], seen=new Set([key(t.target)]);
+    let guard=0; while(opts.length<3&&guard++<200){ const m=mutate(t.target,1+rnd(2),lv.rows,lv.d); if(!seen.has(key(m))){seen.add(key(m));opts.push(m);} }
+    t.options=shuffle(opts); t.answer=t.options.indexOf(t.target); t.pick=null;
+  }
+  if(part===1){
+    t.n=lv.n; t.shown=clone(t.target); t.diff=new Set();
+    let guard=0; while(t.diff.size<lv.n&&guard++<200){
+      const r=lv.rows[rnd(lv.rows.length)], s=rnd(STEPS), k=r+':'+s;
+      if(t.diff.has(k)) continue; if(lv.d<3&&s%2) continue; if(r==='kick'&&s===0) continue; if(r==='snare'&&(s===4||s===12)) continue;
+      t.shown[r][s]=!t.shown[r][s]; t.diff.add(k);
+    }
+    t.marks=new Set();
+  }
+  if(part===2){ t.row=lv.rows[rnd(lv.rows.length)]; t.input=clone(t.target); t.input[t.row].fill(false); }
+  if(part===3){ t.input=clone(t.target); t.show.forEach(r=>t.input[r].fill(false)); }
+  return t;
+}
+function newSeries(){
+  tasks=[]; const seen=new Set();
+  let guard=0; while(tasks.length<TASKS&&guard++<300){ const t=makeTask(), k=key(t.target); if(seen.has(k)) continue; seen.add(k); tasks.push(t); }
+  idx=0; startTask(); $('task').hidden=false; $('result').hidden=true;
+  try{ localStorage.setItem('dd-pos',JSON.stringify({part,level})); }catch(e){}
+}
+function startTask(){ cur=tasks[idx]; plays=0; checked=false; tried=false; lastSig=null; cur.ok=null; setFeedback('','info'); render(); }
+
+/* ---------- geluid ---------- */
+let ctx=null, master=null, noiseBuf=null, stopTimer=null;
+function ac(){ if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();const c=ctx.createDynamicsCompressor();c.threshold.value=-12;c.ratio.value=4;master=ctx.createGain();master.gain.value=.9;master.connect(c);c.connect(ctx.destination);} if(ctx.state==='suspended')ctx.resume(); return ctx; }
+function noise(){ if(!noiseBuf){const len=ctx.sampleRate;noiseBuf=ctx.createBuffer(1,len,ctx.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;} const s=ctx.createBufferSource(); s.buffer=noiseBuf; return s; }
+const SOUNDS={
+  kick(t){ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(45,t+.12);
+    g.gain.setValueAtTime(1,t); g.gain.exponentialRampToValueAtTime(.001,t+.35); o.connect(g); g.connect(master); o.start(t); o.stop(t+.4);
+    const c=ctx.createOscillator(),cg=ctx.createGain(); c.frequency.value=1200; cg.gain.setValueAtTime(.15,t); cg.gain.exponentialRampToValueAtTime(.001,t+.01); c.connect(cg); cg.connect(master); c.start(t); c.stop(t+.02); },
+  snare(t){ const n=noise(),f=ctx.createBiquadFilter(),g=ctx.createGain(); f.type='highpass'; f.frequency.value=1200;
+    g.gain.setValueAtTime(.7,t); g.gain.exponentialRampToValueAtTime(.001,t+.18); n.connect(f); f.connect(g); g.connect(master); n.start(t); n.stop(t+.2);
+    const o=ctx.createOscillator(),og=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(220,t); o.frequency.exponentialRampToValueAtTime(160,t+.08);
+    og.gain.setValueAtTime(.5,t); og.gain.exponentialRampToValueAtTime(.001,t+.1); o.connect(og); og.connect(master); o.start(t); o.stop(t+.12); },
+  hat(t){ const n=noise(),f=ctx.createBiquadFilter(),g=ctx.createGain(); f.type='highpass'; f.frequency.value=7000;
+    g.gain.setValueAtTime(.35,t); g.gain.exponentialRampToValueAtTime(.001,t+.05); n.connect(f); f.connect(g); g.connect(master); n.start(t); n.stop(t+.06); },
+  click(t,acc){ const o=ctx.createOscillator(),g=ctx.createGain(); o.frequency.value=acc?1900:1400; g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(acc?.5:.32,t+.002); g.gain.exponentialRampToValueAtTime(.0001,t+.05); o.connect(g); g.connect(master); o.start(t); o.stop(t+.07); }
+};
+function playPattern(p,withCount,times){
+  ac(); const sd=60/bpm()/4; let t=ctx.currentTime+.1;
+  if(withCount){ for(let i=0;i<4;i++) SOUNDS.click(t+i*sd*4,i===0); t+=16*sd; }
+  for(let k=0;k<times;k++){ for(let s=0;s<STEPS;s++) ROWS.forEach(r=>{ if(p[r.key][s]) SOUNDS[r.key](t+s*sd); }); t+=16*sd; }
+  playing=true; render();
+  clearTimeout(stopTimer); stopTimer=setTimeout(()=>{playing=false;render();},(t-ctx.currentTime+.2)*1000);
+}
+
+/* ---------- raster tekenen ---------- */
+// cls(r,s) geeft extra klassen; clickable = welke rijen je kan aantikken
+function gridHTML(p,opt){
+  opt=opt||{}; const rows=opt.rows||ROWS.map(r=>r.key);
+  let h=`<div class="grid${opt.small?' small':''}"><div></div>`;
+  for(let b=0;b<4;b++) h+=`<div class="count">${COUNT.map((c,i)=>`<span>${i===0?b+1:c}</span>`).join('')}</div>`;
+  ROWS.filter(r=>rows.includes(r.key)).forEach(r=>{
+    h+=`<div class="lab"><i style="background:${r.color}"></i>${r.name}</div>`;
+    for(let b=0;b<4;b++){
+      h+=`<div class="beat r-${r.key}">`;
+      for(let i=0;i<4;i++){ const s=b*4+i, on=p[r.key][s], extra=opt.cls?opt.cls(r.key,s):'';
+        const click=opt.click&&opt.click(r.key);
+        h+=click?`<button type="button" class="cell${on?' on':''}${extra}" data-r="${r.key}" data-s="${s}" aria-pressed="${on}" aria-label="${r.name}, tel ${b+1}, blokje ${i+1}"></button>`
+                :`<span class="cell${on?' on':''}${extra}"></span>`; }
+      h+='</div>';
+    }
+  });
+  return h+'</div>';
+}
+
+/* ---------- weergave ---------- */
+function setFeedback(t,c){const f=$('feedback');f.textContent=t;f.className='feedback '+c}
+function render(){
+  $('parts').innerHTML=PARTS.map((P,i)=>`<button type="button" class="part" data-p="${i}" aria-pressed="${i===part}"><b>Deel ${i+1}</b><span>${P.name}</span><small>${P.info}</small></button>`).join('');
+  $('levels').innerHTML=PARTS[part].levels.map((l,i)=>`<button type="button" data-l="${i}" aria-pressed="${i===level}">${l.name}<small>${l.info}</small></button>`).join('');
+  $('eyebrow').textContent=`Deel ${part+1} · ${L().name} · Opdracht ${idx+1} van ${TASKS}`;
+  $('title').textContent=PARTS[part].name;
+  $('taskText').textContent=PARTS[part].text(cur);
+  $('dots').innerHTML=tasks.map((t,i)=>`<span class="dot${t.ok===true?' ok':t.ok===false?' bad':i===idx?' cur':''}">${i+1}</span>`).join('');
+  $('tempo').textContent=bpm()+' BPM';
+  const max=PARTS[part].max, left=max-plays, pb=$('playBtn');
+  pb.disabled=playing||(!tried&&left<=0);
+  pb.innerHTML=playing?'&#9654; Luister&hellip;':tried?'&#9654; Beluister opnieuw':left>0?`&#9654; Beluister de beat (nog ${left}&times;)`:'Geen beluisterbeurten meer';
+  $('mineBtn').hidden=!(part===2||part===3); $('mineBtn').disabled=playing;
+  $('clearBtn').hidden=checked||part===0; $('checkBtn').hidden=checked;
+  $('checkBtn').textContent=tried?'Controleer opnieuw':'Controleer';
+  $('solBtn').hidden=!tried||checked;
+  $('nextBtn').hidden=!tried; $('nextBtn').innerHTML=idx<TASKS-1?'Volgende opdracht &rarr;':'Bekijk je uitslag &rarr;';
+  renderStage();
+}
+function renderStage(){
+  const t=cur, st=$('stage');
+  if(part===0){
+    st.innerHTML=`<div class="choices">${t.options.map((o,i)=>{
+      let cls=''; if(checked){ if(i===t.answer) cls=' ok'; else if(i===t.pick) cls=' bad'; }
+      return `<button type="button" class="choice${cls}" data-o="${i}" aria-pressed="${t.pick===i}" ${checked?'disabled':''}><span class="lt">${'ABC'[i]}</span>${gridHTML(o,{small:true})}</button>`;}).join('')}</div>`;
+    $('checkBtn').disabled=t.pick==null||sig()===lastSig;
+  }
+  if(part===1){
+    st.innerHTML=`<div class="scroll">${gridHTML(t.shown,{click:()=>!checked,cls:(r,s)=>{const k=r+':'+s,m=t.marks.has(k),d=t.diff.has(k);
+      if(!checked) return m?' marked':''; return d?(m?' good':' missed'):(m?' wrong':'');}})}</div>
+      <p class="hint">${checked?'Groen omrand = juist gevonden · rood = geen fout · rood gestreept = gemist.':'Tik nog eens op een blokje om je keuze weg te halen. Je hebt '+t.marks.size+' van de '+t.n+' aangeduid.'}</p>`;
+    $('checkBtn').disabled=t.marks.size!==t.n||sig()===lastSig;
+  }
+  if(part===2||part===3){
+    const rows=null, build=part===2?[t.row]:t.show;
+    const editable=r=>!checked&&build.includes(r);
+    st.innerHTML=`<div class="scroll">${gridHTML(t.input,{rows,click:r=>editable(r),cls:(r,s)=>{
+      if(!build.includes(r)) return ' off-row';
+      if(!checked&&build.length<3) return ' target';
+      if(!checked) return '';
+      const a=t.input[r][s], g=t.target[r][s]; return a&&g?' good':a&&!g?' wrong':!a&&g?' missed':'';}})}</div>
+      <p class="hint">${checked?'Groen omrand = juist · rood = hier hoort geen slag · rood gestreept = hier ontbreekt een slag.':'Tik op een blokje om het aan of uit te zetten.'}</p>`;
+    $('checkBtn').disabled=sig()===lastSig;
+  }
+}
+// "handtekening" van het huidige antwoord: Controleer opnieuw kan pas na een wijziging
+function sig(){ const t=cur; return part===0?String(t.pick):part===1?[...t.marks].sort().join(','):JSON.stringify(t.input); }
+
+/* ---------- bediening ---------- */
+$('parts').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;part=+b.dataset.p;level=0;newSeries();});
+$('levels').addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(!b)return;level=+b.dataset.l;newSeries();});
+$('stage').addEventListener('click',e=>{
+  if(checked) return;
+  const c=e.target.closest('.choice'); if(c&&part===0){ cur.pick=+c.dataset.o; render(); return; }
+  const b=e.target.closest('button.cell'); if(!b) return;
+  const r=b.dataset.r, s=+b.dataset.s;
+  if(part===1){ const k=r+':'+s; if(cur.marks.has(k)) cur.marks.delete(k); else if(cur.marks.size<cur.n) cur.marks.add(k); }
+  else { cur.input[r][s]=!cur.input[r][s]; if(cur.input[r][s]){ ac(); SOUNDS[r](ctx.currentTime+.01); } }
+  render();
+});
+$('playBtn').addEventListener('click',()=>{
+  if(playing) return; const max=PARTS[part].max;
+  if(!tried){ if(plays>=max) return; plays++; }
+  playPattern(cur.target,true,2);
+});
+$('mineBtn').addEventListener('click',()=>{ if(!playing) playPattern(cur.input,true,1); });
+$('clearBtn').addEventListener('click',()=>{
+  if(part===1) cur.marks.clear();
+  if(part===2) cur.input[cur.row].fill(false);
+  if(part===3) cur.show.forEach(r=>cur.input[r].fill(false));
+  render();
+});
+$('checkBtn').addEventListener('click',()=>{
+  const t=cur; let msg='';
+  let ok=false; const first=!tried;
+  const hint=' Welke? Dat moet je zelf ontdekken: beluister de beat opnieuw, verbeter en controleer opnieuw. Of klik op "Toon oplossing".';
+  if(part===0){ if(t.pick==null) return; ok=t.pick===t.answer; msg=ok?'Juist! Dat is de beat die je hoorde.':'Niet juist. Beluister de beat opnieuw en kies nog eens. Of klik op "Toon oplossing".'; }
+  if(part===1){ if(t.marks.size!==t.n) return; const good=[...t.marks].filter(k=>t.diff.has(k)).length; ok=good===t.n;
+    msg=ok?'Knap! Je vond alle fouten.':`${good} van de ${t.n} fouten gevonden.`+hint; }
+  if(part===2||part===3){ const rows=part===2?[t.row]:t.show; let wrong=0;
+    rows.forEach(r=>{for(let s=0;s<STEPS;s++) if(t.input[r][s]!==t.target[r][s]) wrong++;}); ok=wrong===0;
+    msg=ok?'Helemaal juist! Goed geluisterd.':`Nog ${wrong} ${wrong===1?'blokje':'blokjes'} fout.`+hint; }
+  if(first){ t.ok=ok; if(!ok) msg+=' (Je eerste poging telt voor de score.)'; }   // alleen de eerste poging telt
+  else if(ok) msg='Nu is het juist! Voor je score telt je eerste poging.';
+  tried=true; lastSig=sig();
+  if(ok) checked=true;          // pas nu kleuren tonen
+  setFeedback(msg,ok?'ok':'bad'); render();
+});
+$('solBtn').addEventListener('click',()=>{ checked=true; setFeedback('Groen = juist · rood = hier hoort geen slag / verkeerde keuze · rood gestreept = hier ontbreekt een slag.','info'); render(); });
+$('nextBtn').addEventListener('click',()=>{ if(idx<TASKS-1){ idx++; startTask(); } else showResult(); });
+$('restartBtn').addEventListener('click',()=>{ newSeries(); window.scrollTo({top:0,behavior:'smooth'}); });
+$('againBtn').addEventListener('click',newSeries);
+$('nextPartBtn').addEventListener('click',()=>{
+  if(level<PARTS[part].levels.length-1) level++; else if(part<3){ part++; level=0; }
+  newSeries(); window.scrollTo({top:0,behavior:'smooth'});
+});
+function showResult(){
+  const score=tasks.filter(t=>t.ok).length;
+  $('summary').innerHTML=`<p class="eyebrow">Uitslag · Deel ${part+1} · ${L().name}</p><p class="sumhead">${score} / ${TASKS}</p>
+    <p class="hint">${score===TASKS?'Perfect! Probeer het volgende niveau.':score>=3?'Goed bezig! Nog een reeks, of door naar het volgende niveau?':'Probeer nog een reeks op dit niveau.'}</p>`;
+  const last=part===3&&level===PARTS[3].levels.length-1;
+  $('nextPartBtn').hidden=last;
+  $('nextPartBtn').innerHTML=level<PARTS[part].levels.length-1?'Volgend niveau &rarr;':'Volgend deel &rarr;';
+  $('task').hidden=true; $('result').hidden=false; render();
+}
+
+newSeries();
+})();
+</script>
+</body>
+</html>

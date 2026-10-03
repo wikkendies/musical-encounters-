@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}</style>
+<title>Bar Line Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --staff:#7F89A3; --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6; --now:rgba(242,169,59,.28); --warm:#E08E12;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --now:rgba(245,184,79,.22); --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --now:rgba(245,184,79,.22); --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:8px 0 0;color:var(--muted)}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:18px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chips .lbl{font-weight:700;color:var(--muted);margin-right:4px;font-size:14px}
+.chip{border:1.5px solid var(--line);background:var(--surface-2);border-radius:999px;min-width:40px;height:40px;padding:0 14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.chip[aria-current="true"]{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.chip.done:not([aria-current="true"]){border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.chip.done::after{content:"";width:6px;height:10px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-2px)}
+
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.step{background:var(--surface-2);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.step .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:800;font-size:14px}
+.step strong{font-weight:700}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn svg{width:18px;height:18px;flex:none}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-soft{background:var(--accent-soft);color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-ghost{background:var(--surface);border:1.5px solid var(--line)}
+.controls{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+.ctl{display:flex;align-items:center;gap:10px;font-weight:600}
+.ctl output{font-variant-numeric:tabular-nums;min-width:62px;color:var(--muted)}
+input[type=range]{accent-color:var(--accent);width:140px}
+.switch{display:flex;align-items:center;gap:10px;font-weight:600;cursor:pointer}
+.switch input{appearance:none;width:44px;height:26px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;margin:0}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{transform:translateX(18px)}
+.status{display:flex;align-items:center;gap:0 12px;min-height:44px;padding:10px 14px;border-radius:12px;background:var(--surface-2);color:var(--muted);font-weight:600}
+.status .big{font-family:var(--display);font-size:26px;font-weight:800;color:var(--warm);line-height:1;font-variant-numeric:tabular-nums}
+
+.staff-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#staff{display:block;width:100%;min-width:720px;height:auto;user-select:none;-webkit-user-select:none;color:var(--ink)}
+#staff .sl{stroke:var(--staff);stroke-width:1.5}
+#staff .note{transition:fill .1s}
+#staff .note.now{color:var(--warm)}
+#staff .note.held{color:var(--accent)}
+#staff .box rect{fill:var(--surface-2);stroke:var(--line);stroke-width:2;transition:fill .1s,stroke .1s}
+#staff .box:hover rect{stroke:var(--accent)}
+#staff .box:focus{outline:none}
+#staff .box:focus-visible rect{stroke:var(--accent);stroke-width:3}
+#staff .box .x{stroke:var(--ink);stroke-width:4;stroke-linecap:round;display:none}
+#staff .box.on .x{display:block}
+#staff .box.on rect{stroke:var(--ink)}
+#staff .box.ok rect{fill:var(--ok-soft);stroke:var(--ok)} #staff .box.ok .x{stroke:var(--ok)}
+#staff .box.bad rect{fill:var(--bad-soft);stroke:var(--bad)} #staff .box.bad .x{stroke:var(--bad)}
+#staff .box.miss rect{stroke:var(--warm);stroke-dasharray:5 4}
+#staff .num{fill:var(--muted);font:600 11px var(--body)}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.actions .spacer{flex:1}
+.count{font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>
+.levels{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow);align-self:flex-start}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 12px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.topbar{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+.bigplay{font-size:17px;padding:16px 22px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.counter{font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.counter b{color:var(--ink)}
+.score-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#score{display:flex;flex-direction:column;gap:6px;min-width:760px;user-select:none;-webkit-user-select:none;color:var(--ink)}
+#score svg{display:block;width:100%;height:auto}
+#score .sl{stroke:var(--staff);stroke-width:1.4}
+#score .gap{cursor:pointer}
+#score .gap rect.hit{fill:transparent}
+#score .gap .dot{fill:var(--line)}
+#score .gap:hover .dot,#score .gap:focus-visible .dot{fill:var(--accent)}
+#score .gap:hover .ghostbar{stroke:var(--accent);opacity:.35}
+#score .gap .ghostbar{stroke:transparent;stroke-width:2.5}
+#score .gap:focus{outline:none}
+#score .gap .bar{stroke:var(--accent);stroke-width:2.6;display:none}
+#score .gap.on .bar{display:block}
+#score .gap.on .dot{fill:var(--accent)}
+#score .gap.ok .bar{stroke:var(--ok)} #score .gap.ok .dot{fill:var(--ok)}
+#score .gap.bad .bar{stroke:var(--bad)} #score .gap.bad .dot{fill:var(--bad)}
+#score .gap.sol .bar{display:block;stroke:var(--ok);stroke-dasharray:5 4}
+.info-grid{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--muted);font-size:14px;font-weight:600}
+.tempo-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:6px 14px;font-weight:800;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="ritme.html">&larr; Let's Make Rhythm</a>
+    <h1>Bar Line <span>Hunter</span></h1>
+    <p>De maatstrepen zijn verdwenen. Luister, tel en zet ze terug op de juiste plaats.</p>
+  </header>
+
+  <div class="levels" role="group" aria-label="Niveau" id="levels"></div>
+
+  <section class="panel" aria-labelledby="title">
+    <div class="panel-head">
+      <div><div class="eyebrow" id="eyebrow">Niveau 1</div><h2 id="title">Zet de 7 maatstrepen</h2></div>
+      <span class="counter" id="solved"></span>
+    </div>
+
+    <div class="topbar">
+      <button class="btn btn-primary bigplay" id="playBtn"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5v13l11-6.5z" fill="currentColor"/></svg><span>Beluister</span></button>
+      <div class="ctl">Tempo <span class="tempo-badge" id="tempoOut"></span></div>
+      <label class="switch"><input type="checkbox" id="metro" checked>Metronoom</label>
+      <span class="counter" id="counter">Maatstrepen: <b>0</b> / 7</span>
+    </div>
+    <div class="status" id="status" aria-live="polite"><span>Druk op Beluister. Tik daarna tussen twee noten om een maatstreep te zetten.</span></div>
+
+    <div class="score-wrap"><div id="score" role="group" aria-label="Melodie van 8 maten zonder maatstrepen"></div></div>
+    <p class="info-grid" id="hintline"></p>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn">Controleer</button>
+      <button class="btn btn-ghost" id="clearBtn">Wis maatstrepen</button>
+      <span class="spacer"></span>
+      <button class="linkbtn" id="solveBtn">Toon oplossing</button>
+      <button class="btn btn-soft" id="newBtn">Nieuwe melodie</button>
+    </div>
+    <p class="feedback info" id="feedback" aria-live="polite"></p>
+  </section>
+</div>
+
+<script>
+(function(){
+/* ---------- testmodus: test.html laadt deze pagina met ?test=1&lvl=N&n=M ---------- */
+const TEST=(()=>{try{const q=new URLSearchParams(location.search);if(q.get('test')!=='1')return null;
+  return {lvl:Math.max(1,parseInt(q.get('lvl'))||1),o:Math.max(0,parseInt(q.get('o'))||0),n:Math.max(1,Math.min(20,parseInt(q.get('n'))||3)),i:0,score:0,max:0,items:[]}}catch(e){return null}})();
+function testSend(m){try{if(window.parent!==window)window.parent.postMessage(Object.assign({lmr:'test'},m),'*')}catch(e){}}
+function testRecord(got,max){got=Math.max(0,Math.min(max,got));TEST.score+=got;TEST.max+=max;TEST.items.push([got,max]);TEST.i++;
+  testSend({type:'progress',i:TEST.i,n:TEST.n,score:TEST.score,max:TEST.max});
+  if(TEST.i>=TEST.n){document.body.classList.add('test-finished');testSend({type:'done',score:TEST.score,max:TEST.max,items:TEST.items});return true}return false}
+function testCheck(fn){document.addEventListener('click',e=>{if(!e.target.closest('#checkBtn'))return;e.stopPropagation();e.preventDefault();fn()},true)}
+function testTitle(el){if(el)el.textContent=`Vraag ${TEST.o+TEST.i+1} van ${TEST.o+TEST.n}`}
+function testShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const TEST_NEXT='Antwoord bewaard. Op naar de volgende vraag.';
+if(TEST){const s=document.createElement('style');s.textContent='.back,.levels,.tabs,.no-test{display:none!important}body{padding-top:6px}header h1{font-size:32px}.test-finished .wrap{opacity:.35;pointer-events:none}';document.head.appendChild(s);document.body.classList.add('testmode')}
+
+const GCLEF='M434 2Q464 -103 464 -170Q464 -223 427 -257Q390 -291 337 -291Q287 -291 250 -262Q213 -232 213 -190Q213 -160 234 -134Q254 -107 284 -107Q313 -107 332 -128Q350 -150 350 -178Q350 -240 280 -240Q298 -268 338 -268Q353 -268 368 -264Q384 -259 401 -248Q418 -237 428 -214Q439 -190 439 -157Q439 -136 411 -6Q389 -12 356 -12Q259 -12 190 60Q120 132 120 232Q120 267 132 303Q143 339 158 366Q172 394 200 428Q229 463 248 484Q268 504 303 539Q280 621 280 689Q280 779 313 840Q346 900 379 900Q389 900 402 887Q414 874 426 851Q438 828 446 790Q455 753 455 710Q455 551 342 447L368 329Q384 332 397 332Q458 332 500 282Q542 233 542 162Q542 44 434 2ZM426 746Q426 801 394 801Q358 801 333 748Q308 695 308 630Q308 588 321 557Q359 580 392 640Q426 699 426 746ZM498 128Q498 183 466 216Q434 249 383 249L428 23Q498 52 498 128ZM407 17 361 247Q334 241 312 214Q289 187 289 158Q289 143 295 128Q301 114 310 104Q318 94 327 86Q336 78 342 74Q348 71 348 71L340 66Q307 75 278 106Q248 137 248 184Q248 231 278 270Q307 310 343 323L325 430Q168 299 168 177Q168 104 223 55Q278 6 348 6Q365 6 407 17Z';
+const BARS=8,MAXPLAY=3;
+/* Ritmetypes. hits = [begin, duur] van de klinkende noten binnen het type. */
+const T={
+  W:{dur:4,hits:[[0,4]]}, DH:{dur:3,hits:[[0,3]]}, H:{dur:2,hits:[[0,2]]}, Q:{dur:1,hits:[[0,1]]},
+  DQ:{dur:1.5,hits:[[0,1.5]]}, E1:{dur:.5,hits:[[0,.5]]}, E:{dur:1,hits:[[0,.5],[.5,.5]]},
+  S4:{dur:1,hits:[[0,.25],[.25,.25],[.5,.25],[.75,.25]]}, S816:{dur:1,hits:[[0,.5],[.5,.25],[.75,.25]]}, S168:{dur:1,hits:[[0,.25],[.25,.25],[.5,.5]]},
+  RW:{dur:4,rest:1}, RH:{dur:2,rest:1}, RQ:{dur:1,rest:1}, RE:{dur:.5,rest:1}
+};
+/* Maatpatronen per maatsoort. A = basis, B = + achtsten, C = + rusten/gepunteerde halve, D = + gepunteerde kwart/achtste rust, F = zestienden */
+const P={
+ 4:{A:['Q Q Q Q','H Q Q','Q Q H','H H','Q H Q'],
+    B:['E Q Q Q','Q E Q Q','Q Q E Q','E E H','Q E H','H E Q','E Q H','E E Q Q'],
+    C:['Q Q RQ Q','H RH','DH Q','Q DH','Q RQ H','RQ Q H','E E Q RQ'],
+    D:['DQ E1 Q Q','Q DQ E1 Q','DQ E1 H','RE E1 Q H','Q Q DQ E1'],
+    F:['S4 Q Q Q','Q S816 Q Q','S168 Q H','Q Q S4 Q','DQ E1 S4 Q','S816 S168 H','E S4 Q Q'],
+    end:['W','H H','DH RQ','H RH']},
+ 3:{A:['Q Q Q','H Q','Q H'],
+    B:['E Q Q','Q E Q','Q Q E','E E Q'],
+    C:['DH','Q Q RQ','H RQ','RQ Q Q'],
+    D:['DQ E1 Q','Q DQ E1','RE E1 Q Q'],
+    F:['S4 Q Q','Q S816 Q','S168 Q Q','S4 S4 Q','DQ E1 S4'],
+    end:['DH','H RQ']},
+ 2:{A:['Q Q','H'],
+    B:['E Q','Q E','E E'],
+    C:['Q RQ','RQ Q'],
+    D:['DQ E1','RE E1 Q'],
+    F:['S4 Q','Q S168','S816 E','S4 S4'],
+    end:['H','Q RQ']}
+};
+const LEVELS=[
+ {n:1,meters:[4],sets:{A:1},acc:1,info:'Kwart en halve noten'},
+ {n:2,meters:[4],sets:{A:1,B:1.5},acc:1,info:'+ achtste noten'},
+ {n:3,meters:[4],sets:{A:.6,B:1,C:1.4},acc:.8,info:'+ rusten, gepunteerde halve'},
+ {n:4,meters:[3,4],sets:{A:.6,B:1,C:1},acc:.6,info:'Ook 3/4-maat'},
+ {n:5,meters:[2,3,4],sets:{A:.3,B:1,C:1,D:1.4},acc:.4,info:'+ gepunteerde kwart, 2/4'},
+ {n:6,meters:[2,3,4],sets:{A:.2,B:.8,C:.8,D:1,F:1.6},acc:.25,info:'+ zestienden'}
+];
+const SEMI=[0,2,4,5,7,9,11];
+function stepToMidi(s){const o=Math.floor((s+2)/7),l=((s+2)%7+7)%7;return 60+12*o+SEMI[l]}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function wpick(obj){let tot=0;for(const k in obj)tot+=obj[k];let r=Math.random()*tot;for(const k in obj){r-=obj[k];if(r<=0)return k}return Object.keys(obj)[0]}
+
+function makeMelody(L){
+  const beats=pick(L.meters),lib=P[beats];let bars=[];
+  for(let b=0;b<BARS-1;b++){let pat;do{pat=pick(lib[wpick(L.sets)])}while(b===0&&pat.startsWith('R'));bars.push(pat)}
+  bars.push(L.n<=2?(beats===4?pick(['W','H H']):lib.end[0]):pick(lib.end));
+  const els=[];let t=0;
+  bars.forEach(p=>p.split(' ').forEach(tok=>{els.push({type:tok,start:t,dur:T[tok].dur,rest:!!T[tok].rest});t+=T[tok].dur}));
+  /* toonhoogtes */
+  let s=pick([-2,0,2]);const sounding=[];els.forEach(e=>{if(!e.rest)e.notes=T[e.type].hits.map(h=>{const n={off:h[0],d:h[1]};sounding.push(n);return n})});
+  sounding.forEach((n,i)=>{
+    if(i>0){const r=Math.random();let mv=r<.55?pick([-1,1]):r<.75?pick([-2,2]):r<.87?0:pick([-3,3,-4,4]);
+      s+=mv;if(s<-2)s=-2+Math.abs(mv)%3;if(s>7)s=7-Math.abs(mv)%3}
+    n.step=s});
+  const last=sounding[sounding.length-1];last.step=last.step>2?5:-2;
+  if(sounding.length>1){const p=sounding[sounding.length-2];if(Math.abs(p.step-last.step)>2)p.step=last.step+(last.step===5?-1:1)}
+  sounding.forEach(n=>n.midi=stepToMidi(n.step));
+  const bl=new Set();els.forEach((e,i)=>{const end=e.start+e.dur;if(i<els.length-1&&Math.abs(end/beats-Math.round(end/beats))<1e-9)bl.add(i)});
+  return {beats,els,barlines:bl};
+}
+
+/* ---------- state ---------- */
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const state={lvl:0,mel:null,marks:new Set(),checked:false,shown:false,plays:0,tempo:90,metro:true};
+
+/* ---------- tekenen ---------- */
+const BOT=84,SP=12,W=1010,SLOT=40,LH=128;
+function yOf(s){return BOT-s*(SP/2)}
+function head(x,y,open,big){return open?`<ellipse cx="${x}" cy="${y}" rx="${big?8.4:6.6}" ry="${big?5.4:4.6}" transform="rotate(${big?0:-20} ${x} ${y})" fill="none" stroke="currentColor" stroke-width="${big?2.8:2.2}"/>`
+  :`<ellipse cx="${x}" cy="${y}" rx="7" ry="5.1" transform="rotate(-20 ${x} ${y})" fill="currentColor"/>`}
+function stem(x,y1,y2){return `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="currentColor" stroke-width="1.8"/>`}
+function ledger(x,s){let h='';for(let q=-2;q>=s;q-=2)h+=`<line x1="${x-11}" y1="${yOf(q)}" x2="${x+11}" y2="${yOf(q)}" stroke="currentColor" stroke-width="1.4"/>`;for(let q=6;q<=s;q+=2)if(q>=6)h+='';return h}
+function dot(x,s){const y=yOf(s)-(s%2===0?5:0);return `<circle cx="${x+11}" cy="${y}" r="2.4" fill="currentColor"/>`}
+function flag(x,y,up){return up?`<path d="M0 0 C0.9 7 8.4 10 8.9 18 C9.4 23 7.4 27 5.9 29 C7.4 24.5 7.4 19 0 13.5 Z" transform="translate(${x} ${y})" fill="currentColor"/>`
+  :`<path d="M0 0 C0.9 7 8.4 10 8.9 18 C9.4 23 7.4 27 5.9 29 C7.4 24.5 7.4 19 0 13.5 Z" transform="translate(${x} ${y}) scale(1 -1)" fill="currentColor"/>`}
+function rest(type,x){
+  if(type==='RQ')return `<path transform="translate(${x-12} 0)" d="M9 39 L16.8 48.6 C13.2 51.8 12.2 55.6 16.2 61 L17.4 62.6 C13.4 61.2 9.8 62.6 11.2 67.8 C12 70.8 13.6 73.2 14.2 74.8 C9.2 71.8 5.6 66.8 8.6 63.2 C10.2 61.4 12.6 61.2 13.8 61.8 L7.2 53.6 C10.8 50.4 11.8 46.8 9.2 42.8 Z" fill="currentColor"/>`;
+  if(type==='RH')return `<rect x="${x-8}" y="53.5" width="16" height="6.5" fill="currentColor"/>`;
+  if(type==='RW')return `<rect x="${x-8}" y="48" width="16" height="6.5" fill="currentColor"/>`;
+  return `<g transform="translate(${x-9} 0)"><circle cx="9" cy="51" r="3.4" fill="currentColor"/><path d="M8 53.6 C11.5 55.2 15 53.4 17.6 49 L11.6 72" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+}
+function drawEl(e,xs){
+  if(e.rest)return rest(e.type,xs[0]);
+  const ns=e.notes;let h='';
+  if(ns.length===1){const n=ns[0],x=xs[0],y=yOf(n.step),up=n.step<4,ty=e.type;
+    h+=ledger(x,n.step);
+    if(ty==='W')return h+head(x,y,true,true);
+    h+=head(x,y,ty==='H'||ty==='DH');
+    h+=up?stem(x+6.4,y-1,y-34):stem(x-6.4,y+1,y+34);
+    if(ty==='DH'||ty==='DQ')h+=dot(x,n.step);
+    if(ty==='E1')h+=up?flag(x+6.4,y-34,true):flag(x-6.4,y+34,false);
+    return h}
+  const avg=ns.reduce((a,n)=>a+n.step,0)/ns.length,up=avg<4,ys=ns.map(n=>yOf(n.step));
+  const by=up?Math.min(...ys)-30:Math.max(...ys)+30,sx=xs.map(x=>up?x+6.4:x-6.4);
+  ns.forEach((n,i)=>{h+=ledger(xs[i],n.step)+head(xs[i],ys[i])+stem(sx[i],up?ys[i]-1:ys[i]+1,by)});
+  const beam=(a,b,lvl)=>{const y=up?by+lvl*7:by-lvl*7-5;return `<rect x="${sx[a]-.9}" y="${up?y-2:y+2}" width="${sx[b]-sx[a]+1.8}" height="5" fill="currentColor"/>`};
+  h+=beam(0,ns.length-1,0);
+  if(e.type==='S4')h+=beam(0,3,1);
+  if(e.type==='S816')h+=beam(1,2,1);
+  if(e.type==='S168')h+=beam(0,1,1);
+  return h;
+}
+function layout(){
+  const m=state.mel,els=m.els;
+  const slots=els.map(e=>e.rest?1:e.notes.length),N=slots.reduce((a,b)=>a+b,0);
+  const perLine=Math.floor((W-96)/SLOT),lines=Math.ceil(N/perLine);
+  const target=Math.ceil(N/lines);
+  const rows=[];let cur=[],cnt=0;
+  els.forEach((e,i)=>{cur.push(i);cnt+=slots[i];
+    if(cnt>=target&&rows.length<lines-1){
+      // liever niet breken op een maatstreep
+      if(m.barlines.has(i)&&cur.length>1&&i<els.length-1){const back=cur.pop();cnt-=slots[back];rows.push(cur);cur=[back];cnt=slots[back]}
+      else{rows.push(cur);cur=[];cnt=0}}});
+  if(cur.length)rows.push(cur);
+  return {rows,slots};
+}
+function render(){
+  const m=state.mel,{rows,slots}=layout();let out='';
+  rows.forEach((row,li)=>{
+    let h='';const x0=li===0?96:66;
+    const n=row.reduce((a,i)=>a+slots[i],0),sw=Math.min(78,(W-x0-30)/n);
+    for(let l=0;l<5;l++)h+=`<line class="sl" x1="4" y1="${BOT-l*SP}" x2="${W-6}" y2="${BOT-l*SP}"/>`;
+    h+=`<line x1="4" y1="${BOT-4*SP}" x2="4" y2="${BOT}" stroke="currentColor" stroke-width="2"/>`;
+    h+=`<path d="${GCLEF}" transform="translate(6 ${BOT-SP}) scale(0.074 -0.074)" fill="currentColor"/>`;
+    if(li===0)h+=`<text x="66" y="58" text-anchor="middle" font-weight="800" font-size="24" font-family="Bricolage Grotesque, sans-serif" fill="currentColor">${m.beats}</text><text x="66" y="82" text-anchor="middle" font-weight="800" font-size="24" font-family="Bricolage Grotesque, sans-serif" fill="currentColor">4</text>`;
+    let x=x0+sw/2;const pos={};
+    row.forEach(i=>{const xs=[];for(let k=0;k<slots[i];k++){xs.push(x);x+=sw}pos[i]=xs;h+=drawEl(m.els[i],xs)});
+    const lastRow=li===rows.length-1;
+    row.forEach((i,k)=>{
+      if(lastRow&&k===row.length-1)return;
+      const xa=pos[i][pos[i].length-1],xb=k<row.length-1?pos[row[k+1]][0]:W-6,gx=k<row.length-1?(xa+xb)/2:Math.min(xa+sw/2,W-12);
+      let cls='gap';const on=state.marks.has(i);if(on)cls+=' on';
+      if(state.checked&&on&&state.marks.size===m.barlines.size&&[...state.marks].every(j=>m.barlines.has(j)))cls+=' ok';   // geen groen/rood per maatstreep
+      if(state.shown&&!on&&m.barlines.has(i))cls+=' sol';
+      h+=`<g class="${cls}" data-i="${i}" role="button" tabindex="0" aria-label="Maatstreep na noot ${i+1}${on?' (gezet)':''}">
+        <rect class="hit" x="${gx-11}" y="22" width="22" height="98"/>
+        <line class="ghostbar" x1="${gx}" y1="${BOT-4*SP}" x2="${gx}" y2="${BOT}"/>
+        <line class="bar" x1="${gx}" y1="${BOT-4*SP}" x2="${gx}" y2="${BOT}"/>
+        <circle class="dot" cx="${gx}" cy="112" r="3.2"/></g>`;
+    });
+    if(lastRow)h+=`<line x1="${W-14}" y1="${BOT-4*SP}" x2="${W-14}" y2="${BOT}" stroke="currentColor" stroke-width="2"/><rect x="${W-11}" y="${BOT-4*SP}" width="5" height="${4*SP}" fill="currentColor"/>`;
+    out+=`<svg viewBox="0 0 ${W} ${LH}">${h}</svg>`;
+  });
+  $('score').innerHTML=out;
+  $('counter').innerHTML=`Maatstrepen: <b>${state.marks.size}</b> / ${BARS-1}`;
+  renderPlay();
+}
+function renderLevels(){
+  $('levels').innerHTML=LEVELS.map((L,i)=>`<button data-l="${i}" aria-pressed="${i===state.lvl}">Niveau ${L.n}<small>${L.info}</small></button>`).join('');
+  const L=LEVELS[state.lvl];$('eyebrow').textContent=`Niveau ${L.n} · ${state.mel.beats}/4-maat`;
+  $('solved').textContent=`Opgelost in dit niveau: ${store.get('blh-solved-'+L.n,0)}`;
+  $('hintline').textContent=`Tip: in een ${state.mel.beats}/4-maat telt elke maat ${state.mel.beats} tellen. De eerste tel van elke maat klinkt een beetje zwaarder.`;
+}
+function renderPlay(){const left=state.tried?99:MAXPLAY-state.plays;
+  $('playBtn').querySelector('span').textContent=playing?'Stop':(state.tried?'Beluister opnieuw':left>0?`Beluister (nog ${left}×)`:'Geen beurten meer');
+  $('playBtn').disabled=!playing&&left<=0}
+function setFeedback(m,k){$('feedback').textContent=m;$('feedback').className='feedback '+(k||'info')}
+function setStatus(h){$('status').innerHTML='<span>'+h+'</span>'}
+
+/* ---------- interactie ---------- */
+function toggle(i){if(state.shown)return;
+  if(state.marks.has(i))state.marks.delete(i);else state.marks.add(i);
+  state.checked=false;setFeedback('');render();const g=$('score').querySelector(`.gap[data-i="${i}"]`);g&&g.focus()}
+$('score').addEventListener('click',e=>{const g=e.target.closest('.gap');if(g)toggle(+g.dataset.i)});
+$('score').addEventListener('keydown',e=>{const g=e.target.closest('.gap');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();toggle(+g.dataset.i)}});
+$('levels').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;state.lvl=+b.dataset.l;newMelody()});
+$('checkBtn').addEventListener('click',()=>{const m=state.mel;
+  if(!state.marks.size){setFeedback('Zet eerst maatstrepen tussen de noten.','bad');return}
+  state.checked=true;state.tried=true;render();renderPlay();
+  const good=[...state.marks].filter(i=>m.barlines.has(i)).length,wrong=state.marks.size-good,miss=m.barlines.size-good;
+  if(good===m.barlines.size&&wrong===0){
+    if(state.shown)setFeedback('Juist, maar je hebt de oplossing bekeken.','ok');
+    else{const k='blh-solved-'+LEVELS[state.lvl].n;store.set(k,store.get(k,0)+1);renderLevels();setFeedback('Helemaal juist! Alle maatstrepen staan goed. Klik op Nieuwe melodie.','ok')}
+  }else{const parts=[];if(good)parts.push(`${good} juist`);if(wrong)parts.push(`${wrong} op een verkeerde plaats`);if(miss)parts.push(`er ${miss===1?'ontbreekt er nog 1':'ontbreken er nog '+miss}`);
+    setFeedback(parts.join(', ')+'. Welke? Dat moet je zelf ontdekken: tel de tellen per maat nog eens na, verbeter en controleer opnieuw.','bad')}});
+$('clearBtn').addEventListener('click',()=>{state.marks=new Set();state.checked=false;setFeedback('');render()});
+$('solveBtn').addEventListener('click',()=>{state.shown=true;render();setFeedback('De juiste maatstrepen staan nu als groene stippellijn. Juist gezette strepen blijven blauw.','info')});
+$('newBtn').addEventListener('click',newMelody);
+function applyTempo(){state.tempo=[90,90,85,85,80,75][state.lvl];$('tempoOut').textContent=state.tempo+' BPM'}
+$('metro').addEventListener('change',e=>{state.metro=e.target.checked});
+function newMelody(){stop();applyTempo();state.mel=makeMelody(LEVELS[state.lvl]);state.marks=new Set();state.checked=false;state.shown=false;state.tried=false;state.plays=0;
+  setFeedback('');setStatus('Druk op Beluister. Tik daarna tussen twee noten om een maatstreep te zetten.');renderLevels();render()}
+
+/* ---------- geluid ---------- */
+let ctx=null,playing=null;
+function ac(){if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();return ctx}
+function click(t,accent,out){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=accent?1900:1400;
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(accent?0.4:0.25,t+0.002);g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+  o.connect(g).connect(out);o.start(t);o.stop(t+0.07)}
+function piano(t,d,midi,out,vol){
+  const f=440*Math.pow(2,(midi-69)/12),g=ctx.createGain(),lp=ctx.createBiquadFilter(),pk=0.3*vol;
+  lp.type='lowpass';lp.frequency.setValueAtTime(3800+1800*vol,t);lp.frequency.exponentialRampToValueAtTime(1400,t+Math.max(0.3,d));
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(pk,t+0.006);
+  if(d<0.32){g.gain.exponentialRampToValueAtTime(pk*.5,t+d);g.gain.setTargetAtTime(0.0001,t+d,d<.2?0.015:0.03)}
+  else{g.gain.exponentialRampToValueAtTime(pk*.5,t+0.25);g.gain.exponentialRampToValueAtTime(pk*.25,t+Math.max(0.3,d*0.95));g.gain.setTargetAtTime(0.0001,t+d,0.045)}
+  g.connect(lp).connect(out);
+  [[1,1],[2,.42],[3,.2],[4,.11],[5,.05],[0.5,.18]].forEach(([k,a])=>{const o=ctx.createOscillator(),og=ctx.createGain();
+    o.frequency.value=f*k*(k>1?1+0.0006*k:1);og.gain.value=a;o.connect(og).connect(g);o.start(t);o.stop(t+d+0.4)});
+}
+function stop(msg){if(!playing)return;const p=playing;playing=null;cancelAnimationFrame(p.raf);clearTimeout(p.timer);
+  p.master.gain.setTargetAtTime(0.0001,ctx.currentTime,0.03);setTimeout(()=>p.master.disconnect(),300);renderPlay();if(msg)setStatus(msg)}
+$('playBtn').addEventListener('click',()=>{
+  if(playing){stop('Gestopt.');return}
+  if(!state.tried&&state.plays>=MAXPLAY){setFeedback('Je mag maximaal 3 keer beluisteren.','info');return}
+  state.plays++;
+  const m=state.mel,L=LEVELS[state.lvl],B=m.beats,c=ac(),master=c.createGain();master.gain.value=0.9;master.connect(c.destination);
+  const spb=60/state.tempo,t0=c.currentTime+0.15,total=BARS*B;
+  for(let i=0;i<B;i++)click(t0+i*spb,i===0,master);
+  m.els.forEach(e=>{if(e.rest)return;e.notes.forEach(n=>{const at=e.start+n.off,down=Math.abs(at%B)<1e-9;
+    const v=down?1:1-0.35*L.acc; piano(t0+(B+at)*spb,n.d*spb*(n.d<=.25?.5:.95),n.midi,master,v)})});
+  if(state.metro)for(let b=0;b<total;b++)click(t0+(B+b)*spb,L.acc>=.8&&b%B===0,master);
+  playing={master,raf:0,timer:setTimeout(()=>stop('Klaar. Zet de maatstrepen tussen de noten.'),((B+total)*spb+0.6)*1000)};
+  renderPlay();let last='';
+  const tick=()=>{if(!playing)return;const b=(ctx.currentTime-t0)/spb;
+    if(b<B){const n=Math.max(1,Math.floor(b)+1);if(last!=='c'+n){last='c'+n;setStatus(`</span><span class="big">${n}</span><span>Aftellen…`)}}
+    else if(last!=='p'){last='p';setStatus('De melodie speelt… Luister naar de zware tellen.')}
+    playing.raf=requestAnimationFrame(tick)};
+  playing.raf=requestAnimationFrame(tick)});
+
+newMelody();
+
+if(TEST){['solved','solveBtn','newBtn'].forEach(id=>$(id).classList.add('no-test'));
+  state.lvl=Math.min(LEVELS.length-1,TEST.lvl-1);
+  const go=()=>{newMelody();testTitle($('title'))};go();
+  testCheck(()=>{const m=state.mel;if(!state.marks.size){setFeedback('Zet eerst maatstrepen tussen de noten.','bad');return}
+    const good=[...state.marks].filter(i=>m.barlines.has(i)).length,wrong=state.marks.size-good;
+    if(testRecord(good-wrong,m.barlines.size))return;go();setFeedback(TEST_NEXT,'info')});
+}
+})();
+</script>
+
+</body>
+</html>

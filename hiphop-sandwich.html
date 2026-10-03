@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hip-Hop Sandwich &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6;
+  --cA:#C0392B; --cA-soft:#FBE3DE; --cB:#2E7D4F; --cB-soft:#DDF1E6;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --cA:#FF8A76; --cA-soft:#42231D; --cB:#4CC38A; --cB-soft:#163829;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --cA:#FF8A76; --cA-soft:#42231D; --cB:#4CC38A; --cB-soft:#163829;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:10px 0 0;color:var(--muted);max-width:64ch}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-big{font-size:17px;padding:16px 22px}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+.linkbtn:hover{color:var(--accent)}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* tijdlijn met de drie delen */
+.timeline{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.part{position:relative;overflow:hidden;border-radius:14px;border:2px solid var(--line);background:var(--surface-2);padding:14px 10px;text-align:center;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.part .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);position:relative}
+.part .let{font-family:var(--display);font-weight:800;font-size:34px;line-height:1;color:var(--muted);position:relative}
+.part .ins{font-size:12px;color:var(--muted);position:relative}
+.part .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--accent-soft)}
+.part.now{border-color:var(--accent)}
+.part.play-A,.part.play-B{cursor:pointer}
+.part.lA{border-color:var(--cA);background:var(--cA-soft)} .part.lA .let{color:var(--cA)}
+.part.lB{border-color:var(--cB);background:var(--cB-soft)} .part.lB .let{color:var(--cB)}
+.part.lA .fill{background:rgba(192,57,43,.15)} .part.lB .fill{background:rgba(46,125,79,.15)}
+
+.q{display:flex;flex-direction:column;gap:10px;padding-top:6px;border-top:1px solid var(--line)}
+.q:first-child{border-top:0;padding-top:0}
+.q h3{margin:0;font-size:17px}
+.choices{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.choice{border:2px solid var(--line);background:var(--surface-2);border-radius:12px;padding:12px 8px;font-weight:700;font-size:16px}
+.choice.big{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.12em}
+.choice:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.choice[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.choice.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.choice:disabled{cursor:default}
+@media (max-width:560px){.choices{grid-template-columns:repeat(2,1fr)}}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+.explain{margin:0;padding:14px 16px;border-radius:12px;background:var(--surface-2);font-size:15px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="form.html">&larr; Let's Make Structure</a>
+    <h1>Hip-Hop <span>Sandwich</span></h1>
+    <p>Luister naar de hiphop-beat. Het stuk bestaat uit <strong>drie delen</strong>. Welk deel is hetzelfde, welk deel is nieuw? En welke instrumenten hoor je?</p>
+  </header>
+
+  <section class="panel">
+    <div class="actions">
+      <button class="btn btn-primary btn-big" id="playBtn" type="button">&#9654; Beluister het stuk</button>
+      <button class="linkbtn" id="stopBtn" type="button" hidden>&#9632; Stop</button>
+    </div>
+    <div class="timeline" id="timeline"></div>
+    <p class="hint" id="tlHint">De balkjes tonen welk deel je hoort. Het hele stuk duurt ongeveer 1 minuut.</p>
+  </section>
+
+  <section class="panel">
+    <div id="questions"></div>
+    <p class="feedback info" id="feedback"></p>
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn" type="button" disabled>Controleer</button>
+      <button class="linkbtn" id="solBtn" type="button" hidden>Toon oplossing</button>
+    </div>
+    <p class="explain" id="explain" hidden></p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* ---------- vragen ---------- */
+const QUESTIONS=[
+  {q:'1. Welke vorm heeft het stuk?', big:true, opts:['AB','ABA','AAB','ABC'], ok:'ABA'},
+  {q:'2. Welk instrument speelt de melodie in deel 1?', opts:['viool','trompet','fluit','gitaar'], ok:'viool'},
+  {q:'3. Welk instrument speelt de melodie in deel 2?', opts:['gitaar','viool','trompet','saxofoon'], ok:'trompet'}
+];
+const MAXPLAY=3;
+let answers=QUESTIONS.map(()=>null), tried=false, done=false, solved=false, plays=0, lastChecked=null;
+
+/* ---------- muziek ----------
+   88 BPM, 4/4. Deel A = 8 maten, deel B = 8 maten, deel A = 8 maten + slotakkoord.
+   Tijden in tellen binnen de maat. */
+const BPM=88, BEAT=60/BPM, BAR=4*BEAT, SECTION_BARS=8;
+const N=n=>{ const m=n.match(/^([A-G])(#|b)?(\d)$/); return 12*(+m[3]+1)+{C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0); };
+const A={
+  chords:[['A3','C4','E4','G4'],['F3','A3','C4','E4'],['C4','E4','G4','B3'],['G3','B3','D4','F#4']],
+  bass:['A1','F1','C2','G1'],
+  lead:[ // 4 maten, [toon, begin, duur]; maat 4 en maat 8 verschillen
+    [['E5',0,1.5],['D5',1.5,.5],['C5',2,1],['A4',3,1]],
+    [['F5',0,1.5],['E5',1.5,.5],['C5',2,2]],
+    [['E5',0,1],['G5',1,1],['E5',2,.5],['D5',2.5,.5],['C5',3,1]],
+    [['D5',0,2],['B4',2,1.5]]
+  ],
+  leadEnd:[['A4',0,3]]
+};
+const B={
+  chords:[['D4','F4','A4','C5'],['G3','B3','D4','F4'],['C4','E4','G4','B4'],['E3','G#3','B3','D4']],
+  bass:[['D2','F2','A2','F2'],['G1','B1','D2','F2'],['C2','E2','G2','E2'],['E1','G#1','B1','D2']],
+  lead:[
+    [['A4',.5,.4],['A4',1,.4],['C5',1.5,.4],['D5',2,.9]],
+    [['F5',0,.4],['D5',.5,.4],['B4',1,.9],['G4',2,.9]],
+    [['E5',0,.6],['E5',.75,.2],['G5',1,.9],['E5',2,.4],['C5',2.5,.4]],
+    [['G#4',0,.9],['B4',1,.9],['D5',2,.9]]
+  ],
+  leadEnd:[['G#4',0,.4],['B4',.5,.4],['E5',1,1.8]]
+};
+
+let ctx=null, master=null, noiseBuf=null, playing=false, t0=0, raf=0, stopAt=0, nodes=[];
+function ac(){
+  if(!ctx){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-18; comp.ratio.value=4; comp.attack.value=.005;
+    master=ctx.createGain(); master.gain.value=.55; master.connect(comp); const lim=ctx.createGain(); lim.gain.value=.9; comp.connect(lim); lim.connect(ctx.destination);
+    const len=ctx.sampleRate; noiseBuf=ctx.createBuffer(1,len,ctx.sampleRate); const d=noiseBuf.getChannelData(0); for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
+  }
+  if(ctx.state==='suspended') ctx.resume();
+  return ctx;
+}
+const hz=m=>440*Math.pow(2,(m-69)/12);
+function keep(n){ nodes.push(n); return n; }
+function out(g,dest){ g.connect(dest||master); }
+
+/* drums (zoals Beat Maker) */
+function kick(t,v=1){ const o=keep(ctx.createOscillator()), g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(140,t); o.frequency.exponentialRampToValueAtTime(42,t+.13);
+  g.gain.setValueAtTime(1.1*v,t); g.gain.exponentialRampToValueAtTime(.001,t+.38); o.connect(g); out(g); o.start(t); o.stop(t+.4); }
+function snare(t,v=1){ const n=keep(ctx.createBufferSource()), f=ctx.createBiquadFilter(), g=ctx.createGain(); n.buffer=noiseBuf; f.type='highpass'; f.frequency.value=1400;
+  g.gain.setValueAtTime(.55*v,t); g.gain.exponentialRampToValueAtTime(.001,t+.2); n.connect(f); f.connect(g); out(g); n.start(t); n.stop(t+.22);
+  const o=keep(ctx.createOscillator()), og=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(200,t); o.frequency.exponentialRampToValueAtTime(150,t+.08);
+  og.gain.setValueAtTime(.35*v,t); og.gain.exponentialRampToValueAtTime(.001,t+.1); o.connect(og); out(og); o.start(t); o.stop(t+.12); }
+function clap(t){ [0,.012,.024].forEach(d=>{ const n=keep(ctx.createBufferSource()), f=ctx.createBiquadFilter(), g=ctx.createGain(); n.buffer=noiseBuf; f.type='bandpass'; f.frequency.value=1500; f.Q.value=1.2;
+  g.gain.setValueAtTime(.5,t+d); g.gain.exponentialRampToValueAtTime(.001,t+d+(d>.02?.16:.03)); n.connect(f); f.connect(g); out(g); n.start(t+d); n.stop(t+d+.2); }); }
+function hat(t,v=1){ const n=keep(ctx.createBufferSource()), f=ctx.createBiquadFilter(), g=ctx.createGain(); n.buffer=noiseBuf; f.type='highpass'; f.frequency.value=7500;
+  g.gain.setValueAtTime(.16*v,t); g.gain.exponentialRampToValueAtTime(.001,t+.045); n.connect(f); f.connect(g); out(g); n.start(t); n.stop(t+.06); }
+
+/* bas: warme synthbas */
+function bass(m,t,dur){ const f=hz(m), g=ctx.createGain(), lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.setValueAtTime(f*6,t); lp.frequency.exponentialRampToValueAtTime(f*2.2,t+.25);
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.55,t+.012); g.gain.setTargetAtTime(.38,t+.05,.2); g.gain.setTargetAtTime(.0001,t+dur,.05);
+  [['sine',1,.9],['triangle',2,.25]].forEach(([ty,k,a])=>{ const o=keep(ctx.createOscillator()), og=ctx.createGain(); o.type=ty; o.frequency.value=f*k; og.gain.value=a; o.connect(og); og.connect(lp); o.start(t); o.stop(t+dur+.3); });
+  lp.connect(g); out(g); }
+
+/* piano: lo-fi (zelfde klank als de rest van de site, iets gedempt) */
+function piano(m,t,dur,v=.55){ const f=hz(m), g=ctx.createGain(), lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.Q.value=.7;
+  lp.frequency.setValueAtTime(Math.min(4200,f*8),t); lp.frequency.exponentialRampToValueAtTime(Math.max(600,f*2.5),t+1.2);
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.2*v,t+.008); g.gain.exponentialRampToValueAtTime(.08*v,t+.4); g.gain.setTargetAtTime(.0001,t+dur,.12);
+  [[1,1,0],[1,.5,5],[2,.35,0],[3,.12,0],[4,.06,0]].forEach(([k,a,d])=>{ const o=keep(ctx.createOscillator()), og=ctx.createGain(); o.type='sine'; o.frequency.value=f*k; o.detune.value=d; og.gain.value=a; o.connect(og); og.connect(g); o.start(t); o.stop(t+dur+.8); });
+  g.connect(lp); out(lp); }
+
+/* viool: strijkklank met zachte aanzet en vibrato */
+function violin(m,t,dur){ const f=hz(m), g=ctx.createGain(), bp=ctx.createBiquadFilter(), lp=ctx.createBiquadFilter();
+  bp.type='peaking'; bp.frequency.value=2800; bp.gain.value=5; bp.Q.value=1.2; lp.type='lowpass'; lp.frequency.value=5200;
+  const lfo=keep(ctx.createOscillator()), lg=ctx.createGain(); lfo.frequency.value=5.6; lg.gain.setValueAtTime(0,t); lg.gain.linearRampToValueAtTime(f*.006,t+Math.min(.35,dur*.6));
+  lfo.connect(lg);
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.12,t+.09); g.gain.setTargetAtTime(.1,t+.1,.3); g.gain.setTargetAtTime(.0001,t+dur,.08);
+  [[0,.6],[7,.5],[-6,.5]].forEach(([det,a])=>{ const o=keep(ctx.createOscillator()), og=ctx.createGain(); o.type='sawtooth'; o.frequency.value=f; o.detune.value=det; lg.connect(o.frequency); og.gain.value=a; o.connect(og); og.connect(g); o.start(t); o.stop(t+dur+.4); });
+  lfo.start(t); lfo.stop(t+dur+.4);
+  g.connect(bp); bp.connect(lp); out(lp); }
+
+/* trompet: koperklank die snel openbloeit */
+function trumpet(m,t,dur){ const f=hz(m), g=ctx.createGain(), lp=ctx.createBiquadFilter(), pk=ctx.createBiquadFilter();
+  lp.type='lowpass'; lp.Q.value=2; lp.frequency.setValueAtTime(f*1.5,t); lp.frequency.exponentialRampToValueAtTime(f*9,t+.05); lp.frequency.setTargetAtTime(f*5,t+.08,.15);
+  pk.type='peaking'; pk.frequency.value=1300; pk.gain.value=6; pk.Q.value=1;
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.16,t+.03); g.gain.setTargetAtTime(.12,t+.05,.1); g.gain.setTargetAtTime(.0001,t+dur,.04);
+  [['sawtooth',0,.7],['square',4,.25]].forEach(([ty,det,a])=>{ const o=keep(ctx.createOscillator()), og=ctx.createGain(); o.type=ty; o.frequency.setValueAtTime(f*.97,t); o.frequency.exponentialRampToValueAtTime(f,t+.04); o.detune.value=det; og.gain.value=a; o.connect(og); og.connect(g); o.start(t); o.stop(t+dur+.3); });
+  g.connect(lp); lp.connect(pk); out(pk); }
+
+const swing=b=>b+((b*2)%2===1?.08:0);   // achtste achteraan iets later (hiphop-swing)
+function sectionA(ts,last){
+  for(let bar=0;bar<SECTION_BARS;bar++){
+    const tb=ts+bar*BAR, i=bar%4;
+    [0,1.5,2.5].forEach(b=>kick(tb+b*BEAT)); [1,3].forEach(b=>snare(tb+b*BEAT));
+    for(let e=0;e<8;e++) hat(tb+swing(e/2)*BEAT, e%2?.6:1);
+    bass(N(A.bass[i]),tb,.9*BEAT); bass(N(A.bass[i]),tb+1.75*BEAT,.22*BEAT); bass(N(A.bass[i]),tb+2.5*BEAT,.9*BEAT); bass(N(A.bass[i])+7,tb+3.5*BEAT,.4*BEAT);
+    A.chords[i].forEach(n=>{ piano(N(n),tb,1.4*BEAT); piano(N(n),tb+2.5*BEAT,1.2*BEAT,.45); });
+    const mel=(bar===7)?A.leadEnd:A.lead[i];
+    mel.forEach(([n,b,d])=>violin(N(n),tb+b*BEAT,d*BEAT));
+  }
+}
+function sectionB(ts){
+  for(let bar=0;bar<SECTION_BARS;bar++){
+    const tb=ts+bar*BAR, i=bar%4;
+    [0,.75,2,2.75].forEach(b=>kick(tb+b*BEAT,.9)); [1,3].forEach(b=>{ clap(tb+b*BEAT); snare(tb+b*BEAT,.5); });
+    for(let s=0;s<16;s++) hat(tb+s*.25*BEAT, s%4===0?.9:s%2?.35:.6);
+    B.bass[i].forEach((n,k)=>bass(N(n),tb+k*BEAT,.8*BEAT));
+    [.5,1.5,2.5,3.5].forEach(b=>B.chords[i].forEach(n=>piano(N(n),tb+b*BEAT,.25*BEAT,.6)));
+    const mel=(bar===7)?B.leadEnd:B.lead[i];
+    mel.forEach(([n,b,d])=>trumpet(N(n),tb+b*BEAT,d*BEAT));
+  }
+}
+function ending(ts){ kick(ts); ['A2'].forEach(n=>bass(N(n),ts,2*BEAT)); ['A3','C4','E4','A4'].forEach(n=>piano(N(n),ts,2.5*BEAT,.7)); violin(N('A4'),ts,2*BEAT); }
+const SEC=SECTION_BARS*BAR, TOTAL=3*SEC+3*BEAT;
+
+function play(which){       // which: undefined = alles, 0/1/2 = één deel
+  if(playing) stop();
+  if(which==null&&!tried){ if(plays>=MAXPLAY) return; plays++; }
+  ac(); nodes=[]; t0=ctx.currentTime+.15;
+  const parts=which==null?[0,1,2]:[which];
+  parts.forEach((p,k)=>{ const ts=t0+(which==null?p*SEC:0); if(p===1) sectionB(ts); else sectionA(ts); });
+  const len=which==null?TOTAL:SEC+(which===2?3*BEAT:0);
+  if(which==null||which===2) ending(t0+(which==null?3*SEC:SEC));
+  playing={which,len}; stopAt=t0+len; render(); tick();
+}
+function stop(){
+  nodes.forEach(n=>{ try{ n.stop(); }catch(_){} }); nodes=[];
+  playing=false; cancelAnimationFrame(raf); drawProgress(-1,0); render();
+}
+function tick(){
+  if(!playing) return;
+  const now=ctx.currentTime-t0;
+  if(ctx.currentTime>=stopAt+.2){ playing=false; drawProgress(-1,0); render(); return; }
+  const which=playing.which;
+  if(which==null){ const p=Math.min(2,Math.floor(now/SEC)); drawProgress(p, Math.min(1,(now-p*SEC)/SEC)); }
+  else drawProgress(which, Math.min(1,now/SEC));
+  raf=requestAnimationFrame(tick);
+}
+function drawProgress(p,frac){
+  document.querySelectorAll('.part').forEach((el,i)=>{ el.classList.toggle('now',i===p); el.querySelector('.fill').style.width=(i<p&&playing&&playing.which==null?100:i===p?frac*100:0)+'%'; });
+}
+
+/* ---------- weergave ---------- */
+function renderTimeline(){
+  const reveal=done||solved, L=['A','B','A'], ins=['drums · bas · piano · viool','drums · bas · piano · trompet','drums · bas · piano · viool'];
+  $('timeline').innerHTML=[0,1,2].map(i=>`<div class="part${reveal?' l'+L[i]:''}" data-i="${i}" ${reveal?'role="button" tabindex="0" title="Beluister dit deel"':''}><div class="fill"></div><span class="lab">Deel ${i+1}</span><span class="let">${reveal?L[i]:'?'}</span>${reveal?`<span class="ins">${ins[i]}</span>`:''}</div>`).join('');
+  $('tlHint').textContent=reveal?'Tik op een deel om het apart te beluisteren.':'De balkjes tonen welk deel je hoort. Het hele stuk duurt ongeveer 1 minuut.';
+}
+function render(){
+  const reveal=done||solved, left=MAXPLAY-plays, pb=$('playBtn');
+  pb.disabled=!!playing||(!tried&&left<=0);
+  pb.innerHTML=playing?'&#9654; Luister&hellip;':tried?'&#9654; Beluister opnieuw':left>0?`&#9654; Beluister het stuk (nog ${left}&times;)`:'Geen beluisterbeurten meer';
+  $('stopBtn').hidden=!playing;
+  if(!playing) renderTimeline();
+  $('questions').innerHTML=QUESTIONS.map((q,qi)=>`<div class="q"><h3>${q.q}</h3><div class="choices">${q.opts.map(o=>{
+      let cls='choice'+(q.big?' big':''); if(reveal&&o===q.ok) cls+=' ok';
+      return `<button type="button" class="${cls}" data-q="${qi}" data-o="${o}" aria-pressed="${answers[qi]===o}" ${reveal?'disabled':''}>${o}</button>`; }).join('')}</div></div>`).join('');
+  const full=answers.every(a=>a);
+  $('checkBtn').hidden=reveal; $('checkBtn').disabled=!full||answers.join()===lastChecked;
+  $('checkBtn').textContent=tried?'Controleer opnieuw':'Controleer';
+  $('solBtn').hidden=!tried||reveal;
+  $('explain').hidden=!reveal;
+  $('explain').innerHTML='<strong>ABA is een sandwich:</strong> deel A (brood) &ndash; deel B (beleg) &ndash; deel A (brood). In deel B is alles nieuw: een andere beat met handklappen, een andere baslijn, andere akkoorden en een trompet in plaats van de viool. Op het einde komt deel A precies zo terug als in het begin. Tik op de delen hierboven om ze apart te beluisteren.';
+}
+function check(){
+  const good=answers.filter((a,i)=>a===QUESTIONS[i].ok).length;
+  tried=true; lastChecked=answers.join();
+  if(good===QUESTIONS.length){ done=true; setFb('Alles juist! Het stuk heeft de vorm ABA.','ok'); }
+  else setFb(`${good} van de ${QUESTIONS.length} juist. Welke juist zijn, moet je zelf ontdekken: beluister opnieuw, verbeter en controleer opnieuw.`,'bad');
+  if(playing) stop(); else render();
+}
+function setFb(t,c){ const f=$('feedback'); f.textContent=t; f.className='feedback '+c; }
+
+$('questions').addEventListener('click',e=>{ const b=e.target.closest('.choice'); if(!b||done||solved) return; answers[+b.dataset.q]=b.dataset.o; setFb('','info'); render(); });
+$('playBtn').addEventListener('click',()=>play());
+$('stopBtn').addEventListener('click',stop);
+$('checkBtn').addEventListener('click',check);
+$('solBtn').addEventListener('click',()=>{ solved=true; setFb('Dit zijn de juiste antwoorden.','info'); if(playing) stop(); else render(); });
+$('timeline').addEventListener('click',e=>{ const p=e.target.closest('.part'); if(!p||!(done||solved)) return; play(+p.dataset.i); });
+$('timeline').addEventListener('keydown',e=>{ if(e.key!=='Enter'&&e.key!==' ') return; const p=e.target.closest('.part'); if(!p||!(done||solved)) return; e.preventDefault(); play(+p.dataset.i); });
+render();
+})();
+</script>
+</body>
+</html>

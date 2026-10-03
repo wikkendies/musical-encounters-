@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Form Finder &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --staff:#7F89A3; --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6;
+  --cA:#C43D2B; --cA-soft:#FBE3DE; --cB:#1C8757; --cB-soft:#DDF1E6; --cC:#3257E0; --cC-soft:#DFE6FF;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --cA:#FF8A76; --cA-soft:#42231D; --cB:#4CC38A; --cB-soft:#163829; --cC:#8198FF; --cC-soft:#26336A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --cA:#FF8A76; --cA-soft:#42231D; --cB:#4CC38A; --cB-soft:#163829; --cC:#8198FF; --cC-soft:#26336A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:10px 0 0;color:var(--muted);max-width:64ch}
+.levels{display:inline-flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow);margin-top:14px}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:18px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+.linkbtn:hover{color:var(--accent)}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.rounds{display:flex;gap:8px;flex-wrap:wrap}
+.dot{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;border:2px solid var(--line);font-size:14px;font-weight:700;color:var(--muted)}
+.dot.cur{border-color:var(--accent);color:var(--accent)}
+.dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+
+.rule{margin:0;padding:12px 14px;border-radius:12px;background:var(--surface-2);font-size:15px}
+
+/* partituur: één zin per regel */
+.phrases{display:flex;flex-direction:column;gap:10px}
+.phrase{display:grid;grid-template-columns:64px 1fr;align-items:center;gap:8px;background:var(--surface-2);border:2px solid transparent;border-radius:14px;padding:6px 10px 6px 6px}
+.phrase .tag{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.phrase .let{width:40px;height:40px;border-radius:10px;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:22px;color:var(--muted)}
+.phrase svg{display:block;width:100%;height:auto;color:var(--ink);min-width:0}
+.phrase.lA{border-color:var(--cA);background:var(--cA-soft)} .phrase.lA .let{border:0;background:var(--cA);color:#fff}
+.phrase.lB{border-color:var(--cB);background:var(--cB-soft)} .phrase.lB .let{border:0;background:var(--cB);color:#fff}
+.phrase.lC{border-color:var(--cC);background:var(--cC-soft)} .phrase.lC .let{border:0;background:var(--cC);color:#fff}
+.phrase.lA svg{color:var(--cA)} .phrase.lB svg{color:var(--cB)} .phrase.lC svg{color:var(--cC)}
+.phrase.now{box-shadow:0 0 0 3px var(--accent)}
+.scroll{overflow-x:auto}
+.scroll .phrases{min-width:560px}
+
+.choices{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.choice{border:2px solid var(--line);background:var(--surface-2);border-radius:14px;padding:14px 8px;font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:.12em}
+.choice:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.choice[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.choice.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.choice.bad{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.choice:disabled{cursor:default}
+@media (max-width:560px){.choices{grid-template-columns:repeat(2,1fr)}}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+
+.summary{display:flex;flex-direction:column;gap:8px}
+.sumhead{margin:0;font-family:var(--display);font-size:28px;font-weight:800}
+.sumrow{display:grid;grid-template-columns:120px 1fr 1fr;gap:12px;align-items:center;padding:10px 14px;border-radius:12px;border:2px solid var(--line);font-weight:600}
+.sumrow.ok{background:var(--ok-soft);border-color:var(--ok)}
+.sumrow.bad{background:var(--bad-soft);border-color:var(--bad)}
+.sumrow b{font-family:var(--display);letter-spacing:.1em}
+@media (max-width:560px){.sumrow{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="form.html">&larr; Let's Make Structure</a>
+    <h1>Form <span>Finder</span></h1>
+    <div class="levels" id="levels" role="group" aria-label="Niveau"></div>
+    <p>Lees de partituur. Elke regel is één muzikale zin. Zijn twee zinnen <strong>precies hetzelfde</strong>, dan krijgen ze dezelfde letter. Een nieuwe zin krijgt een nieuwe letter. De eerste zin is altijd <strong>A</strong>. Welke vorm heeft het stuk?</p>
+  </header>
+
+  <section class="panel" id="task">
+    <div class="panel-head">
+      <div>
+        <div class="eyebrow" id="eyebrow">Stuk 1 van 6</div>
+        <h2>Welke vorm lees je?</h2>
+      </div>
+      <div class="rounds" id="rounds" aria-label="Voortgang"></div>
+    </div>
+
+    <div class="scroll"><div class="phrases" id="phrases"></div></div>
+
+    <div>
+      <div class="eyebrow" style="margin-bottom:8px">Kies de vorm</div>
+      <div class="choices" id="choices" role="group" aria-label="Keuzes"></div>
+    </div>
+
+    <p class="feedback info" id="feedback"></p>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn" type="button" disabled>Controleer</button>
+      <button class="btn btn-ghost" id="playBtn" type="button" hidden>&#9654; Beluister het stuk</button>
+      <button class="linkbtn" id="solBtn" type="button" hidden>Toon oplossing</button>
+      <button class="btn btn-primary" id="nextBtn" type="button" hidden>Volgend stuk &rarr;</button>
+      <span style="flex:1"></span>
+      <button class="linkbtn" id="restartBtn" type="button">&#8635; Nieuwe reeks</button>
+    </div>
+    <p class="hint" id="listenHint">Eerst lezen: beluisteren kan pas nadat je een antwoord gecontroleerd hebt.</p>
+  </section>
+
+  <section class="panel" id="result" hidden>
+    <div class="summary" id="summary"></div>
+    <div class="actions"><button class="btn btn-primary" id="againBtn" type="button">Nieuwe reeks</button></div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* ---------- muzikale zinnen (4 maten 4/4, C groot, eigen composities) ----------
+   Noot = toonhoogte + duur: q kwart, h halve, w hele (C4 = do, C5 = hoge do). Maten gescheiden door |.
+   Alle zinnen eindigen op do, zodat elke zin als slot kan dienen.                                         */
+const BANK=[
+  'C4q E4q G4q E4q | F4q A4q G4h | E4q G4q F4q D4q | C4w',
+  'G4h E4q C4q | D4q E4q F4h | E4q D4q C4q E4q | D4h C4h',
+  'C5q B4q A4q G4q | A4h F4h | G4q E4q F4q D4q | C4w',
+  'A4q G4q E4q G4q | A4q C5q A4h | G4q E4q D4q E4q | C4w',
+  'C4h D4h | E4q F4q G4h | F4q E4q D4q E4q | C4w',
+  'G4q C5q B4q C5q | G4q E4q G4h | F4q D4q E4q C4q | D4h C4h',
+  'E4h G4h | C5q B4q A4q G4q | F4q A4q G4q F4q | E4q D4q C4h',
+  'C5h G4h | A4q B4q C5h | D5q C5q B4q A4q | G4q E4q C4h',
+  'D4q F4q A4q F4q | E4q G4q C5h | B4q G4q A4q F4q | E4q D4q C4h',
+  'E4q C4q E4q G4q | C5h B4h | A4q F4q A4q G4q | E4q D4q C4h',
+  'A4h A4q G4q | F4q G4q A4h | D4q E4q F4q D4q | C4w',
+  'G4q A4q G4q F4q | E4q F4q G4h | C5q A4q G4q E4q | D4q E4q C4h'
+];
+const LEVELS=[
+  {name:'Niveau 1', info:'A en B · 3 of 4 zinnen', forms:['ABA','AABB','ABAB','ABBA','AABA','ABAA'],
+   rule:'Tip: vergelijk elke regel met de eerste regel. Is hij hetzelfde? Dan is het A. Zo niet, dan is het B.'},
+  {name:'Niveau 2', info:'A, B en C · 4 of 5 zinnen', forms:['ABAC','ABCA','AABC','ABCB','ABACA','ABCBA','AABA','ABBA'],
+   rule:'Tip: kijk bij een nieuwe zin eerst of hij gelijk is aan A, dan aan B. Is hij nog anders, dan is het C. ABACA heet een rondo: A komt steeds terug.'}
+];
+const COUNT=6, BPM=96;
+
+/* ---------- toestand ---------- */
+let level=0; try{ level=Math.min(LEVELS.length-1,Math.max(0,+(localStorage.getItem('ff-level')||0))); }catch(e){}
+let series=[], idx=0, choice=null, tried=false, done=false, solved=false, playing=false, lastChecked=null;
+const L=()=>LEVELS[level], T=()=>series[idx];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+
+function makeTask(form){
+  const letters=[...new Set(form.split(''))], ph=shuffle(BANK.map((_,i)=>i)).slice(0,letters.length), map={};
+  letters.forEach((l,i)=>map[l]=ph[i]);
+  const wrong=shuffle(L().forms.filter(f=>f!==form)).slice(0,3);
+  return {form, lines:form.split('').map(l=>map[l]), options:shuffle([form,...wrong]), ok:null, given:null};
+}
+function newSeries(){
+  let forms=shuffle(L().forms); while(forms.length<COUNT) forms=forms.concat(shuffle(L().forms));
+  series=forms.slice(0,COUNT).map(makeTask);
+  idx=0; $('task').hidden=false; $('result').hidden=true; renderLevels(); startTask();
+}
+function startTask(){ choice=null; tried=false; done=false; solved=false; lastChecked=null; setFb('','info'); render(); }
+
+/* ---------- notenbalk ---------- */
+const GCLEF='M434 2Q464 -103 464 -170Q464 -223 427 -257Q390 -291 337 -291Q287 -291 250 -262Q213 -232 213 -190Q213 -160 234 -134Q254 -107 284 -107Q313 -107 332 -128Q350 -150 350 -178Q350 -240 280 -240Q298 -268 338 -268Q353 -268 368 -264Q384 -259 401 -248Q418 -237 428 -214Q439 -190 439 -157Q439 -136 411 -6Q389 -12 356 -12Q259 -12 190 60Q120 132 120 232Q120 267 132 303Q143 339 158 366Q172 394 200 428Q229 463 248 484Q268 504 303 539Q280 621 280 689Q280 779 313 840Q346 900 379 900Q389 900 402 887Q414 874 426 851Q438 828 446 790Q455 753 455 710Q455 551 342 447L368 329Q384 332 397 332Q458 332 500 282Q542 233 542 162Q542 44 434 2ZM426 746Q426 801 394 801Q358 801 333 748Q308 695 308 630Q308 588 321 557Q359 580 392 640Q426 699 426 746ZM498 128Q498 183 466 216Q434 249 383 249L428 23Q498 52 498 128ZM407 17 361 247Q334 241 312 214Q289 187 289 158Q289 143 295 128Q301 114 310 104Q318 94 327 86Q336 78 342 74Q348 71 348 71L340 66Q307 75 278 106Q248 137 248 184Q248 231 278 270Q307 310 343 323L325 430Q168 299 168 177Q168 104 223 55Q278 6 348 6Q365 6 407 17Z';
+const NAT={C:0,D:2,E:4,F:5,G:7,A:9,B:11}, IDX={C:0,D:1,E:2,F:3,G:4,A:5,B:6}, DUR={q:1,h:2,w:4};
+function parse(s){ return s.split('|').map(bar=>{ let b=0; return bar.trim().split(/\s+/).map(t=>{ const l=t[0],o=+t[1],d=DUR[t[2]]; const n={l,o,d,beat:b,midi:12*(o+1)+NAT[l],step:(o*7+IDX[l])-(4*7+IDX.E)}; b+=d; return n; }); }); }
+function staffSVG(src,first,last){
+  const SP=10, BOT=78, X0=first?76:52, BW=150, W=X0+4*BW+10, H=110, yOf=s=>BOT-s*SP/2;
+  let h='';
+  for(let k=0;k<5;k++) h+=`<line x1="4" y1="${BOT-k*SP}" x2="${W-4}" y2="${BOT-k*SP}" stroke="var(--staff)" stroke-width="1.2"/>`;
+  h+=`<path d="${GCLEF}" transform="translate(6 ${BOT-SP}) scale(0.066 -0.066)" fill="var(--ink)"/>`;
+  if(first) h+=`<text x="58" y="${BOT-2*SP-2}" text-anchor="middle" font-family="Bricolage Grotesque,system-ui" font-weight="800" font-size="21" fill="var(--ink)">4</text><text x="58" y="${BOT-2}" text-anchor="middle" font-family="Bricolage Grotesque,system-ui" font-weight="800" font-size="21" fill="var(--ink)">4</text>`;
+  parse(src).forEach((bar,i)=>{
+    const bx=X0+i*BW;
+    bar.forEach(n=>{
+      const x=bx+20+n.beat*(BW-34)/4, y=yOf(n.step), up=n.step<4;
+      if(n.step<=-2) h+=`<line x1="${x-11}" y1="${yOf(-2)}" x2="${x+11}" y2="${yOf(-2)}" stroke="currentColor" stroke-width="1.3"/>`;
+      if(n.d===4) h+=`<ellipse cx="${x}" cy="${y}" rx="7" ry="4.8" fill="none" stroke="currentColor" stroke-width="2.3"/>`;
+      else h+=`<ellipse cx="${x}" cy="${y}" rx="6.2" ry="4.5" transform="rotate(-20 ${x} ${y})" ${n.d===2?'fill="none" stroke="currentColor" stroke-width="1.9"':'fill="currentColor"'}/>`;
+      if(n.d<4) h+=up?`<line x1="${x+5.6}" y1="${y-1}" x2="${x+5.6}" y2="${y-30}" stroke="currentColor" stroke-width="1.6"/>`:`<line x1="${x-5.6}" y1="${y+1}" x2="${x-5.6}" y2="${y+30}" stroke="currentColor" stroke-width="1.6"/>`;
+    });
+    const ex=bx+BW;
+    if(i<3||!last) h+=`<line x1="${ex}" y1="${BOT-4*SP}" x2="${ex}" y2="${BOT}" stroke="var(--ink)" stroke-width="1.3"/>`;
+    else h+=`<line x1="${ex-6}" y1="${BOT-4*SP}" x2="${ex-6}" y2="${BOT}" stroke="var(--ink)" stroke-width="1.3"/><rect x="${ex-3}" y="${BOT-4*SP}" width="4.5" height="${4*SP}" fill="var(--ink)"/>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Notenbalk">${h}</svg>`;
+}
+
+/* ---------- geluid ---------- */
+let ctx=null, master=null;
+function ac(){ if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)(); const c=ctx.createDynamicsCompressor(); c.threshold.value=-10; c.ratio.value=4; master=ctx.createGain(); master.gain.value=.9; master.connect(c); c.connect(ctx.destination);} if(ctx.state==='suspended') ctx.resume(); return ctx; }
+function pianoNote(m,time,dur){
+  const c=ac(), f=440*Math.pow(2,(m-69)/12), g=c.createGain(), lp=c.createBiquadFilter();
+  lp.type='lowpass'; lp.Q.value=.7; lp.frequency.setValueAtTime(Math.min(9000,f*14),time); lp.frequency.exponentialRampToValueAtTime(Math.max(700,f*3),time+1.6);
+  g.gain.setValueAtTime(.0001,time); g.gain.exponentialRampToValueAtTime(.32,time+.006); g.gain.exponentialRampToValueAtTime(.12,time+.35); g.gain.setTargetAtTime(.0001,time+.35,1.4);
+  const rel=time+dur; g.gain.cancelScheduledValues(rel); g.gain.setTargetAtTime(.0001,rel,.09); g.connect(lp); lp.connect(master);
+  [[1,1,0],[1,.5,4],[2,.42,0],[3,.2,0],[4,.1,0],[5,.05,0],[6,.03,0]].forEach(([k,a,d])=>{ const o=c.createOscillator(),og=c.createGain(); o.type='sine'; o.frequency.value=f*k*(1+.00035*k*k); o.detune.value=d; og.gain.value=a; o.connect(og); og.connect(g); o.start(time); o.stop(rel+.8); });
+}
+let hiTimers=[];
+function play(){
+  if(playing) return;
+  const c=ac(), beat=60/BPM, t0=c.currentTime+.1, lineDur=16*beat;
+  T().lines.forEach((p,li)=>parse(BANK[p]).forEach((bar,bi)=>bar.forEach(n=>pianoNote(n.midi,t0+li*lineDur+(bi*4+n.beat)*beat,n.d*beat*.92)) ));
+  playing=true; render();
+  hiTimers.forEach(clearTimeout); hiTimers=[];
+  T().lines.forEach((_,li)=>hiTimers.push(setTimeout(()=>markNow(li),(.1+li*lineDur)*1000)));
+  hiTimers.push(setTimeout(()=>{ playing=false; markNow(-1); render(); },(.3+T().lines.length*lineDur)*1000));
+}
+function markNow(li){ document.querySelectorAll('.phrase').forEach((el,i)=>el.classList.toggle('now',i===li)); }
+
+/* ---------- weergave ---------- */
+function setFb(t,c){ const f=$('feedback'); f.textContent=t; f.className='feedback '+c; }
+function render(){
+  const t=T(), n=t.lines.length, reveal=done||solved;
+  $('eyebrow').textContent=`${L().name} · stuk ${idx+1} van ${series.length}`;
+  $('rounds').innerHTML=series.map((s,i)=>`<span class="dot${s.ok===true?' ok':s.ok===false?' bad':i===idx?' cur':''}">${i+1}</span>`).join('');
+  $('phrases').innerHTML=t.lines.map((p,i)=>{ const l=t.form[i];
+    return `<div class="phrase${reveal?' l'+l:''}"><div class="tag">Zin ${i+1}<span class="let">${reveal?l:'?'}</span></div>${staffSVG(BANK[p],i===0,i===n-1)}</div>`; }).join('');
+  $('choices').innerHTML=t.options.map(o=>{ let cls='choice';
+    if(reveal&&o===t.form) cls+=' ok'; else if(tried&&o===lastChecked&&o!==t.form) cls+=' bad';
+    return `<button type="button" class="${cls}" data-o="${o}" aria-pressed="${choice===o}" ${reveal?'disabled':''}>${o}</button>`; }).join('');
+  $('checkBtn').hidden=reveal; $('checkBtn').disabled=!choice||choice===lastChecked;
+  $('checkBtn').textContent=tried?'Controleer opnieuw':'Controleer';
+  $('playBtn').hidden=!tried; $('playBtn').disabled=playing;
+  $('playBtn').innerHTML=playing?'&#9654; Luister&hellip;':'&#9654; Beluister het stuk';
+  $('listenHint').hidden=tried;
+  $('solBtn').hidden=!tried||reveal;
+  $('nextBtn').hidden=!tried;
+  $('nextBtn').innerHTML=idx<series.length-1?'Volgend stuk &rarr;':'Bekijk je uitslag &rarr;';
+}
+function check(){
+  if(!choice) return;
+  const t=T(), first=!tried, ok=choice===t.form;
+  if(first){ t.ok=ok; t.given=choice; }
+  tried=true; lastChecked=choice;
+  if(ok){ done=true; setFb((first?'Juist! ':'Nu is het juist! Voor je score telt je eerste poging. ')+`De vorm is ${t.form}. Beluister het stuk en volg de kleuren.`,'ok'); }
+  else setFb(`Niet juist.${first?' (Deze eerste poging telt voor je score.)':''} Vergelijk de regels nog eens noot per noot. Je mag nu ook luisteren.`,'bad');
+  render();
+}
+function showResult(){
+  const score=series.filter(s=>s.ok).length;
+  $('summary').innerHTML=`<p class="eyebrow">Uitslag &middot; ${L().name}</p><p class="sumhead">${score} / ${series.length}</p><p class="rule">${L().rule}</p>`+
+    series.map((s,i)=>`<div class="sumrow ${s.ok?'ok':'bad'}"><span>Stuk ${i+1}</span><span>Jij: <b>${s.given||'–'}</b></span><span>Juist: <b>${s.form}</b></span></div>`).join('');
+  $('task').hidden=true; $('result').hidden=false;
+}
+
+/* ---------- bediening ---------- */
+$('choices').addEventListener('click',e=>{ const b=e.target.closest('.choice'); if(!b||done||solved) return; choice=b.dataset.o; setFb('','info'); render(); });
+$('checkBtn').addEventListener('click',check);
+$('playBtn').addEventListener('click',play);
+$('solBtn').addEventListener('click',()=>{ solved=true; setFb(`De vorm is ${T().form}. Beluister het stuk en volg de kleuren.`,'info'); render(); });
+$('nextBtn').addEventListener('click',()=>{ hiTimers.forEach(clearTimeout); playing=false; if(idx<series.length-1){ idx++; startTask(); } else showResult(); window.scrollTo({top:0,behavior:'smooth'}); });
+$('restartBtn').addEventListener('click',()=>{ hiTimers.forEach(clearTimeout); playing=false; newSeries(); });
+$('againBtn').addEventListener('click',newSeries);
+function renderLevels(){ $('levels').innerHTML=LEVELS.map((x,i)=>`<button type="button" data-l="${i}" aria-pressed="${i===level}">${x.name}<small>${x.info}</small></button>`).join(''); }
+$('levels').addEventListener('click',e=>{ const b=e.target.closest('[data-l]'); if(!b) return; hiTimers.forEach(clearTimeout); playing=false; level=+b.dataset.l; try{localStorage.setItem('ff-level',level)}catch(_){ } newSeries(); });
+window.__ff={cur:()=>T().form};
+newSeries();
+})();
+</script>
+</body>
+</html>

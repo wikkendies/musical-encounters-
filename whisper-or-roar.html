@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Whisper or Roar &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --staff:#7F89A3; --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --dyn:Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:10px 0 0;color:var(--muted);max-width:64ch}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-big{font-size:17px;padding:16px 22px}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+.linkbtn:hover{color:var(--accent)}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+
+/* kaartjes met dynamiektekens */
+.cards{display:flex;flex-wrap:wrap;gap:12px}
+.card{touch-action:none;-webkit-user-select:none;user-select:none;min-width:92px;height:64px;border:2px solid var(--line);background:var(--surface-2);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:6px 14px;cursor:grab}
+.card:hover:not(:disabled){border-color:var(--accent)}
+.card[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-soft)}
+.card:disabled{opacity:.4;cursor:not-allowed}
+.card .sym{font-family:var(--dyn);font-style:italic;font-weight:700;font-size:32px;line-height:1}
+.card small{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.card svg{width:60px;height:24px}
+.ghost{position:fixed;z-index:50;pointer-events:none;transform:translate(-50%,-50%) scale(1.05);box-shadow:0 10px 24px rgba(22,32,58,.25);opacity:.95}
+
+.scorebox{background:var(--surface-2);border:1.5px solid var(--line);border-radius:16px;padding:10px 8px;overflow-x:auto}
+#score{display:block;width:100%;min-width:640px;height:auto;color:var(--ink)}
+#score .sl{stroke:var(--staff);stroke-width:1.3}
+#score .slot rect{fill:transparent;stroke:var(--line);stroke-width:2;stroke-dasharray:6 5}
+#score .slot{cursor:pointer}
+#score .slot:hover rect,#score .slot.over rect{fill:var(--accent-soft);stroke:var(--accent)}
+#score .slot.filled rect{stroke:var(--accent);stroke-dasharray:none;fill:var(--accent-soft)}
+#score .slot.ok rect{stroke:var(--ok);fill:var(--ok-soft);stroke-dasharray:none}
+#score .slot.ok{color:var(--ok);cursor:default}
+#score .slot.filled{color:var(--accent)}
+#score .slot.locked{cursor:default}
+#score .slot.locked:hover rect{fill:var(--surface-2);stroke:var(--line)}
+#score .slot.filled.locked:hover rect{fill:var(--accent-soft);stroke:var(--accent)}
+#score .slot.ok.locked:hover rect{fill:var(--ok-soft);stroke:var(--ok)}
+#score .mnum{fill:var(--muted);font-family:var(--body);font-weight:700;font-size:12px}
+#score .dyn{font-family:var(--dyn);font-style:italic;font-weight:700;font-size:30px;fill:currentColor}
+
+.levels{display:inline-flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow);margin-top:14px}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.chips{display:flex;gap:8px}
+.chip{width:36px;height:36px;border-radius:50%;border:2px solid var(--line);background:transparent;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;padding:0}
+.chip[aria-current="true"]{border-color:var(--accent);color:var(--accent)}
+.chip.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.legend div{background:var(--surface-2);border-radius:12px;padding:10px 12px;font-size:14px}
+.legend b{font-family:var(--dyn);font-style:italic;font-size:22px;margin-right:6px}
+.legend svg{vertical-align:-2px;margin-right:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="dynamics.html">&larr; Let's Make Dynamics</a>
+    <h1>Whisper or <span>Roar</span></h1>
+    <div class="levels" id="levels" role="group" aria-label="Niveau"></div>
+    <p>Luister naar het pianostukje. Speelt het zacht, luid, wordt het geleidelijk luider of zachter? Sleep het juiste teken naar het vakje onder elke maat.</p>
+  </header>
+
+  <section class="panel">
+    <div class="legend" id="legend" aria-label="Uitleg van de tekens"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="eyebrow" id="eyebrow">Stukje 1</div>
+        <h2>Welke dynamiek hoor je?</h2>
+      </div>
+      <div class="chips" id="chips" aria-label="Kies een stukje"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary btn-big" id="playBtn" type="button">&#9654; Beluister het stukje</button>
+      <button class="btn btn-ghost" id="mineBtn" type="button">&#9654; Speel met mijn tekens</button>
+    </div>
+
+    <div>
+      <div class="eyebrow" style="margin-bottom:8px">Sleep een teken naar een vakje &middot; of tik op een teken en dan op een vakje</div>
+      <div class="cards" id="cards"></div>
+    </div>
+
+    <div class="scorebox"><svg id="score" role="group" aria-label="Partituur voor piano, 4 maten"></svg></div>
+    <p class="hint">Tik op een ingevuld vakje om het teken weg te halen. Elk teken mag je meer dan één keer gebruiken.</p>
+
+    <p class="feedback info" id="feedback"></p>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn" type="button" disabled>Controleer</button>
+      <button class="btn btn-ghost" id="clearBtn" type="button">Wis</button>
+      <button class="linkbtn" id="solBtn" type="button" hidden>Toon oplossing</button>
+      <button class="btn btn-primary" id="nextBtn" type="button" hidden>Volgende stukje &rarr;</button>
+      <span style="flex:1"></span>
+      <button class="linkbtn" id="restartBtn" type="button">&#8635; Opnieuw beginnen</button>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* ---------- niveaus en stukjes ----------
+   rh / lh: per maat gescheiden door |, noot = toonhoogte + duur (q kwart, h halve, w hele), akkoord met + (bv. C3w+G3)
+   dyn: per maat het juiste teken: 'pp' | 'p' | 'f' | 'ff' | 'cresc' | 'decresc'
+   Een crescendo/decrescendo loopt naar het teken van de volgende maat (of een beetje luider/zachter als er geen volgt). */
+const LEVELS=[
+  { name:'Niveau 1', info:'p · f · crescendo', signs:['p','f','cresc'], pieces:[
+    { bpm:88, rh:'C4q E4q G4q E4q | F4q A4q C5q A4q | G4q B4q D5q B4q | C5q G4q C4h', lh:'C3w+G3 | F2w+C3 | G2w+D3 | C3w+G3', dyn:['p','cresc','f','p'] },
+    { bpm:92, rh:'G4q G4q A4q B4q | C5h B4h | A4q B4q C5q D5q | E5h C5h',          lh:'C3w+G3 | A2w+E3 | F2w+C3 | C3w+G3', dyn:['f','p','cresc','f'] },
+    { bpm:84, rh:'A4q E4q A4q C5q | B4h E4h | A4q B4q C5q D5q | E5w',              lh:'A2w+E3 | E2w+B2 | F2w+C3 | A2w+E3', dyn:['p','p','cresc','f'] }
+  ]},
+  { name:'Niveau 2', info:'+ decrescendo', signs:['p','f','cresc','decresc'], pieces:[
+    { bpm:88, rh:'C5q G4q E4q G4q | C5q B4q A4q G4q | F4q E4q D4q E4q | C4w',      lh:'C3w+G3 | C3w+E3 | G2w+D3 | C3w+G3', dyn:['f','f','decresc','p'] },
+    { bpm:92, rh:'E4q F4q G4q A4q | B4q C5q D5q E5q | E5h D5h | C5w',              lh:'C3w+G3 | G2w+D3 | G2w+B2 | C3w+E3', dyn:['p','cresc','f','decresc'] },
+    { bpm:84, rh:'A4q A4q E5q E5q | D5q C5q B4q A4q | G4q A4q B4q G4q | A4w',      lh:'A2w+E3 | F2w+C3 | E2w+B2 | A2w+E3', dyn:['f','decresc','p','f'] }
+  ]},
+  { name:'Niveau 3', info:'+ pp · ff', signs:['pp','p','f','ff','cresc','decresc'], pieces:[
+    { bpm:88, rh:'C4q D4q E4q F4q | G4q A4q B4q C5q | C5q G4q E4q G4q | C5w',      lh:'C3w | F2w+C3 | C3w+G3 | C3w+G3',   dyn:['pp','cresc','ff','p'] },
+    { bpm:84, rh:'D5q B4q G4q B4q | C5q A4q F4q A4q | B4h G4h | C5w',              lh:'G2w+D3 | F2w+C3 | G2w+D3 | C3w+G3', dyn:['ff','decresc','p','pp'] },
+    { bpm:92, rh:'A4q C5q A4q C5q | B4h A4h | E4q D4q C4q D4q | E4w',              lh:'A2w+E3 | E2w+B2 | A2w+E3 | E2w+B2', dyn:['p','f','pp','ff'] }
+  ]}
+];
+const MAXPLAY=3;
+const LEVEL={pp:.07, p:.2, mf:.45, f:.6, ff:1};   // volume per teken (leeg vakje bij "mijn tekens" = blijft zoals ervoor)
+const INFO={
+  pp:{name:'pianissimo',txt:'heel zacht'}, p:{name:'piano',txt:'zacht'}, f:{name:'forte',txt:'luid (sterk)'}, ff:{name:'fortissimo',txt:'heel luid'},
+  cresc:{name:'crescendo',txt:'geleidelijk luider'}, decresc:{name:'decrescendo',txt:'geleidelijk zachter'}
+};
+
+/* ---------- noten ---------- */
+const NAT={C:0,D:2,E:4,F:5,G:7,A:9,B:11}, IDX={C:0,D:1,E:2,F:3,G:4,A:5,B:6};
+const DUR={q:1,h:2,w:4};
+function parseStaff(s){
+  return s.split('|').map(bar=>{ let beat=0;
+    return bar.trim().split(/\s+/).map(tok=>{
+      const parts=tok.split('+'), m=parts[0].match(/^([A-G])(\d)([qhw])$/), d=DUR[m[3]];
+      const pitches=[m[1]+m[2]].concat(parts.slice(1));
+      const n={beat,dur:d,notes:pitches.map(p=>({l:p[0],o:+p[1],midi:12*(+p[1]+1)+NAT[p[0]],di:+p[1]*7+IDX[p[0]]}))};
+      beat+=d; return n; });
+  });
+}
+
+/* ---------- toestand ---------- */
+let lvl=0, piece=0, answer=[], plays=0, tried=false, done=false, solved=false, playing=false, sel=null, lastChecked=null;
+try{ lvl=Math.min(LEVELS.length-1,Math.max(0,+(localStorage.getItem('vc-level')||0))); }catch(e){}
+let doneMap={}; try{ doneMap=JSON.parse(localStorage.getItem('vc-done')||'{}')||{}; }catch(e){}
+function P(){ return LEVELS[lvl].pieces[piece]; }
+function reset(){ answer=[null,null,null,null]; plays=0; tried=false; done=false; solved=false; sel=null; lastChecked=null; setFb('','info'); render(); }
+
+/* ---------- geluid ---------- */
+let ctx=null, dynBus=null, comp=null;
+function ac(){
+  if(!ctx){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    comp=ctx.createDynamicsCompressor(); comp.threshold.value=-8; comp.ratio.value=3;
+    dynBus=ctx.createGain(); dynBus.gain.value=1;
+    comp.connect(dynBus); dynBus.connect(ctx.destination);   // volume NA de compressor, zodat p en f echt verschillen
+  }
+  if(ctx.state==='suspended') ctx.resume();
+  return ctx;
+}
+const hz=m=>440*Math.pow(2,(m-69)/12);
+function pianoNote(m,time,dur,vel,bright){
+  const c=ac(), f=hz(m), g=c.createGain(), lp=c.createBiquadFilter();
+  lp.type='lowpass'; lp.Q.value=.7;
+  lp.frequency.setValueAtTime(Math.min(10000,f*(5+13*bright)),time);    // luider = helderder, zoals een echte piano
+  lp.frequency.exponentialRampToValueAtTime(Math.max(600,f*(2+2*bright)),time+1.6);
+  const pk=.3*vel;
+  g.gain.setValueAtTime(.0001,time);
+  g.gain.exponentialRampToValueAtTime(pk,time+.006);
+  g.gain.exponentialRampToValueAtTime(pk*.4,time+.35);
+  g.gain.setTargetAtTime(.0001,time+.35,1.6);
+  const rel=time+dur; g.gain.cancelScheduledValues(rel); g.gain.setTargetAtTime(.0001,rel,.12);
+  g.connect(lp); lp.connect(comp);
+  [[1,1,0],[1,.5,4],[2,.42,0],[3,.2,0],[4,.1,0],[5,.05,0],[6,.03,0]].forEach(([k,a,det])=>{
+    const o=c.createOscillator(), og=c.createGain();
+    o.type='sine'; o.frequency.value=f*k*(1+.00035*k*k); o.detune.value=det;
+    og.gain.value=a; o.connect(og); og.connect(g); o.start(time); o.stop(rel+1);
+  });
+}
+/* volumeverloop per maat: [beginniveau, eindniveau] */
+function curve(signs){
+  let lvl=LEVEL.mf; const out=[];
+  signs.forEach((s,i)=>{
+    if(LEVEL[s]!=null&&s!=='mf'){ lvl=LEVEL[s]; out.push([lvl,lvl]); }
+    else if(s==='cresc'||s==='decresc'){
+      const nx=signs[i+1], up=s==='cresc';
+      let tgt=(nx&&LEVEL[nx]!=null)?LEVEL[nx]:(up?lvl*2.4:lvl/2.4);
+      if(up&&tgt<=lvl) tgt=Math.min(1,lvl*1.8); if(!up&&tgt>=lvl) tgt=lvl/1.8;
+      tgt=Math.max(.05,Math.min(1,tgt)); out.push([lvl,tgt]); lvl=tgt;
+    } else out.push([lvl,lvl]);
+  });
+  return out;
+}
+function schedule(signs){
+  const c=ac(), beat=60/P().bpm, t0=c.currentTime+.1, bar=4*beat;
+  const rh=parseStaff(P().rh), lh=parseStaff(P().lh), cv=curve(signs);
+  const gn=dynBus.gain; gn.cancelScheduledValues(c.currentTime);
+  gn.setValueAtTime(cv[0][0],t0);
+  cv.forEach(([a,b],i)=>{ const ts=t0+i*bar; gn.setValueAtTime(a,ts); if(a!==b) gn.linearRampToValueAtTime(b,ts+bar*.97); });
+  const at=(i,bt)=>{ const [a,b]=cv[i]; return a+(b-a)*(bt/4); };
+  [[rh,1],[lh,.7]].forEach(([staff,v])=>staff.forEach((b,i)=>b.forEach(n=>n.notes.forEach(p=>
+    pianoNote(p.midi,t0+i*bar+n.beat*beat,n.dur*beat*.95,v,at(i,n.beat))))));
+  return (4*bar+.8)*1000;
+}
+function play(signs,count){
+  if(playing) return;
+  if(count&&!tried){ if(plays>=MAXPLAY) return; plays++; }
+  const ms=schedule(signs);
+  playing=true; render();
+  setTimeout(()=>{ playing=false; render(); },ms);
+}
+
+/* ---------- partituur ---------- */
+const GCLEF='M434 2Q464 -103 464 -170Q464 -223 427 -257Q390 -291 337 -291Q287 -291 250 -262Q213 -232 213 -190Q213 -160 234 -134Q254 -107 284 -107Q313 -107 332 -128Q350 -150 350 -178Q350 -240 280 -240Q298 -268 338 -268Q353 -268 368 -264Q384 -259 401 -248Q418 -237 428 -214Q439 -190 439 -157Q439 -136 411 -6Q389 -12 356 -12Q259 -12 190 60Q120 132 120 232Q120 267 132 303Q143 339 158 366Q172 394 200 428Q229 463 248 484Q268 504 303 539Q280 621 280 689Q280 779 313 840Q346 900 379 900Q389 900 402 887Q414 874 426 851Q438 828 446 790Q455 753 455 710Q455 551 342 447L368 329Q384 332 397 332Q458 332 500 282Q542 233 542 162Q542 44 434 2ZM426 746Q426 801 394 801Q358 801 333 748Q308 695 308 630Q308 588 321 557Q359 580 392 640Q426 699 426 746ZM498 128Q498 183 466 216Q434 249 383 249L428 23Q498 52 498 128ZM407 17 361 247Q334 241 312 214Q289 187 289 158Q289 143 295 128Q301 114 310 104Q318 94 327 86Q336 78 342 74Q348 71 348 71L340 66Q307 75 278 106Q248 137 248 184Q248 231 278 270Q307 310 343 323L325 430Q168 299 168 177Q168 104 223 55Q278 6 348 6Q365 6 407 17Z';
+const SP=12, TB=100, BB=226;              // onderste lijn van de solsleutel- en fasleutelbalk
+const X0=128, MW=194, W=X0+4*MW+16, H=270;
+const TREF=4*7+IDX.E, BREF=2*7+IDX.G;     // E4 = onderste lijn solsleutel, G2 = onderste lijn fasleutel
+function hairpin(x1,x2,y){ return `<path d="M${x2} ${y-9} L${x1} ${y} L${x2} ${y+9}" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" pointer-events="none"/>`; }
+function signSVG(k,cx,y,w){
+  if(k==='cresc') return hairpin(cx-w/2+12,cx+w/2-12,y);
+  if(k==='decresc') return hairpin(cx+w/2-12,cx-w/2+12,y);
+  return `<text class="dyn" x="${cx}" y="${y+10}" text-anchor="middle" pointer-events="none">${k}</text>`;
+}
+function drawScore(){
+  const rh=parseStaff(P().rh), lh=parseStaff(P().lh);
+  let h='';
+  const staffLines=bot=>{ let s=''; for(let k=0;k<5;k++) s+=`<line class="sl" x1="44" y1="${bot-k*SP}" x2="${W-10}" y2="${bot-k*SP}"/>`; return s; };
+  h+=staffLines(TB)+staffLines(BB);
+  /* akkolade + beginstreep */
+  const top=TB-4*SP, bot=BB;
+  h+=`<line x1="44" y1="${top}" x2="44" y2="${bot}" stroke="currentColor" stroke-width="1.6"/>`;
+  h+=`<path d="M34 ${top} C 22 ${top+20}, 34 ${(top+bot)/2-16}, 24 ${(top+bot)/2} C 34 ${(top+bot)/2+16}, 22 ${bot-20}, 34 ${bot}" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>`;
+  /* sleutels */
+  h+=`<path d="${GCLEF}" transform="translate(48 ${TB-SP}) scale(0.078 -0.078)" fill="currentColor"/>`;
+  const fy=BB-3*SP;   // lijn van F3
+  h+=`<path d="M56 ${fy} c 0 -13 24 -15 27 1 c 3 17 -10 32 -28 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/><circle cx="58" cy="${fy}" r="4.6" fill="currentColor"/><circle cx="90" cy="${fy-6}" r="2.4" fill="currentColor"/><circle cx="90" cy="${fy+6}" r="2.4" fill="currentColor"/>`;
+  /* maatsoort */
+  [TB,BB].forEach(b=>{ h+=`<text x="114" y="${b-2*SP-3}" font-family="Bricolage Grotesque,system-ui,sans-serif" font-weight="800" font-size="25" fill="currentColor" text-anchor="middle">4</text><text x="114" y="${b-3}" font-family="Bricolage Grotesque,system-ui,sans-serif" font-weight="800" font-size="25" fill="currentColor" text-anchor="middle">4</text>`; });
+  /* maatstrepen */
+  for(let i=1;i<=4;i++){
+    const x=X0+i*MW;
+    if(i<4) h+=`<line x1="${x}" y1="${top}" x2="${x}" y2="${TB}" stroke="currentColor" stroke-width="1.4"/><line x1="${x}" y1="${BB-4*SP}" x2="${x}" y2="${BB}" stroke="currentColor" stroke-width="1.4"/>`;
+    else h+=`<line x1="${x-7}" y1="${top}" x2="${x-7}" y2="${bot}" stroke="currentColor" stroke-width="1.4"/><rect x="${x-4}" y="${top}" width="5" height="${bot-top}" fill="currentColor"/>`;
+  }
+  /* noten */
+  const noteX=(i,beat)=>X0+i*MW+26+beat*(MW-44)/4;
+  const drawStaff=(staff,bot,ref)=>staff.forEach((b,i)=>b.forEach(n=>{
+    const x=noteX(i,n.beat), steps=n.notes.map(p=>p.di-ref), hollow=n.dur>=2;
+    steps.forEach(s=>{
+      const y=bot-s*SP/2;
+      for(let l=-2;l>=s;l-=2) h+=`<line x1="${x-13}" y1="${bot-l*SP/2}" x2="${x+13}" y2="${bot-l*SP/2}" stroke="currentColor" stroke-width="1.5"/>`;
+      for(let l=10;l<=s;l+=2) h+=`<line x1="${x-13}" y1="${bot-l*SP/2}" x2="${x+13}" y2="${bot-l*SP/2}" stroke="currentColor" stroke-width="1.5"/>`;
+      if(n.dur===4) h+=`<ellipse cx="${x}" cy="${y}" rx="8.4" ry="5.6" fill="none" stroke="currentColor" stroke-width="2.6"/>`;
+      else h+=`<ellipse cx="${x}" cy="${y}" rx="7.2" ry="5.3" transform="rotate(-20 ${x} ${y})" ${hollow?'fill="none" stroke="currentColor" stroke-width="2"':'fill="currentColor"'}/>`;
+    });
+    if(n.dur<4){
+      const s=steps[0], y=bot-s*SP/2, up=s<4;
+      h+=up?`<line x1="${x+6.6}" y1="${y-1}" x2="${x+6.6}" y2="${y-35}" stroke="currentColor" stroke-width="1.8"/>`
+           :`<line x1="${x-6.6}" y1="${y+1}" x2="${x-6.6}" y2="${y+35}" stroke="currentColor" stroke-width="1.8"/>`;
+    }
+  }));
+  drawStaff(rh,TB,TREF); drawStaff(lh,BB,BREF);
+  /* vakjes voor dynamiek (tussen de twee balken) */
+  const sy=TB+22, sh=BB-4*SP-sy-10, sc=sy+sh/2;
+  for(let i=0;i<4;i++){
+    const x=X0+i*MW+8, w=MW-16, a=answer[i];
+    const showSol=solved&&!done;
+    let cls='slot'+(done||solved?' locked':'');
+    let content='';
+    if(solved){ cls+=' ok'; content=signSVG(P().dyn[i],x+w/2,sc,w); }
+    else if(a){ cls+=done?' ok':' filled'; content=signSVG(a,x+w/2,sc,w); }
+    h+=`<g class="${cls}" data-i="${i}" ${done||solved?'':'tabindex="0" role="button"'} aria-label="Vakje maat ${i+1}${a?': '+a:' (leeg)'}"><rect x="${x}" y="${sy}" width="${w}" height="${sh}" rx="10"/>${content}</g>`;
+    h+=`<text class="mnum" x="${X0+i*MW+8}" y="${top-12}">${i+1}</text>`;
+  }
+  const svg=$('score'); svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.innerHTML=h;
+}
+
+/* ---------- weergave ---------- */
+function setFb(t,c){ const f=$('feedback'); f.textContent=t; f.className='feedback '+c; }
+const HP={cresc:'M58 3 L2 12 L58 21', decresc:'M2 3 L58 12 L2 21'};
+function symHTML(k,w,h){ return HP[k]?`<svg viewBox="0 0 60 24" width="${w}" height="${h}" aria-hidden="true"><path d="${HP[k]}" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></svg>`:`<b>${k}</b>`; }
+function cardInner(k){
+  return (HP[k]?symHTML(k,60,24):`<span class="sym">${k}</span>`)+`<small>${INFO[k].name}</small>`;
+}
+function render(){
+  const L=LEVELS[lvl];
+  $('levels').innerHTML=LEVELS.map((x,i)=>`<button type="button" data-l="${i}" aria-pressed="${i===lvl}">${x.name}<small>${x.info}</small></button>`).join('');
+  $('legend').innerHTML=L.signs.map(k=>`<div>${symHTML(k,46,18)}<strong>${INFO[k].name}</strong> &ndash; ${INFO[k].txt}</div>`).join('');
+  $('chips').innerHTML=L.pieces.map((_,i)=>`<button type="button" class="chip${doneMap[lvl+'-'+i]?' done':''}" data-p="${i}" aria-current="${i===piece}" aria-label="Stukje ${i+1}">${i+1}</button>`).join('');
+  $('eyebrow').textContent=`${L.name} · stukje ${piece+1} van ${L.pieces.length}`;
+  $('nextBtn').hidden=!(tried||solved);
+  $('nextBtn').innerHTML=piece<L.pieces.length-1?'Volgende stukje &rarr;':(lvl<LEVELS.length-1?'Naar '+LEVELS[lvl+1].name+' &rarr;':'Terug naar stukje 1 &rarr;');
+  const left=MAXPLAY-plays, pb=$('playBtn');
+  pb.disabled=playing||(!tried&&left<=0);
+  pb.innerHTML=playing?'&#9654; Luister&hellip;':tried?'&#9654; Beluister opnieuw':left>0?`&#9654; Beluister het stukje (nog ${left}&times;)`:'Geen beluisterbeurten meer';
+  $('mineBtn').disabled=playing||answer.every(a=>!a);
+  $('cards').innerHTML=L.signs.map(k=>({k,name:INFO[k].name})).map(s=>`<button type="button" class="card" data-k="${s.k}" aria-pressed="${sel===s.k}" aria-label="${s.name}" ${done||solved?'disabled':''}>${cardInner(s.k)}</button>`).join('');
+  const full=answer.every(a=>a);
+  $('checkBtn').hidden=done||solved; $('clearBtn').hidden=done||solved;
+  $('checkBtn').disabled=!full||answer.join()===lastChecked;
+  $('checkBtn').textContent=tried?'Controleer opnieuw':'Controleer';
+  $('solBtn').hidden=!tried||done||solved;
+  drawScore();
+}
+function place(i,k){ if(done||solved) return; answer[i]=k; setFb('','info'); render(); }
+function tapSlot(i){
+  if(done||solved) return;
+  if(sel){ place(i,sel); }
+  else if(answer[i]){ answer[i]=null; setFb('','info'); render(); }
+  else setFb('Kies eerst een teken (tik erop of sleep het).','info');
+}
+function check(){
+  if(answer.some(a=>!a)) return;
+  const good=answer.filter((a,i)=>a===P().dyn[i]).length;
+  tried=true; lastChecked=answer.join();
+  if(good===4){ done=true; sel=null; doneMap[lvl+'-'+piece]=1; try{localStorage.setItem('vc-done',JSON.stringify(doneMap))}catch(_){ } setFb('Helemaal juist! Knap gehoord.','ok'); }
+  else setFb(`${good} van de 4 juist. Welke juist zijn, moet je zelf ontdekken: beluister opnieuw, verbeter en controleer opnieuw. Of klik op "Toon oplossing".`,'bad');
+  render();
+}
+
+/* ---------- slepen en tikken ---------- */
+let drag=null;
+$('cards').addEventListener('pointerdown',e=>{
+  const b=e.target.closest('.card'); if(!b||b.disabled) return;
+  drag={k:b.dataset.k,x:e.clientX,y:e.clientY,moved:false,ghost:null,el:b,over:null};
+  try{ b.setPointerCapture(e.pointerId); }catch(_){}
+});
+document.addEventListener('pointermove',e=>{
+  if(!drag) return;
+  if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6){
+    drag.moved=true;
+    const g=drag.el.cloneNode(true); g.classList.add('ghost'); g.style.width=drag.el.offsetWidth+'px';
+    document.body.appendChild(g); drag.ghost=g;
+  }
+  if(drag.moved){
+    drag.ghost.style.left=e.clientX+'px'; drag.ghost.style.top=e.clientY+'px';
+    const el=document.elementFromPoint(e.clientX,e.clientY), s=el&&el.closest&&el.closest('#score .slot');
+    if(drag.over&&drag.over!==s) drag.over.classList.remove('over');
+    if(s&&!s.classList.contains('locked')){ s.classList.add('over'); drag.over=s; } else drag.over=null;
+  }
+});
+function endDrag(e){
+  if(!drag) return;
+  const d=drag; drag=null;
+  if(d.ghost) d.ghost.remove();
+  if(!d.moved){ sel=(sel===d.k?null:d.k); render(); return; }
+  const el=document.elementFromPoint(e.clientX,e.clientY), s=el&&el.closest&&el.closest('#score .slot');
+  if(s&&!s.classList.contains('locked')) place(+s.dataset.i,d.k); else render();
+}
+document.addEventListener('pointerup',endDrag);
+document.addEventListener('pointercancel',()=>{ if(drag){ if(drag.ghost) drag.ghost.remove(); drag=null; render(); } });
+$('cards').addEventListener('keydown',e=>{ const b=e.target.closest('.card'); if(b&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); sel=(sel===b.dataset.k?null:b.dataset.k); render(); const again=$('cards').querySelector(`[data-k="${b.dataset.k}"]`); again&&again.focus(); } });
+$('score').addEventListener('click',e=>{ const s=e.target.closest('.slot'); if(s) tapSlot(+s.dataset.i); });
+$('score').addEventListener('keydown',e=>{ if(e.key!=='Enter'&&e.key!==' ') return; const s=e.target.closest&&e.target.closest('.slot'); if(!s) return; e.preventDefault(); const i=+s.dataset.i; tapSlot(i); const again=$('score').querySelector(`.slot[data-i="${i}"]`); again&&again.focus&&again.focus(); });
+
+$('playBtn').addEventListener('click',()=>play(P().dyn,true));
+$('mineBtn').addEventListener('click',()=>play(answer,false));
+$('checkBtn').addEventListener('click',check);
+$('clearBtn').addEventListener('click',()=>{ answer=[null,null,null,null]; setFb('','info'); render(); });
+$('solBtn').addEventListener('click',()=>{ solved=true; sel=null; setFb('Dit is de juiste dynamiek. Beluister het stukje gerust opnieuw.','info'); render(); });
+$('restartBtn').addEventListener('click',reset);
+$('nextBtn').addEventListener('click',()=>{ const n=LEVELS[lvl].pieces.length;
+  if(piece<n-1) piece++; else if(lvl<LEVELS.length-1){ lvl++; piece=0; try{localStorage.setItem('vc-level',lvl)}catch(_){ } } else piece=0;
+  reset(); window.scrollTo({top:0,behavior:'smooth'}); });
+$('levels').addEventListener('click',e=>{ const b=e.target.closest('[data-l]'); if(!b||playing) return; lvl=+b.dataset.l; piece=0; try{localStorage.setItem('vc-level',lvl)}catch(_){ } reset(); });
+$('chips').addEventListener('click',e=>{ const b=e.target.closest('[data-p]'); if(!b||playing) return; piece=+b.dataset.p; reset(); });
+
+reset();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Name That Note &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --staff:#7F89A3; --line:#D3D9E6; --accent:#B5472C; --accent-ink:#FFFFFF; --accent-soft:#F6DDD5;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#FF9B7A; --accent-ink:#1A0E0A; --accent-soft:#4A2A20;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#FF9B7A; --accent-ink:#1A0E0A; --accent-soft:#4A2A20;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:8px 0 0;color:var(--muted)}
+.levels{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface);padding:5px;border-radius:14px;box-shadow:var(--shadow)}
+.levels button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.levels button small{font-weight:500;font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.levels button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:inline-grid;place-items:center;font-weight:700;font-size:13px;color:var(--muted)}
+.chip[aria-current="true"]{border-color:var(--accent);color:var(--accent)}
+.chip.seen{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-soft{background:var(--accent-soft);color:var(--accent)}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.staff-scroll{display:flex;justify-content:center}
+#staff{display:block;width:100%;max-width:440px;height:auto;color:var(--ink)}
+#staff .sl{stroke:var(--staff);stroke-width:1.4}
+#staff .ok{color:var(--ok)}
+.answers{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.nbtn{min-width:64px;height:64px;border-radius:16px;border:2px solid var(--line);background:var(--surface-2);font-family:var(--display);font-weight:800;font-size:26px}
+.nbtn:hover:not(:disabled){border-color:var(--accent)}
+.nbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.nbtn:disabled{cursor:default}
+.nbtn.right{background:var(--ok);border-color:var(--ok);color:#fff}
+.nbtn.wrong{background:var(--bad);border-color:var(--bad);color:#fff}
+.nbtn.dim{opacity:.4}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.actions .spacer{flex:1}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+.hint{margin:0;color:var(--muted);font-size:14px}
+details.help{background:var(--surface-2);border-radius:12px;padding:10px 14px}
+details.help summary{cursor:pointer;font-weight:700;color:var(--muted)}
+details.help p{margin:8px 0 0;color:var(--muted)}
+.board{display:flex;gap:10px;flex-wrap:wrap}
+.sc{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:6px 14px;font-weight:800;font-variant-numeric:tabular-nums;font-size:18px;border:2px solid transparent}
+.sc b{font-family:var(--display);font-size:24px;line-height:1}
+.sc small{font-size:13px;font-weight:700}
+.sc.good{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.sc.bad{background:var(--bad-soft);color:var(--bad);border-color:var(--bad)}
+.score{font-family:var(--display);font-weight:800;font-size:clamp(40px,9vw,64px);line-height:1;margin:0}
+.score small{font-size:.4em;color:var(--muted);font-weight:700}
+.rchips{display:flex;flex-wrap:wrap;gap:8px}
+.rchip{min-width:44px;height:44px;padding:0 10px;border-radius:12px;display:inline-grid;place-items:center;font-family:var(--display);font-weight:800;font-size:18px;border:2px solid var(--line)}
+.rchip.good{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.rchip.miss{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <a class="back" href="melodie.html">&larr; Let's Make Melodies</a>
+      <h1>Name That <span>Note</span></h1>
+      <p>Welke noot staat er op de notenbalk? Kies de juiste notennaam.</p>
+    </div>
+    <div class="levels" id="levels" role="group" aria-label="Niveau"></div>
+  </header>
+
+  <section class="panel" id="qPanel">
+    <div class="panel-head">
+      <div>
+        <div class="eyebrow" id="eyebrow">Niveau 1</div>
+        <h2 id="title">Noot 1</h2>
+      </div>
+      <div class="board" aria-live="polite"><span class="sc good" title="Aantal juiste antwoorden"><b id="nGood">0</b><small>juist</small></span><span class="sc bad" title="Aantal foute antwoorden"><b id="nBad">0</b><small>fout</small></span></div>
+    </div>
+
+    <div class="staff-scroll"><svg id="staff" role="img" aria-label="Een noot op de notenbalk"></svg></div>
+
+    <div class="answers" id="answers" role="group" aria-label="Kies de notennaam"></div>
+
+    <div class="actions">
+      <span class="spacer"></span>
+      <button class="btn btn-ghost" id="stopBtn" type="button">Stop en bekijk score</button>
+    </div>
+    <p class="feedback info" id="feedback" aria-live="polite"></p>
+
+    <details class="help">
+      <summary>Hulp nodig?</summary>
+      <p id="helpText"></p>
+    </details>
+  </section>
+
+  <section class="panel" id="rPanel" hidden>
+    <div>
+      <div class="eyebrow" id="rEyebrow">Uitslag</div>
+      <h2>Je score</h2>
+    </div>
+    <div class="board"><span class="sc good"><b id="rGood">0</b><small>juist</small></span><span class="sc bad"><b id="rBad">0</b><small>fout</small></span></div>
+    <p class="score" id="score"></p>
+    <p class="hint" id="rHint"></p>
+    <div class="actions">
+      <button class="btn btn-primary" id="againBtn" type="button">Verder oefenen</button>
+      <button class="btn btn-ghost" id="resetBtn" type="button">Opnieuw beginnen met 0</button>
+      <button class="btn btn-soft" id="upBtn" type="button" hidden>Naar het volgende niveau &rarr;</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div>
+      <div class="eyebrow">Hulpmiddel</div>
+      <h2>Pianoklavier</h2>
+    </div>
+    <p class="hint">Tik op een toets om de noot te horen. De bolletjes tonen welke noten in dit niveau kunnen voorkomen.</p>
+    <div id="piano"></div>
+  </section>
+</div>
+
+<script src="piano.js"></script>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* ---------- noten ----------
+   step = plaats op de notenbalk (0 = onderste lijn E4); C4 hangt aan een hulplijntje. C' = hoge C (C5). */
+const NOTE={C:{m:60,step:-2},D:{m:62,step:-1},E:{m:64,step:0},F:{m:65,step:1},G:{m:67,step:2},
+  A:{m:69,step:3},B:{m:71,step:4},"C'":{m:72,step:5},"D'":{m:74,step:6},"E'":{m:76,step:7},"F'":{m:77,step:8},"G'":{m:79,step:9},"A'":{m:81,step:10}};
+
+/* ---------- niveaus ----------
+   pool = de noten die in dit niveau voorkomen. Nieuw niveau = een object toevoegen.     */
+const LEVELS=[
+  {name:'Niveau 1', sub:'C, D, E', pool:['C','D','E'],
+   help:'E staat op de onderste lijn. D hangt net onder die lijn. C hangt nog een stapje lager, aan een klein lijntje onder de notenbalk.'},
+  {name:'Niveau 2', sub:'C tot G', pool:['C','D','E','F','G'],
+   help:'Tel van onder naar boven: C hangt aan een hulplijntje, D hangt onder de balk, E staat op de eerste lijn, F in de eerste ruimte en G op de tweede lijn.'},
+  {name:'Niveau 3', sub:"C tot C'", pool:['C','D','E','F','G','A','B',"C'"],
+   help:"Tel van onder naar boven: C (hulplijntje), D, E (eerste lijn), F (eerste ruimte), G (tweede lijn), A (tweede ruimte), B (derde lijn) en C' (derde ruimte). Het afkappingsteken ' betekent: de hoge C."},
+  {name:'Niveau 4', sub:"C tot A'", pool:['C','D','E','F','G','A','B',"C'","D'","E'","F'","G'","A'"],
+   help:"Vanaf B ga je verder omhoog: B (derde lijn), C' (derde ruimte), D' (vierde lijn), E' (vierde ruimte), F' (bovenste lijn), G' (ruimte boven de balk) en A' (op het hulplijntje boven de balk). Laag blijft C aan het hulplijntje onder de balk."}
+];
+
+/* ---------- toestand ---------- */
+let lvl=0, cur=null, last=null, bag=[], n=0, good=0, bad=0, sel=null, phase='ask', piano=null, timer=null;
+try{ lvl=Math.min(LEVELS.length-1,Math.max(0,+localStorage.getItem('nn-level')||0)); }catch(e){}
+const pool=()=>LEVELS[lvl].pool, target=()=>cur;
+
+function shuffle(a){a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a}
+// oneindig veel noten: telkens een volgende uit een geschudde zak, nooit twee dezelfde na elkaar
+function nextNote(){
+  if(!bag.length){
+    bag=shuffle(pool());
+    if(bag.length>1&&bag[0]===last){const j=bag.findIndex(x=>x!==last);[bag[0],bag[j]]=[bag[j],bag[0]]}
+  }
+  return bag.shift();
+}
+function clearTimer(){ if(timer){clearTimeout(timer);timer=null} }
+function advance(ms){ clearTimer(); timer=setTimeout(()=>{ timer=null; if(phase==='done') loadQ(); },ms); }
+function resetAll(){ good=0; bad=0; n=0; last=null; bag=[]; cur=null; $('qPanel').hidden=false; $('rPanel').hidden=true; loadQ(); }
+function loadQ(){
+  clearTimer(); if(cur) last=cur; cur=nextNote(); n++;
+  sel=null; phase='ask'; setFeedback('','info'); render();
+}
+
+/* ---------- notenbalk ---------- */
+const GCLEF='M434 2Q464 -103 464 -170Q464 -223 427 -257Q390 -291 337 -291Q287 -291 250 -262Q213 -232 213 -190Q213 -160 234 -134Q254 -107 284 -107Q313 -107 332 -128Q350 -150 350 -178Q350 -240 280 -240Q298 -268 338 -268Q353 -268 368 -264Q384 -259 401 -248Q418 -237 428 -214Q439 -190 439 -157Q439 -136 411 -6Q389 -12 356 -12Q259 -12 190 60Q120 132 120 232Q120 267 132 303Q143 339 158 366Q172 394 200 428Q229 463 248 484Q268 504 303 539Q280 621 280 689Q280 779 313 840Q346 900 379 900Q389 900 402 887Q414 874 426 851Q438 828 446 790Q455 753 455 710Q455 551 342 447L368 329Q384 332 397 332Q458 332 500 282Q542 233 542 162Q542 44 434 2ZM426 746Q426 801 394 801Q358 801 333 748Q308 695 308 630Q308 588 321 557Q359 580 392 640Q426 699 426 746ZM498 128Q498 183 466 216Q434 249 383 249L428 23Q498 52 498 128ZM407 17 361 247Q334 241 312 214Q289 187 289 158Q289 143 295 128Q301 114 310 104Q318 94 327 86Q336 78 342 74Q348 71 348 71L340 66Q307 75 278 106Q248 137 248 184Q248 231 278 270Q307 310 343 323L325 430Q168 299 168 177Q168 104 223 55Q278 6 348 6Q365 6 407 17Z';
+const SP=12, BOT=120, W=240;
+const yOf=s=>BOT-s*SP/2;
+function noteSVG(n,x,cls){
+  const s=NOTE[n].step, y=yOf(s), up=s<4;
+  let g='';
+  if(s<=-2) g+=`<line x1="${x-14}" y1="${yOf(-2)}" x2="${x+14}" y2="${yOf(-2)}" stroke="currentColor" stroke-width="1.6"/>`;
+  for(let k=10;k<=s;k+=2) g+=`<line x1="${x-14}" y1="${yOf(k)}" x2="${x+14}" y2="${yOf(k)}" stroke="currentColor" stroke-width="1.6"/>`;
+  g+=`<ellipse cx="${x}" cy="${y}" rx="7.4" ry="5.4" transform="rotate(-20 ${x} ${y})" fill="currentColor"/>`;
+  g+=up?`<line x1="${x+6.8}" y1="${y-1}" x2="${x+6.8}" y2="${y-36}" stroke="currentColor" stroke-width="1.9"/>`
+       :`<line x1="${x-6.8}" y1="${y+1}" x2="${x-6.8}" y2="${y+36}" stroke="currentColor" stroke-width="1.9"/>`;
+  return `<g class="${cls||''}">${g}</g>`;
+}
+function renderStaff(){
+  let h='';
+  for(let k=0;k<5;k++) h+=`<line class="sl" x1="8" y1="${yOf(2*k)}" x2="${W-8}" y2="${yOf(2*k)}"/>`;
+  h+=`<path d="${GCLEF}" transform="translate(12 ${BOT-SP}) scale(0.078 -0.078)" fill="currentColor"/>`;
+  h+=noteSVG(target(),150,phase==='done'?'ok':'');
+  const svg=$('staff'); svg.setAttribute('viewBox',`0 30 ${W} 122`); svg.innerHTML=h;
+}
+
+/* ---------- weergave ---------- */
+function setFeedback(t,c){const f=$('feedback');f.textContent=t;f.className='feedback '+c}
+function render(){
+  $('levels').innerHTML=LEVELS.map((L,k)=>`<button type="button" data-l="${k}" aria-pressed="${k===lvl}">${L.name}<small>${L.sub}</small></button>`).join('');
+  $('nGood').textContent=good; $('nBad').textContent=bad;
+  $('eyebrow').textContent=LEVELS[lvl].name+' · '+LEVELS[lvl].sub;
+  $('title').textContent=`Noot ${n}`;
+  $('answers').innerHTML=pool().map(x=>{
+    let c=''; if(phase==='done'){ if(x===cur) c=' right'; else if(x===sel) c=' wrong'; else c=' dim'; }
+    return `<button type="button" class="nbtn${c}" data-n="${x}"${phase==='done'?' disabled':''}>${x}</button>`}).join('');
+  $('helpText').textContent=LEVELS[lvl].help;
+  renderStaff();
+  mountPiano();
+  if(piano) piano.mark(pool().map(x=>NOTE[x].m));
+}
+function showResult(){
+  clearTimer();
+  $('qPanel').hidden=true; $('rPanel').hidden=false;
+  const tot=good+bad, p=tot?Math.round(100*good/tot):0;
+  $('rEyebrow').textContent=LEVELS[lvl].name+' · '+LEVELS[lvl].sub;
+  $('rGood').textContent=good; $('rBad').textContent=bad;
+  $('score').innerHTML=tot?`${p}% <small>van de antwoorden was juist</small>`:`<small>Nog niets beantwoord</small>`;
+  $('rHint').textContent=tot?'Elk juist antwoord telt mee bij “juist”, elk fout antwoord bij “fout”. Ook een tweede poging na een fout antwoord telt mee.':'';
+  $('upBtn').hidden=lvl>=LEVELS.length-1||tot<10||p<85;
+}
+
+/* ---------- bediening ---------- */
+$('levels').addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(!b)return;lvl=+b.dataset.l;try{localStorage.setItem('nn-level',lvl)}catch(_){ }resetAll();});
+$('answers').addEventListener('click',e=>{
+  const b=e.target.closest('[data-n]'); if(!b||phase!=='ask') return;
+  sel=b.dataset.n; phase='done';
+  if(piano) piano.play(NOTE[cur].m,.9);          // je hoort de juiste noot
+  if(sel===cur){
+    good++; setFeedback(`Juist! Dit is een ${cur}.`,'ok'); advance(900);
+  } else {
+    bad++; setFeedback(`Niet juist. Dit is een ${cur}.`,'bad'); advance(2000);
+  }
+  render();
+});
+$('stopBtn').addEventListener('click',showResult);
+$('againBtn').addEventListener('click',()=>{ $('qPanel').hidden=false; $('rPanel').hidden=true; loadQ(); });
+$('resetBtn').addEventListener('click',resetAll);
+$('upBtn').addEventListener('click',()=>{ if(lvl<LEVELS.length-1){ lvl++; try{localStorage.setItem('nn-level',lvl)}catch(_){ } resetAll(); } });
+
+/* ---------- pianoklavier ---------- */
+function mountPiano(){
+  if(!window.MEPiano) return;
+  const oct=pool().some(x=>NOTE[x].m>72)?2:1;
+  if(piano&&piano.oct===oct) return;
+  if(piano) piano.destroy();
+  $('piano').innerHTML='';
+  piano=MEPiano.mount($('piano'),{names:'sharp',low:60,octaves:oct,computerKeys:false}); piano.oct=oct;
+}
+
+resetAll();
+})();
+</script>
+</body>
+</html>
