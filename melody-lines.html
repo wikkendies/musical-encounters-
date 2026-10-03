@@ -160,12 +160,18 @@ const LEVELS=[
   {name:'Sprong en dalen',  path:'M15 90 L 38 22 L 145 85',                              notes:['C4','C5','B4','A4','G4','F4','E4','D4']},
   {name:'Trap omhoog',      path:'M15 92 H 45 V 70 H 80 V 48 H 115 V 26 H 145',           notes:['C4','C4','E4','E4','G4','G4','C5','C5']},
   {name:'Zigzag omhoog',    path:'M12 92 L 32 76 L 50 84 L 70 64 L 88 72 L 108 52 L 126 60 L 148 36', notes:['C4','E4','D4','F4','E4','G4','F4','A4','G4']}
+  ]},
+  {name:'Niveau 3',info:'Twee toppen, grote zigzag, pieken, val en klim',mels:[
+  {name:'Twee toppen',      path:'M12 92 L 39 33 L 66 73 L 107 13 L 148 92',              notes:['C4','G4','C5','G4','E4','G4','C5','E5','C5','G4','C4']},
+  {name:'Grote zigzag',     path:'M12 92 L 24 58 L 37 82 L 49 48 L 62 72 L 74 38 L 86 68 L 99 33 L 111 58 L 123 23 L 136 48 L 148 13', notes:['C4','G4','D4','A4','E4','B4','F4','C5','G4','D5','A4','E5']},
+  {name:'Stijgende pieken', path:'M12 92 L 27 72 L 42 92 L 57 58 L 72 92 L 87 38 L 103 92 L 118 23 L 133 92 L 148 13', notes:['C4','E4','C4','G4','C4','B4','C4','D5','C4','E5']},
+  {name:'Val en klim',      path:'M12 33 L 26 92 L 148 13',                              notes:['C5','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5']}
   ]}
 ];
 let level=0;
 try{const v=+localStorage.getItem('ml-level');if(v>=0&&v<LEVELS.length)level=v}catch(e){}
 let MELODIES=LEVELS[level].mels;
-const MIDI={C4:60,D4:62,E4:64,F4:65,G4:67,A4:69,B4:71,C5:72,D5:74};
+const MIDI={C4:60,D4:62,E4:64,F4:65,G4:67,A4:69,B4:71,C5:72,D5:74,E5:76};
 const MAXPLAY=3, GAP=.3, PAUSE=0;   // PAUSE = stilte tussen de stukjes (s), bewust 0
 
 /* ---------- toestand ---------- */
@@ -205,7 +211,7 @@ function playAll(){
 }
 
 /* ---------- weergave ---------- */
-const lineSVG=m=>`<svg viewBox="0 0 160 110" aria-hidden="true"><path d="${MELODIES[m].path}" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`;
+const lineSVG=m=>`<svg viewBox="0 0 160 110" aria-hidden="true"><path d="${MELODIES[m].path}" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 function setFeedback(t,cls){const f=$('feedback');f.textContent=t;f.className='feedback '+cls}
 function render(){
   $('slots').innerHTML=order.map((m,i)=>{
