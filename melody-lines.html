@@ -166,12 +166,18 @@ const LEVELS=[
   {name:'Grote zigzag',     path:'M12 92 L 24 58 L 37 82 L 49 48 L 62 72 L 74 38 L 86 68 L 99 33 L 111 58 L 123 23 L 136 48 L 148 13', notes:['C4','G4','D4','A4','E4','B4','F4','C5','G4','D5','A4','E5']},
   {name:'Stijgende pieken', path:'M12 92 L 27 72 L 42 92 L 57 58 L 72 92 L 87 38 L 103 92 L 118 23 L 133 92 L 148 13', notes:['C4','E4','C4','G4','C4','B4','C4','D5','C4','E5']},
   {name:'Val en klim',      path:'M12 33 L 26 92 L 148 13',                              notes:['C5','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5']}
+  ]},
+  {name:'Niveau 4',info:'Piramide, dubbele dal, trap omlaag, trechter',mels:[
+  {name:'Piramide',         path:'M12 92 L 23 78 L 35 63 L 46 49 L 57 35 L 69 20 L 80 13 L 91 20 L 103 35 L 114 49 L 125 63 L 137 78 L 148 92', notes:['C4','E4','G4','B4','D5','F5','G5','F5','D5','B4','G4','E4','C4']},
+  {name:'Dubbele dal',      path:'M12 13 L 23 35 L 35 56 L 46 78 L 57 92 L 69 78 L 80 56 L 91 35 L 103 13 L 114 35 L 125 56 L 137 78 L 148 92', notes:['G5','D5','A4','E4','C4','E4','A4','D5','G5','D5','A4','E4','C4']},
+  {name:'Trap omlaag',      path:'M15 13 H 34 V 27 H 52 V 42 H 71 V 56 H 89 V 70 H 108 V 85 H 126 V 92 H 145', notes:['G5','G5','E5','E5','C5','C5','A4','A4','F4','F4','D4','D4','C4','C4']},
+  {name:'Trechter',         path:'M12 92 L 24 13 L 37 85 L 49 20 L 61 78 L 74 27 L 86 70 L 99 35 L 111 63 L 123 42 L 136 56 L 148 49', notes:['C4','G5','D4','F5','E4','E5','F4','D5','G4','C5','A4','B4']}
   ]}
 ];
 let level=0;
 try{const v=+localStorage.getItem('ml-level');if(v>=0&&v<LEVELS.length)level=v}catch(e){}
 let MELODIES=LEVELS[level].mels;
-const MIDI={C4:60,D4:62,E4:64,F4:65,G4:67,A4:69,B4:71,C5:72,D5:74,E5:76};
+const MIDI={C4:60,D4:62,E4:64,F4:65,G4:67,A4:69,B4:71,C5:72,D5:74,E5:76,F5:77,G5:79};
 const MAXPLAY=3, GAP=.3, PAUSE=0;   // PAUSE = stilte tussen de stukjes (s), bewust 0
 
 /* ---------- toestand ---------- */
