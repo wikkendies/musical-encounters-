@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Test samenstellen &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(32px,6vw,50px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:10px 0 0;color:var(--muted);max-width:66ch}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface-2);padding:5px;border-radius:14px;align-self:flex-start}
+.seg button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;line-height:1.2;display:flex;flex-direction:column;align-items:flex-start}
+.seg button small{font-weight:500;font-size:12px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.grp{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:2px 0 -8px}
+.rows{display:flex;flex-direction:column;gap:8px}
+.row{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px 14px;align-items:center;background:var(--surface-2);border:2px solid transparent;border-radius:12px;padding:10px 14px}
+.row.on{border-color:var(--accent);background:var(--accent-soft)}
+.row label.nm{display:flex;align-items:center;gap:10px;font-weight:700;cursor:pointer;min-width:0}
+.row input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent)}
+.row .f{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
+.row select,.row input[type=number]{border:1.5px solid var(--line);border-radius:8px;background:var(--surface);padding:6px 8px;width:70px}
+.row:not(.on) .f{opacity:.45}
+.row.off{opacity:.55;grid-template-columns:auto 1fr}
+.row.off .nt{font-size:13px;color:var(--muted);justify-self:end}
+@media (max-width:560px){.row{grid-template-columns:auto 1fr;}.row .f{grid-column:2}}
+.tot{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.tot input{border:1.5px solid var(--line);border-radius:8px;background:var(--surface-2);padding:8px 10px;width:84px}
+.row input[type=number]:read-only{opacity:.7}
+.total{font-weight:700}
+.warn{color:var(--bad);font-weight:600}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+textarea{width:100%;min-height:260px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface-2);padding:12px;font-family:ui-monospace,Consolas,Menlo,monospace;font-size:13px;line-height:1.5;resize:vertical}
+.done{color:var(--ok);font-weight:700}
+.gform{display:flex;flex-direction:column;gap:10px;max-width:420px}
+.gform label{font-weight:700;font-size:14px}
+.gform input{font:inherit;font-size:18px;padding:11px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);width:100%}
+.gform .btn{align-self:flex-start}
+.err{color:var(--bad);font-weight:700;min-height:24px;margin:0}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+.gate h1,#app h1{margin:0}
+ol.steps{margin:0;padding-left:20px;color:var(--muted);font-size:15px}
+</style>
+</head>
+<body>
+
+<div class="wrap gate" id="gate">
+  <header>
+    <a class="back" href="index.html">&larr; Musical Encounters</a>
+    <h1>Leerkracht<span>gedeelte</span></h1>
+    <p id="gateText">Dit deel is enkel voor de leerkracht. Geef je code in.</p>
+  </header>
+  <section class="panel">
+    <form id="gateForm" class="gform" autocomplete="off">
+      <label id="gateLbl" for="gateIn">Code</label>
+      <input id="gateIn" type="password" autocomplete="off" required>
+      <button class="btn btn-primary" type="submit" id="gateBtn">Openen</button>
+    </form>
+    <p class="err" id="gateErr" aria-live="polite"></p>
+    <div id="gateSetup" hidden>
+      <p class="hint">Je code is gekozen. Zorg dat ze ook voor leerlingen niet te raden is. Om ze te bewaren, vervang je in dit bestand (<code>test-samenstellen.html</code>) de regel <code>const CODE_HASH='';</code> door deze regel en zet je het bestand online:</p>
+      <textarea id="gateHash" readonly spellcheck="false" style="min-height:70px"></textarea>
+      <div class="actions"><button class="btn btn-primary" id="gateCopy" type="button">Kopieer regel</button><button class="btn btn-ghost" id="gateGo" type="button">Verder naar de pagina</button></div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header>
+    <a class="back" href="index.html">&larr; Musical Encounters</a>
+    <h1>Test <span>samenstellen</span></h1>
+    <p>Kies per niveau welke oefeningen in de test zitten, alle bouwstenen samen in één test, welk niveau van die oefening en hoeveel vragen. Onderaan krijg je een blok dat je in <code>test.html</code> plakt. Leerlingen kunnen hier niets aan wijzigen.</p>
+  </header>
+
+  <section class="panel">
+    <div>
+      <div class="eyebrow">Stap 1</div>
+      <h2>Kies het niveau van de test</h2>
+    </div>
+    <div class="seg" id="nivSeg" role="group" aria-label="Niveau van de test"></div>
+    <p class="hint" id="nivHint"></p>
+  </section>
+
+  <section class="panel">
+    <div>
+      <div class="eyebrow" id="eb">Stap 2</div>
+      <h2 id="ttl">Oefeningen in de test</h2>
+    </div>
+    <div class="tot">
+      <label for="totIn"><strong>Totaal aantal vragen in deze test</strong></label>
+      <input type="number" id="totIn" min="1" max="60" placeholder="leeg">
+      <button class="btn btn-ghost" id="totClear" type="button">Zelf per oefening kiezen</button>
+    </div>
+    <p class="hint" id="totHint"></p>
+    <div class="rows" id="rows"></div>
+    <p class="total" id="total"></p>
+  </section>
+
+  <section class="panel">
+    <div>
+      <div class="eyebrow">Stap 3</div>
+      <h2>Code voor test.html</h2>
+    </div>
+    <ol class="steps">
+      <li>Klik op "Kopieer".</li>
+      <li>Open <code>test.html</code> en zoek <code>const TESTS={ … };</code> en <code>const NAMES={ … };</code>. Vervang elk van de twee door de nieuwe versie hieronder (laat <code>const TESTS_MEL</code> staan).</li>
+      <li>Vervang dat stuk door de gekopieerde code en zet <code>test.html</code> opnieuw online.</li>
+    </ol>
+    <textarea id="out" readonly spellcheck="false" aria-label="Code om te plakken"></textarea>
+    <div class="actions">
+      <button class="btn btn-primary" id="copyBtn" type="button">Kopieer</button>
+      <button class="btn btn-ghost" id="resetBtn" type="button">Terug naar de huidige test</button>
+      <span class="done" id="copied" hidden>Gekopieerd!</span>
+    </div>
+    <p class="hint">Je keuzes blijven bewaard in deze browser. Niveaus zonder oefeningen worden niet in de code gezet; zo'n niveau heeft dan geen test.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ===== CODE VAN DE LEERKRACHT =====
+   Leeg = bij het eerste gebruik kies je zelf een code; de pagina geeft dan de regel die je hier moet plakken. */
+const CODE_HASH='';
+/* ==================================== */
+const $=id=>document.getElementById(id);
+/* SHA-256 (zodat de code zelf nergens in dit bestand staat) */
+function sha256(str){
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const b=Array.from(new TextEncoder().encode(str)), l=b.length*8;
+  b.push(0x80); while(b.length%64!==56) b.push(0);
+  for(let i=7;i>=0;i--) b.push(i>=4?0:(l>>>(i*8))&255);
+  let h=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const rr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<b.length;o+=64){
+    const w=[]; for(let i=0;i<16;i++) w[i]=(b[o+4*i]<<24)|(b[o+4*i+1]<<16)|(b[o+4*i+2]<<8)|b[o+4*i+3];
+    for(let i=16;i<64;i++){ const s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3), s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)|0; }
+    let [a,bb,c,d,e,f,g,hh]=h;
+    for(let i=0;i<64;i++){
+      const S1=rr(e,6)^rr(e,11)^rr(e,25), ch=(e&f)^(~e&g), t1=(hh+S1+ch+K[i]+w[i])|0;
+      const S0=rr(a,2)^rr(a,13)^rr(a,22), mj=(a&bb)^(a&c)^(bb&c), t2=(S0+mj)|0;
+      hh=g; g=f; f=e; e=(d+t1)|0; d=c; c=bb; bb=a; a=(t1+t2)|0;
+    }
+    h=[(h[0]+a)|0,(h[1]+bb)|0,(h[2]+c)|0,(h[3]+d)|0,(h[4]+e)|0,(h[5]+f)|0,(h[6]+g)|0,(h[7]+hh)|0];
+  }
+  return h.map(x=>('00000000'+(x>>>0).toString(16)).slice(-8)).join('');
+}
+window.__sha256=sha256;
+function open_(){ $('gate').hidden=true; $('app').hidden=false; try{ sessionStorage.setItem('ts-ok','1'); }catch(e){} window.scrollTo(0,0); }
+let ok=false; try{ ok=sessionStorage.getItem('ts-ok')==='1'&&!!CODE_HASH; }catch(e){}
+if(ok) open_();
+else if(!CODE_HASH){
+  $('gateText').textContent='Eerste keer: kies een code voor dit leerkrachtgedeelte (minstens 6 tekens).';
+  $('gateLbl').textContent='Kies een code'; $('gateBtn').textContent='Code instellen';
+}
+$('gateForm').addEventListener('submit',e=>{
+  e.preventDefault(); const v=$('gateIn').value;
+  if(!CODE_HASH){
+    if(v.length<6){ $('gateErr').textContent='Kies een code van minstens 6 tekens.'; return; }
+    $('gateErr').textContent=''; $('gateForm').hidden=true; $('gateSetup').hidden=false;
+    $('gateHash').value="const CODE_HASH='"+sha256(v)+"';"; return;
+  }
+  if(sha256(v)===CODE_HASH) open_(); else { $('gateErr').textContent='Deze code klopt niet.'; $('gateIn').select(); }
+});
+$('gateCopy').addEventListener('click',async()=>{ try{ await navigator.clipboard.writeText($('gateHash').value); }catch(_){ $('gateHash').select(); try{document.execCommand('copy')}catch(__){} } });
+$('gateGo').addEventListener('click',open_);
+})();
+</script>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* Oefeningen die een testmodus hebben (bestandsnaam zonder .html). Nieuwe oefening testklaar? Voeg hier één regel toe. */
+const GROEPEN=[
+  {naam:'Ritme',ex:[
+    ['hold-that-note','Hold That Note',1],['rhythm-sequence','Rhythm Sequence',1],['missing-beat','Missing Beat',1],['follow-the-score','Follow the Score',1],
+    ['bar-line-hunter','Bar Line Hunter',1],['rhythm-builder','Rhythm Builder',1],['find-the-bass','Find the Bass',1],
+    ['drum-detective','Drum Detective',0],['tap-it-back','Tap It Back',0]]},
+  {naam:'Melodie',ex:[
+    ['mind-the-gap','Mind the Gap',1],['melodiepuzzel','Melodiepuzzel',1],['melody-lines','Melody Lines',1],['mission-impossible','Mission Impossible',1],
+    ['melody-builder','Melody Builder',1],['sharp-ears','Sharp Ears',1],['name-that-note','Name That Note',0]]},
+  {naam:'Dynamiek',ex:[['whisper-or-roar','Whisper or Roar',0]]},
+  {naam:'Tempo',ex:[['keep-up','Keep Up!',0],['hold-the-beat','Hold the Beat',0]]},
+  {naam:'Klankkleur',ex:[['klankkleur/trompet-dempers','Trompetdempers',0],['klankkleur/kleurwoorden','Kleurwoorden',0],['klankkleur/vreemde-eend','Vreemde eend',0]]},
+  {naam:'Samenklank',ex:[]},
+  {naam:'Vorm',ex:[['form-finder','Form Finder',0],['hiphop-sandwich','Hip-Hop Sandwich',0]]}
+];
+const ALL=GROEPEN.reduce((a,g)=>a.concat(g.ex.filter(x=>x[2])),[]);   // enkel oefeningen met testmodus komen in de code, in deze volgorde
+const NIV=[1,2,3,4,5,6];
+const JAAR=['Schooljaar 1','Schooljaar 1','Schooljaar 2','Schooljaar 2','Schooljaar 3','Schooljaar 3'];
+
+/* De huidige test uit test.html (startpunt): enkel ritme. Melodie kun je er zelf bij aanvinken. */
+const DEFAULT={
+  1:[['hold-that-note',1,2],['rhythm-sequence',1,1],['missing-beat',1,3],['follow-the-score',1,1],['bar-line-hunter',1,1],['rhythm-builder',1,2],['find-the-bass',1,3]],
+  2:[['hold-that-note',2,2],['rhythm-sequence',2,1],['missing-beat',2,3],['follow-the-score',2,1],['bar-line-hunter',2,1],['rhythm-builder',2,2],['find-the-bass',1,3]],
+  3:[['hold-that-note',3,2],['rhythm-sequence',3,1],['missing-beat',3,3],['follow-the-score',3,1],['bar-line-hunter',3,1],['rhythm-builder',3,2]],
+  4:[['missing-beat',3,3],['follow-the-score',3,1],['bar-line-hunter',4,2],['rhythm-builder',3,2]],
+  5:[['missing-beat',3,4],['bar-line-hunter',5,2],['rhythm-builder',4,2]],
+  6:[['missing-beat',3,4],['bar-line-hunter',6,2],['rhythm-builder',4,3]]
+};
+
+/* toestand: plan[niveau] = { exId: {lvl, n} } (alleen aangevinkte oefeningen, ritme en melodie samen)
+   tot[niveau] = totaal aantal vragen (leeg = per oefening zelf kiezen) */
+let niv=1, plan={}, tot={};
+function fromDefault(){
+  const p={}; NIV.forEach(n=>{ p[n]={}; (DEFAULT[n]||[]).forEach(([ex,l,q])=>{ p[n][ex]={lvl:l,n:q}; }); });
+  return p;
+}
+try{ const s=JSON.parse(localStorage.getItem('ts-plan2')||'null'); plan=(s&&s[1])?s:fromDefault(); }catch(e){ plan=fromDefault(); }
+try{ const t=JSON.parse(localStorage.getItem('ts-tot2')||'null'); if(t&&typeof t==='object') tot=t; }catch(e){}
+function save(){ try{ localStorage.setItem('ts-plan2',JSON.stringify(plan)); localStorage.setItem('ts-tot2',JSON.stringify(tot)); }catch(e){} }
+/* verdeel het totaal gelijk over alle aangevinkte oefeningen (rest naar de eerste) */
+function applyTotal(){
+  const T=tot[niv]; if(!T) return null;
+  const ids=ALL.map(x=>x[0]).filter(id=>plan[niv][id]);
+  if(!ids.length) return {short:false};
+  const base=Math.floor(T/ids.length), rem=T%ids.length;
+  ids.forEach((id,k)=>{ plan[niv][id].n=Math.max(1,Math.min(20,base+(k<rem?1:0))); });
+  return {short:T<ids.length};
+}
+function clampN(v,lo,hi){ v=parseInt(v,10); return isNaN(v)?lo:Math.max(lo,Math.min(hi,v)); }
+
+function render(){
+  $('nivSeg').innerHTML=NIV.map(n=>{ const cnt=Object.keys(plan[n]).length;
+    return `<button type="button" data-n="${n}" aria-pressed="${n===niv}">Niveau ${n}<small>${cnt?cnt+' oefeningen':'leeg'}</small></button>`; }).join('');
+  $('nivHint').textContent=`Niveau ${niv} van de test hoort bij ${JAAR[niv-1].toLowerCase()}. Het niveau van de test is het niveau van de klas in je Google Sheet.`;
+  $('eb').textContent=`Test niveau ${niv}`;
+  const cur=plan[niv], T=tot[niv], at=applyTotal();
+  $('totIn').value=T||'';
+  $('totHint').innerHTML=T?(at&&at.short?`<span class="warn">Elke aangevinkte oefening heeft minstens 1 vraag nodig. Vink minder oefeningen aan of verhoog het totaal.</span>`:'De vragen worden gelijk verdeeld over alle aangevinkte oefeningen, ritme en melodie samen. Vul het totaal leeg om per oefening zelf te kiezen.')
+    :'Leeg: je kiest zelf per oefening hoeveel vragen. Of vul een totaal in, dan verdeel ik ze gelijk over de aangevinkte oefeningen.';
+  $('rows').innerHTML=GROEPEN.map(g=>`<div class="grp">${g.naam}</div>`+(g.ex.length?g.ex.map(([id,naam,klaar])=>{
+    if(!klaar) return `<div class="row off"><label class="nm"><input type="checkbox" disabled> ${naam}</label><span class="nt">nog geen testmodus</span></div>`;
+    const e=cur[id], on=!!e, lvl=e?e.lvl:niv, q=e?e.n:2;
+    return `<div class="row${on?' on':''}" data-ex="${id}">
+      <label class="nm"><input type="checkbox" data-a="chk"${on?' checked':''}> ${naam}</label>
+      <span></span>
+      <label class="f">niveau <select data-a="lvl"${on?'':' disabled'}>${NIV.map(l=>`<option${l===lvl?' selected':''}>${l}</option>`).join('')}</select></label>
+      <label class="f">vragen <input type="number" data-a="n" min="1" max="20" value="${q}"${on?'':' disabled'}${T?' readonly':''}></label>
+    </div>`; }).join(''):`<div class="row off"><span class="nt">nog geen oefeningen</span></div>`)).join('');
+  const sum=Object.values(cur).reduce((a,e)=>a+e.n,0), cnt=Object.keys(cur).length;
+  $('total').innerHTML=cnt?`${cnt} oefeningen · ${sum} vragen in deze test`:'<span class="warn">Dit niveau heeft geen oefeningen: er is dan geen test voor dit niveau.</span>';
+  $('out').value=makeCode();
+}
+function makeCode(){
+  const lines=[];
+  NIV.forEach(n=>{ const ex=ALL.filter(([id])=>plan[n][id]);
+    if(!ex.length) return;
+    lines.push(`  ${n}:[`+ex.map(([id])=>`{ex:'${id}',lvl:${plan[n][id].lvl},n:${plan[n][id].n}}`).join(',')+']'); });
+  const names=ALL.map(([id,naam])=>`'${id}':'${naam}'`).join(',\n  ');
+  return `const TESTS={\n${lines.join(',\n')}\n};\n\nconst NAMES={\n  ${names}\n};`;
+}
+
+$('nivSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-n]'); if(!b) return; niv=+b.dataset.n; render(); });
+$('rows').addEventListener('change',e=>{
+  const row=e.target.closest('.row'); if(!row) return;
+  const id=row.dataset.ex, cur=plan[niv], a=e.target.dataset.a;
+  if(a==='chk'){ if(e.target.checked) cur[id]={lvl:niv,n:2}; else delete cur[id]; }
+  else if(cur[id]&&a==='lvl') cur[id].lvl=clampN(e.target.value,1,6);
+  else if(cur[id]&&a==='n') cur[id].n=clampN(e.target.value,1,20);
+  save(); render();
+});
+$('totIn').addEventListener('change',()=>{ const v=parseInt($('totIn').value,10); if(v>0) tot[niv]=Math.min(60,v); else delete tot[niv]; save(); render(); });
+$('totClear').addEventListener('click',()=>{ delete tot[niv]; save(); render(); });
+$('copyBtn').addEventListener('click',async()=>{
+  const t=$('out').value;
+  try{ await navigator.clipboard.writeText(t); }catch(_){ $('out').select(); try{ document.execCommand('copy'); }catch(__){} }
+  $('copied').hidden=false; setTimeout(()=>{ $('copied').hidden=true; },2000);
+});
+$('resetBtn').addEventListener('click',()=>{ plan=fromDefault(); tot={}; save(); render(); });
+render();
+})();
+</script>
+</body>
+</html>
