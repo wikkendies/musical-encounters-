@@ -82,6 +82,18 @@ textarea{width:100%;min-height:260px;border:1.5px solid var(--line);border-radiu
 .back:hover{color:var(--accent)}
 .gate h1,#app h1{margin:0}
 ol.steps{margin:0;padding-left:20px;color:var(--muted);font-size:15px}
+
+.mine{display:grid;gap:10px;margin-top:6px}
+.mcard{border:1.5px solid var(--line,#d9deea);border-radius:12px;padding:12px 14px;background:#fff;display:grid;gap:6px}
+.mcard.empty{opacity:.65}
+.mhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mhead strong{font-size:1.02rem}
+.mhead .sp{flex:1}
+.mbadge{font-size:.78rem;padding:2px 8px;border-radius:99px;background:#fff3cd;color:#7a5a00}
+.mbadge.ok{background:#e1f4e6;color:#1c6b34}
+.mlist{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.mlist li{font-size:.86rem;background:#eef1fb;border-radius:8px;padding:3px 9px}
+.mnote{font-size:.85rem;color:#5b6475}
 </style>
 </head>
 <body>
@@ -113,6 +125,20 @@ ol.steps{margin:0;padding-left:20px;color:var(--muted);font-size:15px}
     <h1>Test <span>samenstellen</span></h1>
     <p>Kies per niveau welke oefeningen in de test zitten, alle bouwstenen samen in één test, welk niveau van die oefening en hoeveel vragen. Onderaan krijg je een blok dat je in <code>test.html</code> plakt. Leerlingen kunnen hier niets aan wijzigen.</p>
   </header>
+
+
+  <section class="panel" id="minePanel">
+    <div>
+      <div class="eyebrow">Overzicht</div>
+      <h2>Mijn testen</h2>
+    </div>
+    <p class="hint" id="mineHint">Testen laden uit test.html…</p>
+    <div class="mine" id="mine"></div>
+    <div class="actions">
+      <button class="btn btn-ghost" id="mineReload" type="button">Opnieuw laden uit test.html</button>
+      <button class="btn btn-ghost" id="mineAll" type="button">Alle online testen in de bouwer zetten</button>
+    </div>
+  </section>
 
   <section class="panel">
     <div>
@@ -283,7 +309,7 @@ function render(){
     </div>`; }).join(''):`<div class="row off"><span class="nt">nog geen oefeningen</span></div>`)).join('');
   const sum=Object.values(cur).reduce((a,e)=>a+e.n,0), cnt=Object.keys(cur).length;
   $('total').innerHTML=cnt?`${cnt} oefeningen · ${sum} vragen in deze test`:'<span class="warn">Dit niveau heeft geen oefeningen: er is dan geen test voor dit niveau.</span>';
-  $('out').value=makeCode();
+  $('out').value=makeCode(); if(typeof renderMine==='function') renderMine();
 }
 function makeCode(){
   const lines=[];
@@ -311,7 +337,60 @@ $('copyBtn').addEventListener('click',async()=>{
   $('copied').hidden=false; setTimeout(()=>{ $('copied').hidden=true; },2000);
 });
 $('resetBtn').addEventListener('click',()=>{ plan=fromDefault(); tot={}; save(); render(); });
+
+/* ===== Mijn testen: overzicht van wat er nu online staat (gelezen uit test.html) ===== */
+let pub={};   // pub[niveau] = [{ex,lvl,n}] zoals in test.html
+let pubMel={};
+function grab(src,name){
+  const m=src.match(new RegExp('const '+name+'=\\{[\\s\\S]*?\\n\\};'));
+  if(!m) return null;
+  try{ return (new Function(m[0].replace('const '+name+'=','return ')))(); }catch(e){ return null; }
+}
+function nm(id){ const f=ALL.find(x=>x[0]===id); return f?f[1]:id; }
+function sameLvl(n){
+  const a=(pub[n]||[]).map(e=>e.ex+'|'+e.lvl+'|'+e.n).join(','),
+        b=ALL.filter(([id])=>plan[n][id]).map(([id])=>id+'|'+plan[n][id].lvl+'|'+plan[n][id].n).join(',');
+  return a===b;
+}
+function renderMine(){
+  const keys=Object.keys(pub);
+  $('mine').innerHTML=NIV.map(n=>{
+    const list=pub[n]||[], sum=list.reduce((a,e)=>a+e.n,0), same=sameLvl(n);
+    return `<div class="mcard${list.length?'':' empty'}">
+      <div class="mhead"><strong>Test niveau ${n}</strong><span class="mnote">${JAAR[n-1]}</span><span class="sp"></span>
+        ${list.length?`<span class="mbadge${same?' ok':''}">${same?'zoals online':'bewerkt, nog niet online'}</span>`:''}
+        <button class="btn btn-ghost" type="button" data-edit="${n}">${list.length?'Bewerken':'Nieuw maken'}</button></div>
+      ${list.length?`<ul class="mlist">${list.map(e=>`<li>${nm(e.ex)} · niv ${e.lvl} · ${e.n}×</li>`).join('')}</ul>
+      <div class="mnote">${list.length} oefeningen · ${sum} vragen</div>`:'<div class="mnote">Nog geen test voor dit niveau.</div>'}
+    </div>`; }).join('');
+  const mel=Object.keys(pubMel);
+  $('mineHint').textContent=keys.length?'Dit staat nu online in test.html. Klik op Bewerken om een test in de bouwer hieronder te openen.'+(mel.length?' (De aparte melodie-demotest in test.html staat niet in dit overzicht.)':''):'Ik kon geen testen lezen uit test.html. Je kunt toch gewoon hieronder nieuwe testen samenstellen.';
+}
+function loadPub(){
+  $('mineHint').textContent='Testen laden uit test.html…';
+  fetch('test.html?'+Date.now(),{cache:'no-store'}).then(r=>{ if(!r.ok) throw 0; return r.text(); }).then(src=>{
+    pub=grab(src,'TESTS')||{}; pubMel=grab(src,'TESTS_MEL')||{};
+    renderMine();
+  }).catch(()=>{ pub={}; renderMine(); });
+}
+function fromPub(n){
+  const o={}; (pub[n]||[]).forEach(e=>{ if(ALL.some(x=>x[0]===e.ex)) o[e.ex]={lvl:e.lvl,n:e.n}; });
+  return o;
+}
+$('mine').addEventListener('click',e=>{
+  const b=e.target.closest('[data-edit]'); if(!b) return;
+  const n=+b.dataset.edit;
+  if((pub[n]||[]).length && sameLvl(n)) { plan[n]=fromPub(n); }   // zoals online: verse kopie; anders behoud je lopende bewerking
+  niv=n; delete tot[n]; save(); render(); renderMine();
+  $('nivSeg').scrollIntoView({behavior:'smooth',block:'start'});
+});
+$('mineAll').addEventListener('click',()=>{
+  if(!Object.keys(pub).length) return;
+  NIV.forEach(n=>{ plan[n]=fromPub(n); }); tot={}; save(); render(); renderMine();
+});
+$('mineReload').addEventListener('click',loadPub);
 render();
+loadPub();
 })();
 </script>
 </body>
