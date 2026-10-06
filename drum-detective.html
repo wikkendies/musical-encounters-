@@ -186,15 +186,16 @@ const ROWS=[{key:'hat',name:'Hi-hat',color:'var(--hat)'},{key:'snare',name:'Snar
 const ROWNAME={hat:'hi-hat',snare:'snare',kick:'baskick'};
 const STEPS=16, COUNT=['1','e','+','a'], TASKS=5;
 
-/* ---------- beats maken per moeilijkheid (1 = eenvoudig, 3 = moeilijk) ---------- */
+/* ---------- beats maken per moeilijkheid (1 = eenvoudig, 3 = moeilijk, 4 = tussen 2 en 3 in: Bouw na niveau 4) ---------- */
 const HATS={
   1:['x.x.x.x.x.x.x.x.'],
   2:['x.x.x.x.x.x.x.x.','x...x...x...x...','..x...x...x...x.'],
-  3:['x.x.x.x.x.x.x.x.','xxxxxxxxxxxxxxxx','x.x.x.xxx.x.x.xx','..x...x...x...x.','x.xxx.xxx.xxx.xx']
+  3:['x.x.x.x.x.x.x.x.','xxxxxxxxxxxxxxxx','x.x.x.xxx.x.x.xx','..x...x...x...x.','x.xxx.xxx.xxx.xx'],
+  4:['x.x.x.x.x.x.x.x.','x.x.x.x.x.x.x.x.','x.x.x.xxx.x.x.x.']
 };
-const KICKPOS={1:[2,6,8,10,14], 2:[2,6,8,10,14], 3:[2,3,6,7,8,9,10,11,14,15]};
-const KICKN={1:[1,2], 2:[2,3], 3:[2,4]};
-const GHOST={1:[], 2:[14,10], 3:[7,9,15,14]};
+const KICKPOS={1:[2,6,8,10,14], 2:[2,6,8,10,14], 3:[2,3,6,7,8,9,10,11,14,15], 4:[2,3,6,7,8,10,14]};
+const KICKN={1:[1,2], 2:[2,3], 3:[2,4], 4:[2,3]};
+const GHOST={1:[], 2:[14,10], 3:[7,9,15,14], 4:[7,15]};
 const arr=s=>s.split('').map(c=>c==='x');
 function gen(d){
   const kick=Array(STEPS).fill(false); kick[0]=true;
@@ -232,10 +233,10 @@ const PARTS=[
    levels:[{name:'Niveau 1',info:'Baskick invullen',d:1,rows:['kick']},{name:'Niveau 2',info:'Baskick of snare',d:2,rows:['kick','snare']},{name:'Niveau 3',info:'Ook de hi-hat',d:3,rows:['kick','snare','hat']}],
    text:t=>`Twee instrumenten staan er al. Vul de ${ROWNAME[t.row]} in.`},
   {name:'Bouw na', info:'De hele beat zelf', max:5,
-   levels:[{name:'Niveau 1',info:'Baskick (hi-hat + snare staan er al)',d:1,show:['kick']},{name:'Niveau 2',info:'Snare + baskick (hi-hat staat er al)',d:2,show:['snare','kick']},{name:'Niveau 3',info:'Alle drie',d:2,show:['hat','snare','kick']},{name:'Niveau 4',info:'Met 16den (e en a)',d:3,show:['hat','snare','kick']}],
+   levels:[{name:'Niveau 1',info:'Baskick (hi-hat + snare staan er al)',d:1,show:['kick']},{name:'Niveau 2',info:'Snare + baskick (hi-hat staat er al)',d:2,show:['snare','kick']},{name:'Niveau 3',info:'Alle drie',d:2,show:['hat','snare','kick']},{name:'Niveau 4',info:'Met 16den (e en a)',d:4,show:['hat','snare','kick']}],
    text:t=>t.show.length===1?'Hi-hat en snare staan er al. Bouw de baskick na.':t.show.length===2?'De hi-hat staat er al. Bouw de snare en de baskick na.':'Bouw de hele beat na: hi-hat, snare en baskick.'}
 ];
-const TEMPO=[80,90,95,100];   // per niveau
+const TEMPO=[80,90,95,75];   // per niveau
 
 /* ---------- toestand ---------- */
 let part=0, level=0, tasks=[], idx=0, cur=null, plays=0, checked=false, tried=false, lastSig=null, playing=false;
