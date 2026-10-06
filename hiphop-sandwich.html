@@ -217,8 +217,8 @@ function trumpet(m,t,dur){ const f=hz(m), g=ctx.createGain(), lp=ctx.createBiqua
   g.connect(lp); lp.connect(pk); out(pk); }
 
 const swing=b=>b+((b*2)%2===1?.08:0);   // achtste achteraan iets later (hiphop-swing)
-function sectionA(ts,last){
-  for(let bar=0;bar<SECTION_BARS;bar++){
+function sectionA(ts,b0=0,b1=SECTION_BARS){
+  for(let bar=b0;bar<b1;bar++){
     const tb=ts+bar*BAR, i=bar%4;
     [0,1.5,2.5].forEach(b=>kick(tb+b*BEAT)); [1,3].forEach(b=>snare(tb+b*BEAT));
     for(let e=0;e<8;e++) hat(tb+swing(e/2)*BEAT, e%2?.6:1);
@@ -228,8 +228,8 @@ function sectionA(ts,last){
     mel.forEach(([n,b,d])=>violin(N(n),tb+b*BEAT,d*BEAT));
   }
 }
-function sectionB(ts){
-  for(let bar=0;bar<SECTION_BARS;bar++){
+function sectionB(ts,b0=0,b1=SECTION_BARS){
+  for(let bar=b0;bar<b1;bar++){
     const tb=ts+bar*BAR, i=bar%4;
     [0,.75,2,2.75].forEach(b=>kick(tb+b*BEAT,.9)); [1,3].forEach(b=>{ clap(tb+b*BEAT); snare(tb+b*BEAT,.5); });
     for(let s=0;s<16;s++) hat(tb+s*.25*BEAT, s%4===0?.9:s%2?.35:.6);
@@ -247,12 +247,23 @@ function play(which){       // which: undefined = alles, 0/1/2 = één deel
   if(which==null&&!tried){ if(plays>=MAXPLAY) return; plays++; }
   ac(); nodes=[]; t0=ctx.currentTime+.15;
   const parts=which==null?[0,1,2]:[which];
-  parts.forEach((p,k)=>{ const ts=t0+(which==null?p*SEC:0); if(p===1) sectionB(ts); else sectionA(ts); });
+  // maat voor maat inplannen (niet alles tegelijk): dat is veel lichter voor trage toestellen
+  queue=[];
+  parts.forEach(p=>{ const ts=t0+(which==null?p*SEC:0);
+    for(let k=0;k<SECTION_BARS;k++) queue.push([ts+k*BAR,()=>{ if(p===1) sectionB(ts,k,k+1); else sectionA(ts,k,k+1); }]); });
   const len=which==null?TOTAL:SEC+(which===2?3*BEAT:0);
-  if(which==null||which===2) ending(t0+(which==null?3*SEC:SEC));
-  playing={which,len}; stopAt=t0+len; render(); tick();
+  if(which==null||which===2){ const et=t0+(which==null?3*SEC:SEC); queue.push([et,()=>ending(et)]); }
+  playing={which,len}; stopAt=t0+len;
+  pump(); clearInterval(pumpTimer); pumpTimer=setInterval(pump,250);
+  render(); tick();
+}
+let queue=[], pumpTimer=0;
+function pump(){
+  while(queue.length&&queue[0][0]<ctx.currentTime+2.5) queue.shift()[1]();
+  if(!queue.length) clearInterval(pumpTimer);
 }
 function stop(){
+  clearInterval(pumpTimer); queue=[];
   nodes.forEach(n=>{ try{ n.stop(); }catch(_){} }); nodes=[];
   playing=false; cancelAnimationFrame(raf); drawProgress(-1,0); render();
 }
