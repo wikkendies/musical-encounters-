@@ -164,6 +164,17 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
+/* ---------- testmodus: test.html laadt deze pagina met ?test=1&lvl=N&n=M ---------- */
+const TEST=(()=>{try{const q=new URLSearchParams(location.search);if(q.get('test')!=='1')return null;
+  return {lvl:Math.max(1,parseInt(q.get('lvl'))||1),o:Math.max(0,parseInt(q.get('o'))||0),n:Math.max(1,Math.min(20,parseInt(q.get('n'))||3)),i:0,score:0,max:0,items:[]}}catch(e){return null}})();
+function testSend(m){try{if(window.parent!==window)window.parent.postMessage(Object.assign({lmr:'test'},m),'*')}catch(e){}}
+function testRecord(got,max){got=Math.max(0,Math.min(max,got));TEST.score+=got;TEST.max+=max;TEST.items.push([got,max]);TEST.i++;
+  testSend({type:'progress',i:TEST.i,n:TEST.n,score:TEST.score,max:TEST.max});
+  if(TEST.i>=TEST.n){document.body.classList.add('test-finished');testSend({type:'done',score:TEST.score,max:TEST.max,items:TEST.items});return true}return false}
+function testTitle(el){if(el)el.textContent='Vraag '+(TEST.o+Math.min(TEST.i+1,TEST.n))+' van '+(TEST.o+TEST.n)}
+function testShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const TEST_NEXT='Antwoord bewaard. Op naar de volgende vraag.';
+if(TEST){const s=document.createElement('style');s.textContent='.back,.levels,.tabs,.no-test{display:none!important}body{padding-top:6px}header h1{font-size:32px}.test-finished .wrap{opacity:.35;pointer-events:none}';document.head.appendChild(s);document.body.classList.add('testmode')}
 
 /* ---------- niveaus ----------
    Eén maat per ritme. Maatsoort vooraan (standaard 4/4). Tekens (duur in tellen):
@@ -403,6 +414,19 @@ $('levels').addEventListener('click',e=>{ const b=e.target.closest('[data-l]'); 
 
 /* testhulp: window.__tib.simulate([tellen]) */
 window.__tib={fake:(tp)=>{ ac(); win={beat:60/L().bpm,start:0,end:0,meter:R().meter}; taps=tp.slice(); running=true; finish(); }, cur:()=>series[idx].str, parse,judge:(str,tp)=>{ win={beat:60/L().bpm}; return judge(parse(str),tp); }, all:()=>LEVELS.flatMap(l=>l.pool)};
+if(TEST){
+ level=Math.min(LEVELS.length-1,TEST.lvl-1);
+ $('showNotes').checked=false;
+ document.querySelectorAll('.switch,#againBtn,#nextBtn,#restartBtn,#previewBox,#resultBox').forEach(el=>el.classList.add('no-test'));
+ const _rt=renderTop; renderTop=function(){_rt();testTitle($('eyebrow'))};
+ renderPreview=function(){$('previewBox').hidden=true};
+ newSeries=function(){let p=[];while(p.length<TEST.n)p=p.concat(testShuffle(L().pool));
+  series=p.slice(0,TEST.n).map(str=>({str,ok:null,first:null}));idx=0;$('task').hidden=false;$('result').hidden=true;startTask()};
+ const _f=finish; finish=function(){_f();const s=series[idx];
+  $('resultBox').hidden=true;$('againBtn').hidden=true;$('nextBtn').hidden=true;$('startBtn').disabled=true;
+  setPhase('Klaar',TEST_NEXT);setFb('','info');
+  if(!testRecord(s.ok?1:0,1))setTimeout(()=>{idx++;startTask()},1200)};
+}
 newSeries();
 })();
 </script>
