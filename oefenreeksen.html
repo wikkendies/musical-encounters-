@@ -108,9 +108,23 @@ select{font:inherit;padding:9px 12px;border-radius:12px;border:1.5px solid var(-
     <form class="tform" id="loginForm" autocomplete="off">
       <label>Klas<small>bv. 1A</small><input id="inKlas" required maxlength="8" autocapitalize="characters"></label>
       <label>Schoolmail<small>voornaam.achternaam@stludgardis.be</small><input id="inEmail" required type="email" maxlength="60" placeholder="voornaam.achternaam@stludgardis.be"></label>
-      <button class="btn btn-primary" type="submit" id="loginBtn">Verder</button>
+      <label>Je eigen code<small>Nog geen code of vergeten? Klik op de knop hieronder.</small><input id="inCode" type="password" maxlength="30" autocomplete="current-password"></label>
+      <button class="btn btn-primary" type="submit" id="loginBtn" style="grid-column:1/-1">Verder</button>
     </form>
     <p class="err" id="loginErr" aria-live="polite"></p>
+    <button class="linkbtn" id="needCodeBtn" type="button">Nog geen code of vergeten? Stuur me een code</button>
+  </section>
+
+  <!-- 1b. code kiezen -->
+  <section class="panel" id="scrCode" hidden>
+    <form class="tform" id="codeForm" autocomplete="off">
+      <p id="codeInfo" style="grid-column:1/-1;margin:0"></p>
+      <label>Code uit je mail<small>6 cijfers</small><input id="inMail" required inputmode="numeric" maxlength="6"></label>
+      <label>Kies je eigen code<small>minstens 6 tekens, onthoud ze goed</small><input id="inNew" required type="password" minlength="6" maxlength="30" autocomplete="new-password"></label>
+      <button class="btn btn-primary" type="submit" id="codeBtn" style="grid-column:1/-1">Bewaar mijn code</button>
+    </form>
+    <p class="err" id="codeErr" aria-live="polite"></p>
+    <button class="linkbtn" id="codeBackBtn" type="button">Terug</button>
   </section>
 
   <!-- 2. overzicht -->
@@ -221,7 +235,7 @@ let SHOWNAME='';       // schuilnaam op de ranglijst (komt van de Sheet)
 let S=null;            // lopende reeks
 let API_OK=true;
 
-function show(id){['scrLogin','scrHome','scrRun','scrDone'].forEach(s=>$(s).hidden=s!==id);$('hdr').hidden=id==='scrRun';window.scrollTo(0,0)}
+function show(id){['scrLogin','scrCode','scrHome','scrRun','scrDone'].forEach(s=>$(s).hidden=s!==id);$('hdr').hidden=id==='scrRun';window.scrollTo(0,0)}
 function norm(s){return String(s||'').trim()}
 function parseEmail_(email){
   const m=/^([a-zà-ü'-]+)\.([a-zà-ü'-]+)@([a-z0-9.-]+)$/i.exec(String(email||'').trim());
@@ -243,20 +257,50 @@ function isOpen(i){return i===0||(BEST[reeksen()[i-1].id]||0)>=PASS}
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();
   const klas=norm($('inKlas').value).toUpperCase().replace(/\s+/g,'');
   const email=norm($('inEmail').value).toLowerCase();
+  const code=$('inCode').value;
   const P=parseEmail_(email);
-  if(!klas||!email){$('loginErr').textContent='Vul alle vakjes in.';return}
+  if(!klas||!email||!code){$('loginErr').textContent='Vul alle vakjes in. Nog geen code? Klik op de knop onder het formulier.';return}
   if(!P){$('loginErr').textContent='Dit lijkt geen schoolmail (voornaam.achternaam@'+EMAIL_DOMAIN+').';return}
   const jaar=parseInt(klas,10);
   if(!REEKSEN[jaar]){$('loginErr').textContent='Voor klas '+klas+' zijn er nog geen reeksen.';return}
-  U={klas,email,naam:P.voornaam,jaar};store.set(KEY,U);$('loginErr').textContent='';
+  U={klas,email,naam:P.voornaam,jaar,code};$('loginErr').textContent='';$('loginBtn').disabled=true;
+  await enter();$('loginBtn').disabled=false;
+});
+function loginFout(msg){store.del(KEY);U=null;BEST={};show('scrLogin');$('loginErr').textContent=msg||'Log opnieuw in.'}
+function vraagGegevens(){
+  const klas=norm($('inKlas').value).toUpperCase().replace(/\s+/g,''),email=norm($('inEmail').value).toLowerCase();
+  if(!klas||!parseEmail_(email)){$('loginErr').textContent='Vul eerst je klas en je schoolmail in.';return null}
+  if(!REEKSEN[parseInt(klas,10)]){$('loginErr').textContent='Voor klas '+klas+' zijn er nog geen reeksen.';return null}
+  return {klas,email};
+}
+$('needCodeBtn').addEventListener('click',async()=>{
+  const g=vraagGegevens();if(!g)return;
+  $('needCodeBtn').disabled=true;$('loginErr').textContent='Even geduld…';
+  const r=await api('code_vraag',g);$('needCodeBtn').disabled=false;
+  if(!r.ok){$('loginErr').textContent=r.error||'Het versturen lukt niet.';return}
+  $('loginErr').textContent='';$('codeErr').textContent='';$('codeInfo').textContent='We stuurden een code naar '+g.email+'. Kijk ook in de ongewenste mail. De code werkt 15 minuten.';
+  $('codeForm').reset();show('scrCode');
+});
+$('codeBackBtn').addEventListener('click',()=>show('scrLogin'));
+$('codeForm').addEventListener('submit',async e=>{e.preventDefault();
+  const g=vraagGegevens();if(!g){show('scrLogin');return}
+  const nieuw=$('inNew').value;
+  if(nieuw.length<6){$('codeErr').textContent='Kies een code van minstens 6 tekens.';return}
+  $('codeBtn').disabled=true;
+  const r=await api('code_bevestig',{email:g.email,mailcode:norm($('inMail').value),nieuw});
+  $('codeBtn').disabled=false;
+  if(!r.ok){$('codeErr').textContent=r.error||'Bewaren lukt niet.';return}
+  const P=parseEmail_(g.email);
+  U={klas:g.klas,email:g.email,naam:P.voornaam,jaar:parseInt(g.klas,10),code:nieuw};$('inCode').value=nieuw;
   await enter();
 });
-$('notMeBtn').addEventListener('click',()=>{store.del(KEY);U=null;BEST={};SHOWNAME='';$('loginForm').reset();show('scrLogin')});
+$('notMeBtn').addEventListener('click',()=>{store.del(KEY);U=null;BEST={};SHOWNAME='';$('loginForm').reset();$('loginErr').textContent='';show('scrLogin')});
 
 async function enter(){
   BEST=localBest();SHOWNAME='';
-  const r=await api('mijn',{klas:U.klas,email:U.email});
-  if(r&&r.ok){
+  const r=await api('mijn',{klas:U.klas,email:U.email,code:U.code});
+  if(r&&r.fout==='code'){loginFout(r.error);return}
+  if(r&&r.ok){store.set(KEY,U);
     API_OK=true;SHOWNAME=r.naam||'';
     Object.keys(r.scores||{}).forEach(k=>{BEST[k]=Math.max(BEST[k]||0,r.scores[k])});
     saveBest();
@@ -346,7 +390,8 @@ async function finish(){
 }
 async function send(){
   const score=LAST.score;
-  const r=await api('oefen',{klas:U.klas,email:U.email,reeks:LAST.id,score});
+  const r=await api('oefen',{klas:U.klas,email:U.email,code:U.code,reeks:LAST.id,score});
+  if(r&&r.fout==='code'){loginFout(r.error);return}
   const prev=BEST[LAST.id]||0;
   if(!r.ok){
     /* Niet naar de Sheet gelukt: bewaar lokaal zodat de volgende reeks wel opengaat. */
