@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Oefenreeksen samenstellen &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+--bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+--line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+--ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6;
+--shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+--display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+--body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+color-scheme:dark;
+--bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+--line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+--ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+color-scheme:dark;
+--bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+--line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+--ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B;
+--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(32px,6vw,50px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:10px 0 0;color:var(--muted);max-width:66ch}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface-2);padding:5px;border-radius:14px;align-self:flex-start}
+.seg button{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;line-height:1.2;display:flex;flex-direction:column;align-items:flex-start}
+.seg button small{font-weight:500;font-size:12px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn-danger{background:var(--bad-soft);color:var(--bad);border:1.5px solid transparent}
+.btn.sm{padding:7px 11px;font-size:14px;border-radius:10px}
+.btn:disabled{opacity:.5;cursor:default}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.err{color:var(--bad);font-weight:700;min-height:24px;margin:0}
+.ok{color:var(--ok);font-weight:700}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+.gform{display:flex;flex-direction:column;gap:10px;max-width:420px}
+.gform label{font-weight:700;font-size:14px}
+.gform input{font:inherit;font-size:18px;padding:11px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);width:100%}
+.gform .btn{align-self:flex-start}
+
+.cards{display:flex;flex-direction:column;gap:10px}
+.rcard{border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface-2);display:grid;gap:8px}
+.rhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rhead strong{font-size:1.05rem}
+.rhead .sp{flex:1}
+.badge{font-size:.78rem;padding:2px 9px;border-radius:99px;background:var(--bad-soft);color:var(--bad);font-weight:600}
+.badge.go{background:var(--ok-soft);color:var(--ok)}
+.chips{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.chips li{font-size:.86rem;background:var(--accent-soft);border-radius:8px;padding:3px 9px}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+
+.matwrap{overflow-x:auto}
+table.mat{border-collapse:collapse;min-width:100%}
+.mat th,.mat td{padding:8px 10px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+.mat th:first-child,.mat td:first-child{text-align:left;font-weight:700}
+.mat th button{border:0;background:transparent;font-weight:700;color:var(--accent);text-decoration:underline;padding:0}
+.mat input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent)}
+.mat tr.dirty td:first-child::after{content:" \25CF";color:var(--accent)}
+
+.drow{display:grid;grid-template-columns:1fr auto auto auto;gap:8px 12px;align-items:center;background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.drow select,.drow input[type=number],.field input{border:1.5px solid var(--line);border-radius:8px;background:var(--surface);padding:7px 9px}
+.drow input[type=number]{width:72px}
+.drow label.f{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:4px;max-width:420px}
+.field label{font-weight:700;font-size:14px}
+.field input{font-size:16px}
+@media (max-width:560px){.drow{grid-template-columns:1fr 1fr}.drow select{grid-column:1/-1}}
+</style>
+</head>
+<body>
+
+<!-- toegang leerkracht -->
+<div class="wrap gate" id="gate">
+<header>
+<a class="back" href="index.html">&larr; Musical Encounters</a>
+<h1>Leerkracht<span>gedeelte</span></h1>
+<p>Dit deel is enkel voor de leerkracht. Geef je code in. Het is dezelfde code als bij Test samenstellen.</p>
+</header>
+<section class="panel">
+<form id="gateForm" class="gform" autocomplete="off">
+<label for="gateIn">Code</label>
+<input id="gateIn" type="password" autocomplete="off" required>
+<button class="btn btn-primary" type="submit" id="gateBtn">Openen</button>
+</form>
+<p class="err" id="gateErr" aria-live="polite"></p>
+</section>
+</div>
+
+<div class="wrap" id="app" hidden>
+<header>
+<a class="back" href="index.html">&larr; Musical Encounters</a>
+<h1>Oefenreeksen <span>samenstellen</span></h1>
+<p>Stel de reeksen per leerjaar samen en bepaal per klas welke reeksen open staan. Wijzigingen staan meteen online voor de leerlingen. Leerlingen kunnen hier niets aan wijzigen.</p>
+</header>
+
+<section class="panel">
+<div><div class="eyebrow">Stap 1</div><h2>Kies het leerjaar</h2></div>
+<div class="seg" id="jaarSeg" role="group" aria-label="Leerjaar"></div>
+<p class="hint" id="status" aria-live="polite"></p>
+</section>
+
+<section class="panel">
+<div><div class="eyebrow">Stap 2</div><h2 id="listTitle">Reeksen</h2></div>
+<p class="hint">Leerlingen doen de reeksen in deze volgorde. Een volgende reeks gaat pas open na 85% op de vorige. Een nieuwe reeks staat eerst voor niemand open: zet hem daarna open in stap 3.</p>
+<div class="cards" id="cards"></div>
+<div class="actions"><button class="btn btn-primary" id="newBtn" type="button">Nieuwe reeks toevoegen</button></div>
+</section>
+
+<section class="panel" id="editPanel" hidden>
+<div><div class="eyebrow" id="editEb">Reeks bewerken</div><h2 id="editTitle">Oefeningen in deze reeks</h2></div>
+<div class="field"><label for="editNaam">Naam (enkel voor jou, leerlingen zien "Oefening 1, 2, …")</label><input id="editNaam" maxlength="60" placeholder="bv. Ritme basis"></div>
+<div id="drows" style="display:flex;flex-direction:column;gap:8px"></div>
+<div class="actions"><button class="btn btn-ghost" id="addRow" type="button">Oefening toevoegen</button></div>
+<p class="hint" id="editWarn" hidden>Let op: wijzig je de oefeningen van een reeks waar leerlingen al scores voor hebben, dan blijven die scores en de ranglijst bij deze reeks horen. Maak dan liever een nieuwe reeks.</p>
+<p class="err" id="editErr" aria-live="polite"></p>
+<div class="actions">
+<button class="btn btn-primary" id="saveBtn" type="button">Bewaar reeks</button>
+<button class="btn btn-ghost" id="cancelBtn" type="button">Annuleren</button>
+</div>
+</section>
+
+<section class="panel">
+<div><div class="eyebrow">Stap 3</div><h2>Open voor welke klassen?</h2></div>
+<p class="hint">Vink aan welke klassen een reeks zien. Een klas ziet enkel de aangevinkte reeksen, in de volgorde hierboven.</p>
+<div class="matwrap" id="mat"></div>
+<div class="actions">
+<button class="btn btn-primary" id="matSave" type="button" disabled>Bewaar openzetting</button>
+<span class="ok" id="matOk" hidden>Bewaard!</span>
+</div>
+<p class="err" id="matErr" aria-live="polite"></p>
+</section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const API_URL='https://script.google.com/macros/s/AKfycbxS2CoIVIslhTdXGsmQ1rGtsAkQJOCAoy8rAOc7fh3f_ogM1LlhVFUlS4f0gi21gQs/exec';
+/* SHA-256 van de leerkrachtcode: dezelfde als in test-samenstellen.html (de code zelf staat nergens) */
+const CODE_HASH='332c6707447e1cdc7c1c2e5b02515f5206655441cb84ee9bbe7633364b0afc67';
+
+/* Oefeningen met testmodus (klaar=1). Nieuwe oefening testklaar? Voeg hier één regel toe. Zelfde lijst als Test samenstellen. */
+const GROEPEN=[
+{naam:'Ritme',ex:[['hold-that-note','Hold That Note'],['rhythm-sequence','Rhythm Sequence'],['missing-beat','Missing Beat'],['follow-the-score','Follow the Score'],['bar-line-hunter','Bar Line Hunter'],['rhythm-builder','Rhythm Builder'],['find-the-bass','Find the Bass'],['drum-detective','Drum Detective'],['tap-it-back','Tap It Back']]},
+{naam:'Melodie',ex:[['mind-the-gap','Mind the Gap'],['melodiepuzzel','Melodiepuzzel'],['melody-lines','Melody Lines'],['mission-impossible','Mission Impossible'],['melody-builder','Melody Builder'],['sharp-ears','Sharp Ears'],['name-that-note','Name That Note']]},
+{naam:'Dynamiek',ex:[['whisper-or-roar','Whisper or Roar']]},
+{naam:'Tempo',ex:[['keep-up','Keep Up!'],['hold-the-beat','Hold the Beat']]},
+{naam:'Vorm',ex:[['form-finder','Form Finder']]}
+];
+const NAAM={};GROEPEN.forEach(g=>g.ex.forEach(e=>{NAAM[e[0]]=e[1]}));
+const nm=id=>NAAM[id]||id;
+
+let CODE='', ALL=[], KLASSEN=[], jaar=0, edit=null /* {id|null, naam, delen[]} */, openSet={} /* id -> Set(klas) */, dirty=new Set();
+
+async function sha256hex(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function api(action,data){
+  try{const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action,lcode:CODE},data||{}))});return await r.json()}
+  catch(e){return {ok:false,error:'Geen verbinding. Controleer het internet en probeer opnieuw.'}}
+}
+const klasJaar=k=>parseInt(k,10);
+const jaren=()=>{const s=new Set();KLASSEN.forEach(k=>s.add(klasJaar(k)));ALL.forEach(r=>s.add(r.jaar));return Array.from(s).filter(x=>x>0).sort((a,b)=>a-b)};
+const reeksenVan=j=>ALL.filter(r=>r.jaar===j).sort((a,b)=>a.volgorde-b.volgorde);
+const klassenVan=j=>KLASSEN.filter(k=>klasJaar(k)===j).sort();
+function say(t,bad){const s=$('status');s.textContent=t||'';s.style.color=bad?'var(--bad)':''}
+
+/* ---------- toegang ---------- */
+function show(){ $('gate').hidden=true; $('app').hidden=false; window.scrollTo(0,0); }
+async function laad(){
+  say('Reeksen laden…');
+  const r=await api('reeksen_leraar');
+  if(!r.ok){ say(r.error||'Laden mislukt.',true); return r; }
+  ALL=r.reeksen; KLASSEN=r.klassen; dirty=new Set();
+  openSet={}; ALL.forEach(x=>{ const kl=klassenVan(x.jaar); openSet[x.id]=new Set(x.klassen.indexOf('*')>=0?kl:x.klassen.filter(k=>kl.indexOf(k)>=0)); });
+  const js=jaren(); if(!js.includes(jaar)) jaar=js[0]||0;
+  say(''); render(); return r;
+}
+$('gateForm').addEventListener('submit',async e=>{
+  e.preventDefault(); const v=$('gateIn').value; $('gateErr').textContent=''; $('gateBtn').disabled=true;
+  if(await sha256hex(v)!==CODE_HASH){ $('gateErr').textContent='Deze code klopt niet.'; $('gateIn').select(); $('gateBtn').disabled=false; return; }
+  CODE=v; const r=await laad(); $('gateBtn').disabled=false;
+  if(r&&r.ok){ try{ sessionStorage.setItem('rs-code',v); }catch(_){} show(); }
+  else $('gateErr').textContent=(r&&r.error)||'Laden mislukt.';
+});
+(async function auto(){ let c=''; try{ c=sessionStorage.getItem('rs-code')||''; }catch(_){}
+  if(!c||await sha256hex(c)!==CODE_HASH) return; CODE=c; const r=await laad(); if(r&&r.ok) show(); })();
+
+/* ---------- weergave ---------- */
+function render(){
+  $('jaarSeg').innerHTML=jaren().map(j=>`<button type="button" data-j="${j}" aria-pressed="${j===jaar}">Leerjaar ${j}<small>${reeksenVan(j).length} reeksen</small></button>`).join('');
+  $('listTitle').textContent='Reeksen van leerjaar '+jaar;
+  const list=reeksenVan(jaar), kl=klassenVan(jaar);
+  $('cards').innerHTML=list.length?list.map((r,i)=>{
+    const o=Array.from(openSet[r.id]||[]).sort();
+    return `<div class="rcard" data-id="${r.id}">
+<div class="rhead"><strong>Oefening ${i+1}</strong>${r.naam&&!/^Oefening \d+$/.test(r.naam)?`<span class="hint">${esc(r.naam)}</span>`:''}<span class="sp"></span>
+<span class="badge${o.length?' go':''}">${o.length?'open voor '+o.join(', '):'voor niemand open'}</span></div>
+<ul class="chips">${r.delen.map(d=>`<li>${esc(nm(d.ex))} · niv ${d.lvl} · ${d.n}×</li>`).join('')}</ul>
+<div class="tools"><button class="btn btn-ghost sm" data-a="edit" type="button">Bewerken</button>
+<button class="btn btn-ghost sm" data-a="up" type="button"${i?'':' disabled'}>↑ Omhoog</button>
+<button class="btn btn-ghost sm" data-a="down" type="button"${i<list.length-1?'':' disabled'}>↓ Omlaag</button>
+<button class="btn btn-danger sm" data-a="del" type="button">Verwijderen</button></div></div>`;
+  }).join(''):'<p class="hint">Nog geen reeksen voor dit leerjaar.</p>';
+  renderMat(list,kl);
+}
+function renderMat(list,kl){
+  if(!list.length||!kl.length){ $('mat').innerHTML='<p class="hint">'+(kl.length?'Maak eerst een reeks.':'Er staan geen klassen van dit leerjaar in je Sheet (tabblad Klassen).')+'</p>'; $('matSave').disabled=true; return; }
+  $('mat').innerHTML=`<table class="mat"><thead><tr><th>Reeks</th>${kl.map(k=>`<th><button type="button" data-col="${k}" title="Alle reeksen aan of uit voor ${k}">${k}</button></th>`).join('')}<th></th></tr></thead><tbody>${
+    list.map((r,i)=>`<tr data-id="${r.id}"${dirty.has(r.id)?' class="dirty"':''}><td>Oefening ${i+1}</td>${kl.map(k=>`<td><input type="checkbox" data-k="${k}" aria-label="Oefening ${i+1} voor ${k}"${(openSet[r.id]||new Set()).has(k)?' checked':''}></td>`).join('')}<td><button class="btn btn-ghost sm" data-row="${r.id}" type="button">alle</button></td></tr>`).join('')}</tbody></table>`;
+  $('matSave').disabled=!dirty.size;
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+$('jaarSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-j]'); if(!b) return; if(dirty.size&&!confirm('Er zijn niet-bewaarde wijzigingen in de openzetting. Toch van leerjaar wisselen?')) return; jaar=+b.dataset.j; dirty=new Set(); closeEdit(); laadLokaal(); });
+function laadLokaal(){ ALL.forEach(x=>{ const kl=klassenVan(x.jaar); openSet[x.id]=new Set(x.klassen.indexOf('*')>=0?kl:x.klassen.filter(k=>kl.indexOf(k)>=0)); }); render(); }
+
+/* ---------- lijst: bewerken, volgorde, verwijderen ---------- */
+$('cards').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-a]'); if(!b) return;
+  const id=b.closest('.rcard').dataset.id, r=ALL.find(x=>x.id===id), a=b.dataset.a;
+  if(a==='edit') return openEdit(r);
+  if(a==='up'||a==='down'){
+    const list=reeksenVan(jaar), i=list.findIndex(x=>x.id===id), j=a==='up'?i-1:i+1; if(j<0||j>=list.length) return;
+    const t=list[i]; list[i]=list[j]; list[j]=t; list.forEach((x,k)=>{x.volgorde=k+1});
+    render(); const res=await api('reeks_volgorde',{jaar,ids:list.map(x=>x.id)});
+    if(!res.ok) say(res.error||'Volgorde bewaren mislukt.',true); else say('Volgorde bewaard.'); return;
+  }
+  if(a==='del'){
+    if(!confirm('Deze reeks verwijderen? De scores en ranglijsten die erbij horen blijven in je Sheet staan, maar leerlingen zien de reeks niet meer.')) return;
+    b.disabled=true; const res=await api('reeks_verwijder',{id});
+    if(!res.ok){ say(res.error||'Verwijderen mislukt.',true); b.disabled=false; return; }
+    ALL=ALL.filter(x=>x.id!==id); delete openSet[id]; dirty.delete(id); render(); say('Reeks verwijderd.');
+  }
+});
+
+/* ---------- editor ---------- */
+function exOptions(sel){ return GROEPEN.map(g=>`<optgroup label="${g.naam}">${g.ex.map(([id,n])=>`<option value="${id}"${id===sel?' selected':''}>${n}</option>`).join('')}</optgroup>`).join(''); }
+function openEdit(r){
+  edit=r?{id:r.id,naam:r.naam&&!/^Oefening \d+$/.test(r.naam)?r.naam:'',delen:r.delen.map(d=>({...d}))}:{id:null,naam:'',delen:[{ex:'hold-that-note',lvl:1,n:3}]};
+  $('editEb').textContent=r?'Reeks bewerken':'Nieuwe reeks'; $('editNaam').value=edit.naam; $('editWarn').hidden=!r; $('editErr').textContent='';
+  drawRows(); $('editPanel').hidden=false; $('editPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function closeEdit(){ edit=null; $('editPanel').hidden=true; }
+function drawRows(){
+  $('drows').innerHTML=edit.delen.map((d,i)=>`<div class="drow" data-i="${i}">
+<select data-f="ex" aria-label="Oefening">${exOptions(d.ex)}</select>
+<label class="f">niveau <select data-f="lvl">${[1,2,3,4,5,6].map(l=>`<option${l===d.lvl?' selected':''}>${l}</option>`).join('')}</select></label>
+<label class="f">vragen <input type="number" data-f="n" min="1" max="20" value="${d.n}"></label>
+<button class="btn btn-ghost sm" data-del type="button" aria-label="Oefening weg"${edit.delen.length>1?'':' disabled'}>✕</button></div>`).join('');
+  $('addRow').disabled=edit.delen.length>=8;
+}
+$('newBtn').addEventListener('click',()=>openEdit(null));
+$('cancelBtn').addEventListener('click',closeEdit);
+$('addRow').addEventListener('click',()=>{ const l=edit.delen[edit.delen.length-1]; edit.delen.push({ex:l?l.ex:'hold-that-note',lvl:l?l.lvl:1,n:l?l.n:3}); drawRows(); });
+$('drows').addEventListener('change',e=>{
+  const row=e.target.closest('.drow'); if(!row) return; const d=edit.delen[+row.dataset.i], f=e.target.dataset.f;
+  if(f==='ex') d.ex=e.target.value; else if(f==='lvl') d.lvl=+e.target.value;
+  else if(f==='n'){ d.n=Math.max(1,Math.min(20,parseInt(e.target.value,10)||1)); e.target.value=d.n; }
+});
+$('drows').addEventListener('click',e=>{ const b=e.target.closest('[data-del]'); if(!b||edit.delen.length<2) return; edit.delen.splice(+b.closest('.drow').dataset.i,1); drawRows(); });
+$('saveBtn').addEventListener('click',async()=>{
+  const naam=$('editNaam').value.trim(); $('editErr').textContent=''; $('saveBtn').disabled=true;
+  const bestaand=edit.id?ALL.find(x=>x.id===edit.id):null;
+  const kl=bestaand?Array.from(openSet[edit.id]||[]):[];
+  const res=await api('reeks_bewaar',{reeks:{id:edit.id,jaar,naam,delen:edit.delen,klassen:kl}});
+  $('saveBtn').disabled=false;
+  if(!res.ok){ $('editErr').textContent=res.error||'Bewaren mislukt.'; return; }
+  closeEdit(); dirty=new Set(); const r=await laad(); if(r&&r.ok) say('Reeks bewaard. Nieuwe reeksen staan voor niemand open: zet ze open in stap 3.');
+});
+
+/* ---------- openzetting per klas ---------- */
+$('mat').addEventListener('change',e=>{
+  const cb=e.target.closest('input[type=checkbox]'); if(!cb) return; const id=cb.closest('tr').dataset.id, k=cb.dataset.k;
+  const s=openSet[id]||(openSet[id]=new Set()); if(cb.checked) s.add(k); else s.delete(k);
+  dirty.add(id); cb.closest('tr').classList.add('dirty'); $('matSave').disabled=false; $('matOk').hidden=true; badges();
+});
+$('mat').addEventListener('click',e=>{
+  const col=e.target.closest('[data-col]'), row=e.target.closest('[data-row]'), list=reeksenVan(jaar), kl=klassenVan(jaar);
+  if(col){ const k=col.dataset.col, alles=list.every(r=>openSet[r.id].has(k)); list.forEach(r=>{ alles?openSet[r.id].delete(k):openSet[r.id].add(k); dirty.add(r.id); }); }
+  else if(row){ const id=row.dataset.row, alles=kl.every(k=>openSet[id].has(k)); alles?openSet[id].clear():kl.forEach(k=>openSet[id].add(k)); dirty.add(id); }
+  else return;
+  $('matOk').hidden=true; render();
+});
+function badges(){ list_(); }
+function list_(){ reeksenVan(jaar).forEach(r=>{ const c=document.querySelector(`.rcard[data-id="${r.id}"] .badge`); if(!c) return; const o=Array.from(openSet[r.id]).sort(); c.textContent=o.length?'open voor '+o.join(', '):'voor niemand open'; c.classList.toggle('go',!!o.length); }); }
+$('matSave').addEventListener('click',async()=>{
+  $('matErr').textContent=''; $('matSave').disabled=true;
+  const wijz=Array.from(dirty).map(id=>({id,klassen:Array.from(openSet[id]||[])}));
+  const res=await api('reeks_klassen',{wijz});
+  if(!res.ok){ $('matErr').textContent=res.error||'Bewaren mislukt.'; $('matSave').disabled=false; return; }
+  ALL.forEach(r=>{ if(dirty.has(r.id)) r.klassen=Array.from(openSet[r.id]); });
+  dirty=new Set(); $('matOk').hidden=false; setTimeout(()=>{$('matOk').hidden=true},3000); render();
+});
+})();
+</script>
+</body>
+</html>

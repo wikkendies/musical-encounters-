@@ -136,7 +136,7 @@ select{font:inherit;padding:9px 12px;border-radius:12px;border:1.5px solid var(-
       </div>
       <div><div class="eyebrow" id="homeEyebrow"></div><h2>Kies een reeks</h2></div>
       <div class="cards" id="cards"></div>
-      <p class="rule">Elke reeks heeft vier oefeningen. Je mag een reeks zo vaak overdoen als je wilt: je beste score telt.</p>
+      <p class="rule">Je mag een reeks zo vaak overdoen als je wilt: je beste score telt.</p>
     </section>
     <section class="panel" id="rankPanel">
       <div><div class="eyebrow">Ranglijst</div><h2>De beste tien</h2></div>
@@ -296,6 +296,11 @@ $('codeForm').addEventListener('submit',async e=>{e.preventDefault();
 });
 $('notMeBtn').addEventListener('click',()=>{store.del(KEY);U=null;BEST={};SHOWNAME='';$('loginForm').reset();$('loginErr').textContent='';show('scrLogin')});
 
+async function laadReeksen(){
+  /* De reeksen van je klas staan in de Sheet (leerkracht beheert ze). Lukt dat niet, dan gebruiken we de ingebouwde lijst. */
+  const r=await api('reeksen',{klas:U.klas});
+  if(r&&r.ok&&Array.isArray(r.reeksen))REEKSEN[U.jaar]=r.reeksen.map(x=>({id:x.id,delen:x.delen}));
+}
 async function enter(){
   BEST=localBest();SHOWNAME='';
   const r=await api('mijn',{klas:U.klas,email:U.email,code:U.code});
@@ -305,6 +310,7 @@ async function enter(){
     Object.keys(r.scores||{}).forEach(k=>{BEST[k]=Math.max(BEST[k]||0,r.scores[k])});
     saveBest();
   }
+  await laadReeksen();
   home();
 }
 
@@ -315,6 +321,8 @@ function home(){
   $('meSub').textContent='Klas '+U.klas+(SHOWNAME?' · je staat op de ranglijst als: '+SHOWNAME:'');
   $('homeEyebrow').textContent='Leerjaar '+U.jaar;
   const list=reeksen();
+  $('rankPanel').hidden=!list.length;
+  if(!list.length){$('cards').innerHTML='<p class="rule">Er staan voor jouw klas nog geen oefeningen open. Je leerkracht zet ze open zodra jullie ze gezien hebben.</p>';return}
   $('cards').innerHTML=list.map((r,i)=>{
     const b=BEST[r.id],open=isOpen(i),done=b>=PASS;
     return `<div class="card ${done?'done':open?'open':'locked'}">
