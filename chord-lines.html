@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}</style>
+<title>Chord Lines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --staff:#7F89A3; --line:#D3D9E6; --accent:#3257E0; --accent-ink:#FFFFFF; --accent-soft:#DCE3FF;
+  --ok:#1C8757; --ok-soft:#D5EFE2; --bad:#C43D2B; --bad-soft:#F8DCD6; --warm:#E08E12;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 8px 24px rgba(22,32,58,.07);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1322; --surface:#161E33; --surface-2:#1C2640; --ink:#E6EAF5; --muted:#9BA6C3;
+  --staff:#6E7895; --line:#2A3553; --accent:#8198FF; --accent-ink:#0E1322; --accent-soft:#26336A;
+  --ok:#4CC38A; --ok-soft:#163829; --bad:#FF7B67; --bad-soft:#44201B; --warm:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,54px);line-height:1;letter-spacing:-.02em;margin:0}
+header h1 span{color:var(--accent)}
+header p{margin:8px 0 0;color:var(--muted)}
+.panel{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:18px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips button{border:2px solid var(--line);background:var(--surface-2);border-radius:999px;padding:6px 16px;font-weight:700}
+.chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chips button.done:not([aria-pressed="true"]){border-color:var(--ok);color:var(--ok)}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn svg{width:18px;height:18px;flex:none}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-big{font-size:17px;padding:16px 22px}
+.btn-soft{background:var(--accent-soft);color:var(--accent)}
+.btn-ghost{background:var(--surface-2);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.controls{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+.status{display:flex;align-items:center;gap:0 12px;min-height:44px;padding:10px 14px;border-radius:12px;background:var(--surface-2);color:var(--muted);font-weight:600}
+.status .big{font-family:var(--display);font-size:26px;font-weight:800;color:var(--warm);line-height:1;font-variant-numeric:tabular-nums}
+
+/* stukjes + vakjes */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{position:relative;border:2px solid var(--line);background:var(--surface-2);border-radius:16px;padding:10px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ink);touch-action:none;min-width:0;transition:border-color .12s,transform .12s,background .12s}
+.card svg{width:100%;height:auto;max-width:260px;display:block}
+.card .lab{font-family:var(--display);font-weight:800;font-size:20px}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.card.used{display:none}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.slot{border:2px dashed var(--line);border-radius:16px;min-height:150px;display:flex;flex-direction:column;align-items:stretch;padding:8px;gap:6px;background:transparent;transition:border-color .12s,background .12s}
+.slot .pos{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;border-radius:8px;padding:2px 0}
+.slot.now .pos{background:rgba(242,169,59,.28);color:var(--ink)}
+.slot.over{border-color:var(--accent);background:var(--accent-soft)}
+.picking .slot:has(.empty){border-color:var(--accent)}
+.slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.slot .card{flex:1}
+.slot .empty{flex:1;display:grid;place-items:center;color:var(--muted);font-size:14px;text-align:center;border:0;background:none;border-radius:10px}
+.picking .slot .empty{color:var(--accent);font-weight:700}
+.ghost{position:fixed;left:0;top:0;z-index:50;pointer-events:none;width:200px;background:var(--surface);border:2px solid var(--accent);border-radius:14px;padding:6px;box-shadow:0 12px 30px rgba(22,32,58,.25);color:var(--ink)}
+.ghost svg{width:100%;height:auto;display:block}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.actions .spacer{flex:1}
+.feedback{min-height:24px;font-weight:600;margin:0}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)} .feedback.info{color:var(--muted)}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;font-weight:600}
+.hint{margin:0;color:var(--muted);font-size:14px}
+@media (max-width:760px){.cards,.slots{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="samenklank.html">&larr; Let's Make Harmony</a>
+    <h1>Chord <span>Lines</span></h1>
+    <p>Elke lijn is één noot. Hoe hoger de lijn, hoe hoger de noot. Hoe langer de lijn, hoe langer de noot klinkt. Lijnen die boven elkaar liggen, klinken tegelijk. De noten beginnen en eindigen niet altijd op hetzelfde moment, maar ze overlappen. Je hoort de vier stukjes na elkaar, in een willekeurige volgorde. In welke volgorde klonken ze?</p>
+  </header>
+
+  <section class="panel" aria-labelledby="pTitle">
+    <div class="panel-head">
+      <div>
+        <div class="eyebrow" id="pEyebrow">Luisteren naar samenklank</div>
+        <h2 id="pTitle">Sleep elk stukje naar het vakje van het moment waarop je het hoorde</h2>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="Kies een oefening"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary btn-big" id="playBtn"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5v13l11-6.5z" fill="currentColor"/></svg><span>Beluister</span></button>
+    </div>
+    <div class="status" id="status" aria-live="polite"><span>Druk op <em>Beluister</em>. Je hoort eerst 4 tikken, dan de vier stukjes met een korte pauze ertussen.</span></div>
+
+    <div class="slots" id="slots"></div>
+    <div class="cards" id="cards"></div>
+    <p class="hint" id="hint">Raad welk stukje als eerste klonk en sleep het naar het 1e vakje. Ga zo verder voor het 2e, 3e en 4e stukje. Of tik eerst op een stukje en dan op een vakje. Tik op een stukje in een vakje om het terug te leggen.</p>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn">Controleer</button>
+      <button class="btn btn-ghost" id="clearBtn">Maak vakjes leeg</button>
+      <span class="spacer"></span>
+      <button class="linkbtn" id="solveBtn">Toon oplossing</button>
+      <button class="btn btn-soft" id="nextBtn">Volgende oefening</button>
+    </div>
+    <p class="feedback info" id="feedback" aria-live="polite"></p>
+  </section>
+</div>
+
+<script>
+(function(){
+/* ---------- muziek ---------- */
+/* Vier stukjes (naar de afbeelding). Noot = [hoogte, start, lengte] in achtsten; een stukje duurt 8 achtsten.
+   Hoogte: 0 = C4 (laag), 1 = E4 (midden), 2 = G4 (hoog): samen een C-drieklank. Nooit meer dan 2 noten tegelijk. */
+const MIDI=[60,64,67];
+const EX=[
+  [ [[1,0,2.5],[0,0,7],[2,4.5,2.5]],
+    [[2,0.5,2.5],[0,0.5,7],[1,5,2.5]],
+    [[2,0.5,2.5],[2,5,2.5],[0,0.5,7]],
+    [[2,0.5,2.5],[0,0.5,2.5],[2,5,2.5],[0,5,2.5]] ]
+];
+const LABELS=['A','B','C','D'];
+const TEMPO=72;
+
+/* ---------- lijngrafiek ---------- */
+function fragSVG(f){
+  const W=250,H=112,XL=14,UW=26,RY=r=>84-r*28;
+  let h='';
+  for(let r=0;r<3;r++)h+=`<line x1="${XL-6}" y1="${RY(r)}" x2="${XL+8*UW+6}" y2="${RY(r)}" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/>`;
+  f.forEach(n=>{
+    const x1=XL+n[1]*UW+6,x2=XL+(n[1]+n[2])*UW-6,y=RY(n[0]);
+    h+=`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="var(--accent)" stroke-width="12" stroke-linecap="round"/>`;
+  });
+  h+=`<line x1="234" y1="14" x2="234" y2="98" stroke="currentColor" stroke-width="1.8"/><line x1="240" y1="14" x2="240" y2="98" stroke="currentColor" stroke-width="3.4"/>`;
+  return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${h}</svg>`;
+}
+
+/* ---------- state ---------- */
+const $=id=>document.getElementById(id);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const MAXPLAY=3;
+let ex=0,S=null,playing=null,ctx=null;
+const doneEx=[false,false,false];
+function playsLeft(){return S.tried?99:MAXPLAY-S.plays}
+function setFeedback(m,k){$('feedback').textContent=m;$('feedback').className='feedback '+(k||'info')}
+function setStatus(html){$('status').innerHTML='<span>'+html+'</span>'}
+
+function renderChips(){
+  if(EX.length<2){$('chips').innerHTML='';return}
+  $('chips').innerHTML=EX.map((e,i)=>`<button type="button" data-e="${i}" aria-pressed="${i===ex}" class="${doneEx[i]?'done':''}">Oefening ${i+1}${doneEx[i]?' ✓':''}</button>`).join('');
+}
+function loadEx(i){
+  stop();ex=i;
+  const order=shuffle([0,1,2,3]);
+  S={frags:EX[i],order,slots:[null,null,null,null],selected:null,checked:false,nowPos:-1,plays:0,tried:false,shown:false};
+  $('pEyebrow').textContent='Luisteren naar samenklank';
+  render();
+  $('nextBtn').textContent=EX.length>1?(i<EX.length-1?'Volgende oefening':'Opnieuw beginnen'):'Nieuwe volgorde';
+  setFeedback('');
+  setStatus('Druk op <em>Beluister</em>. Je hoort eerst 4 tikken, dan de vier stukjes met een korte pauze ertussen.');
+  renderChips();updatePlay();
+}
+$('chips').addEventListener('click',e=>{const b=e.target.closest('[data-e]');if(!b)return;loadEx(+b.dataset.e)});
+$('nextBtn').addEventListener('click',()=>loadEx(ex<EX.length-1?ex+1:0));
+
+function updatePlay(){
+  const span=$('playBtn').querySelector('span');
+  span.textContent=playing?'Stop':(S.tried?'Beluister opnieuw':(playsLeft()>0?`Beluister de vier stukjes (nog ${playsLeft()}×)`:'Geen beluisterbeurten meer'));
+  $('playBtn').disabled=!playing&&playsLeft()<=0;
+}
+
+/* ---------- weergave ---------- */
+function cardHTML(k,extra,sel){return `<button type="button" class="card${extra||''}" data-k="${k}"${sel===undefined?'':` aria-pressed="${sel}"`} aria-label="Stukje ${LABELS[k]}"><span class="lab">${LABELS[k]}</span>${fragSVG(S.frags[k])}</button>`}
+function render(){
+  const e=S,all=e.checked&&e.slots.every((x,q)=>x===e.order[q]);
+  $('slots').innerHTML=[0,1,2,3].map(p=>{const k=e.slots[p];
+    return `<div class="slot${all&&k!==null?' ok':''}${e.nowPos===p?' now':''}" data-p="${p}"><div class="pos">${p+1}e</div>${k===null?`<button type="button" class="empty" data-p="${p}">${e.selected!==null?'Tik om hier te leggen':'Sleep een stukje hierheen'}</button>`:cardHTML(k)}</div>`}).join('');
+  $('cards').innerHTML=[0,1,2,3].map(k=>cardHTML(k,e.slots.includes(k)?' used':'',e.selected===k)).join('');
+  document.body.classList.toggle('picking',e.selected!==null);
+}
+
+/* ---------- slepen & tikken ---------- */
+let drag=null;
+function place(p,k){const e=S;const old=e.slots.indexOf(k);if(old>=0)e.slots[old]=null;
+  if(e.slots[p]!==null&&old>=0)e.slots[old]=e.slots[p];
+  e.slots[p]=k;e.selected=null;e.checked=false;setFeedback('');render()}
+$('cards').addEventListener('pointerdown',ev=>{const c=ev.target.closest('.card');if(!c||c.classList.contains('used'))return;ev.preventDefault();begin(ev,+c.dataset.k,c,false)});
+$('slots').addEventListener('pointerdown',ev=>{const c=ev.target.closest('.card');if(!c)return;ev.preventDefault();begin(ev,+c.dataset.k,c,true)});
+$('slots').addEventListener('click',ev=>{const b=ev.target.closest('.empty');if(!b)return;
+  if(S.selected!==null)place(+b.dataset.p,S.selected);else setFeedback('Kies eerst een stukje, of sleep het naar een vakje.','info')});
+function begin(ev,k,el,fromSlot){drag={k,el,fromSlot,x0:ev.clientX,y0:ev.clientY,active:false,ghost:null,p:null};
+  window.addEventListener('pointermove',move);window.addEventListener('pointerup',up,{once:true})}
+function slotAt(x,y){const el=document.elementFromPoint(x,y);const sl=el&&el.closest('.slot');return sl?+sl.dataset.p:null}
+function move(ev){if(!drag)return;
+  if(!drag.active){if(Math.hypot(ev.clientX-drag.x0,ev.clientY-drag.y0)<6)return;drag.active=true;
+    const g=document.createElement('div');g.className='ghost';g.innerHTML=fragSVG(S.frags[drag.k]);document.body.appendChild(g);drag.ghost=g;drag.el.style.opacity='.3'}
+  drag.ghost.style.transform=`translate(${ev.clientX-100}px,${ev.clientY-50}px)`;
+  document.querySelectorAll('.slot.over').forEach(x=>x.classList.remove('over'));
+  drag.p=slotAt(ev.clientX,ev.clientY);if(drag.p!==null)document.querySelector(`.slot[data-p="${drag.p}"]`).classList.add('over')}
+function up(){window.removeEventListener('pointermove',move);const d=drag;drag=null;if(!d)return;
+  if(d.ghost)d.ghost.remove();
+  const e=S;
+  if(d.active){
+    if(d.p!==null)place(d.p,d.k);
+    else if(d.fromSlot){e.slots[e.slots.indexOf(d.k)]=null;e.checked=false;render()}
+    else render();
+  }else{
+    if(d.fromSlot){e.slots[e.slots.indexOf(d.k)]=null;e.checked=false;setFeedback('');render()}
+    else{e.selected=e.selected===d.k?null:d.k;render()}
+  }}
+
+/* ---------- controleren ---------- */
+$('checkBtn').addEventListener('click',()=>{
+  if(S.slots.includes(null)){setFeedback('Leg eerst in elk vakje een stukje.','bad');return}
+  S.checked=true;S.tried=true;
+  const good=S.slots.filter((k,p)=>k===S.order[p]).length;
+  render();updatePlay();
+  if(good===4){
+    if(!S.shown){doneEx[ex]=true;renderChips()}
+    setFeedback(S.shown?'Juist, maar je hebt de oplossing bekeken. Probeer de oefening later opnieuw!':'Helemaal juist! Klik op "Nieuwe volgorde" om opnieuw te oefenen.','ok')}
+  else setFeedback(`${good} van de 4 vakjes zijn juist. Welke juist zijn, moet je zelf ontdekken: luister opnieuw, verwissel stukjes en controleer opnieuw.`,'bad');
+});
+$('clearBtn').addEventListener('click',()=>{S.slots=[null,null,null,null];S.checked=false;S.selected=null;setFeedback('');render()});
+$('solveBtn').addEventListener('click',()=>{
+  S.shown=true;S.tried=true;S.slots=S.order.slice();S.checked=true;S.selected=null;
+  render();updatePlay();setFeedback('Dit is de juiste volgorde. Luister nog eens mee.','info');
+});
+
+/* ---------- audio ---------- */
+function ac(){if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();return ctx}
+function click(t,accent,out){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=accent?1900:1400;
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(accent?0.45:0.28,t+0.002);g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+  o.connect(g).connect(out);o.start(t);o.stop(t+0.07)}
+function piano(t,d,midi,out){
+  const f=440*Math.pow(2,(midi-69)/12),g=ctx.createGain(),lp=ctx.createBiquadFilter();
+  lp.type='lowpass';lp.frequency.setValueAtTime(5200,t);lp.frequency.exponentialRampToValueAtTime(1400,t+Math.max(0.3,d));
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.32,t+0.006);
+  g.gain.exponentialRampToValueAtTime(0.2,t+0.25);g.gain.exponentialRampToValueAtTime(0.14,t+Math.max(0.3,d*0.95));g.gain.setTargetAtTime(0.0001,t+d,0.045);
+  g.connect(lp).connect(out);
+  [[1,1],[2,.42],[3,.2],[4,.11],[5,.05],[0.5,.18]].forEach(([k,a])=>{const o=ctx.createOscillator(),og=ctx.createGain();
+    o.frequency.value=f*k*(k>1?1+0.0006*k:1);og.gain.value=a;o.connect(og).connect(g);o.start(t);o.stop(t+d+0.4)});
+}
+function stop(){
+  if(!playing)return;const p=playing;playing=null;cancelAnimationFrame(p.raf);clearTimeout(p.timer);
+  p.master.gain.setTargetAtTime(0.0001,ctx.currentTime,0.03);setTimeout(()=>p.master.disconnect(),300);
+  S.nowPos=-1;document.querySelectorAll('.slot.now').forEach(x=>x.classList.remove('now'));
+  updatePlay();
+}
+function play(){
+  if(playing){stop();return}
+  if(playsLeft()<=0){setFeedback('Je mag maximaal 3 keer beluisteren.','info');return}
+  S.plays++;
+  const c=ac(),master=c.createGain();master.gain.value=0.8;
+  const comp=c.createDynamicsCompressor();master.connect(comp);comp.connect(c.destination);
+  const spb=60/TEMPO,unit=spb/2,t0=c.currentTime+0.15;
+  for(let i=0;i<4;i++)click(t0+i*spb,i===0,master);
+  S.order.forEach((k,pos)=>{
+    const f=S.frags[k],base=t0+(4+pos*6)*spb;
+    const cg=c.createGain();cg.gain.value=0.5;cg.connect(master);
+    f.forEach(n=>piano(base+n[1]*unit,n[2]*unit*0.96,MIDI[n[0]],cg));
+  });
+  const total=4+4*6-2;
+  playing={master,raf:0,timer:setTimeout(()=>{stop();setStatus('Klaar. Sleep de stukjes naar de vakjes, of luister nog eens.')},(total*spb+0.6)*1000)};
+  updatePlay();
+  let last='';
+  const tick=()=>{
+    if(!playing)return;
+    const b=(ctx.currentTime-t0)/spb;let key,html;
+    if(b<4){const n=b<0?1:Math.floor(b)+1;key='c'+n;html=`<span class="big">${n}</span> Aftellen…`}
+    else{const pos=Math.min(3,Math.floor((b-4)/6)),off=(b-4)-pos*6;
+      if(off<4){key='p'+pos;html=`<span class="big">${pos+1}</span> Het ${pos+1}e stukje speelt…`}
+      else{key='r'+pos;html=pos<3?'Korte pauze…':'Laatste stukje afgelopen.'}}
+    if(key!==last){$('status').innerHTML=html;last=key;
+      document.querySelectorAll('.slot.now').forEach(x=>x.classList.remove('now'));
+      S.nowPos=key[0]==='p'?+key.slice(1):-1;
+      if(S.nowPos>=0){const sl=document.querySelector(`.slot[data-p="${S.nowPos}"]`);if(sl)sl.classList.add('now')}}
+    playing.raf=requestAnimationFrame(tick);
+  };
+  playing.raf=requestAnimationFrame(tick);
+}
+$('playBtn').addEventListener('click',play);
+
+loadEx(0);
+})();
+</script>
+
+</body>
+</html>
