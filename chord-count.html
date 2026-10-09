@@ -70,7 +70,6 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
 .card .under{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center}
 .num{width:72px;height:72px;text-align:center;font-family:var(--display);font-weight:800;font-size:34px;border:2px dashed var(--line);border-radius:16px;background:var(--surface);color:var(--ink);padding:0;caret-color:var(--accent)}
 .num:focus{border-style:solid;border-color:var(--accent);background:var(--accent-soft)}
-.card.now{border-color:var(--accent);background:var(--accent-soft)}
 .card.ok{border-color:var(--ok);background:var(--ok-soft)}
 .card.ok .num{border-style:solid;border-color:var(--ok);background:var(--surface)}
 .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -89,14 +88,14 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
   <header>
     <a class="back" href="samenklank.html">&larr; Let's Make Harmony</a>
     <h1>Chord <span>Count</span></h1>
-    <p>Elke lijn is één noot. Hoe hoger de lijn, hoe hoger de noot. Lijnen die boven elkaar liggen, klinken tegelijk. De noten beginnen en eindigen niet altijd op hetzelfde moment, maar ze overlappen. Je hoort de stukjes A, B, C en D na elkaar. Hoeveel noten klinken er telkens samen?</p>
+    <p>Elke lijn is één noot. Hoe hoger de lijn, hoe hoger de noot. Lijnen die boven elkaar liggen, klinken tegelijk. De noten beginnen en eindigen niet altijd op hetzelfde moment, maar ze overlappen. Je hoort de vier stukjes na elkaar, in een willekeurige volgorde. In welke volgorde klonken ze?</p>
   </header>
 
   <section class="panel" aria-labelledby="pTitle">
     <div class="panel-head">
       <div>
         <div class="eyebrow" id="pEyebrow">Niveau 1 &middot; Oefening 1</div>
-        <h2 id="pTitle">Hoeveel noten klinken er tegelijk?</h2>
+        <h2 id="pTitle">Zet onder elk stukje het nummer waarin je het hoorde</h2>
       </div>
       <div class="chips" id="chips" role="group" aria-label="Kies een oefening"></div>
     </div>
@@ -104,10 +103,10 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
     <div class="controls">
       <button class="btn btn-primary btn-big" id="playBtn"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5v13l11-6.5z" fill="currentColor"/></svg><span>Beluister</span></button>
     </div>
-    <div class="status" id="status" aria-live="polite"><span>Druk op <em>Beluister</em>. Je hoort eerst 4 tikken, dan de stukjes A, B, C en D met een korte pauze ertussen.</span></div>
+    <div class="status" id="status" aria-live="polite"><span>Druk op <em>Beluister</em>. Je hoort eerst 4 tikken, dan de vier stukjes met een korte pauze ertussen.</span></div>
 
     <div class="cards" id="cards"></div>
-    <p class="hint" id="hint">Tel hoeveel lijnen er in het midden boven elkaar liggen: zoveel noten klinken er samen. Typ onder elk stukje een getal van 1 tot 4. Hetzelfde getal mag meerdere keren voorkomen.</p>
+    <p class="hint" id="hint">Hoeveel noten klinken er samen, en welke? Typ onder elk stukje een getal van 1 tot 4: het nummer van het moment waarop je dat stukje hoorde. Elk getal gebruik je één keer.</p>
 
     <div class="actions">
       <button class="btn btn-primary" id="checkBtn">Controleer</button>
@@ -123,9 +122,9 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
 <script>
 (function(){
 /* ---------- muziek ---------- */
-/* Niveau 1, drie oefeningen. Noot = [hoogte, start, lengte] in achtsten; een stukje duurt 8 achtsten.
+/* Niveau 1, drie oefeningen. De stukjes klinken in willekeurige volgorde. Noot = [hoogte, start, lengte] in achtsten; een stukje duurt 8 achtsten.
    Hoogte: 0 = C4, 1 = E4, 2 = G4, 3 = C5. De noten van één stukje beginnen en eindigen niet precies
-   samen, maar overlappen allemaal in het midden. Het juiste getal = het aantal noten dat samen klinkt.
+   samen, maar overlappen allemaal in het midden. Het juiste getal = de plaats waarop het stukje klinkt (1 tot 4).
    Maar één stukje in de drie oefeningen heeft één enkele noot. */
 const MIDI=[60,64,67,72];
 const EX=[
@@ -160,6 +159,7 @@ function fragSVG(f){
 
 /* ---------- state ---------- */
 const $=id=>document.getElementById(id);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 const MAXPLAY=3;
 let ex=0,S=null,playing=null,ctx=null;
 const doneEx=[false,false,false];
@@ -172,12 +172,13 @@ function renderChips(){
 }
 function loadEx(i){
   stop();ex=i;
-  S={frags:EX[i],answers:EX[i].map(f=>f.length),vals:[null,null,null,null],plays:0,tried:false,shown:false};
+  const order=shuffle([0,1,2,3]);
+  S={frags:EX[i],order,answers:EX[i].map((f,k)=>order.indexOf(k)+1),vals:[null,null,null,null],plays:0,tried:false,shown:false};
   $('pEyebrow').innerHTML='Niveau 1 &middot; Oefening '+(i+1);
-  $('cards').innerHTML=S.frags.map((f,k)=>`<div class="card" data-k="${k}"><span class="lab">${LABELS[k]}</span>${fragSVG(f)}<label class="under">Aantal tegelijk<input class="num" data-k="${k}" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Aantal noten tegelijk in stukje ${LABELS[k]}"></label></div>`).join('');
+  $('cards').innerHTML=S.frags.map((f,k)=>`<div class="card" data-k="${k}"><span class="lab">${LABELS[k]}</span>${fragSVG(f)}<label class="under">Volgorde<input class="num" data-k="${k}" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Volgnummer van stukje ${LABELS[k]}"></label></div>`).join('');
   $('nextBtn').textContent=i<EX.length-1?'Volgende oefening':'Opnieuw beginnen';
   setFeedback('');
-  setStatus('Druk op <em>Beluister</em>. Je hoort eerst 4 tikken, dan de stukjes A, B, C en D met een korte pauze ertussen.');
+  setStatus('Druk op <em>Beluister</em>. Je hoort eerst 4 tikken, dan de vier stukjes met een korte pauze ertussen.');
   renderChips();updatePlay();
 }
 $('chips').addEventListener('click',e=>{const b=e.target.closest('[data-e]');if(!b)return;loadEx(+b.dataset.e)});
@@ -185,7 +186,7 @@ $('nextBtn').addEventListener('click',()=>loadEx(ex<EX.length-1?ex+1:0));
 
 function updatePlay(){
   const span=$('playBtn').querySelector('span');
-  span.textContent=playing?'Stop':(S.tried?'Beluister opnieuw':(playsLeft()>0?`Beluister A, B, C en D (nog ${playsLeft()}×)`:'Geen beluisterbeurten meer'));
+  span.textContent=playing?'Stop':(S.tried?'Beluister opnieuw':(playsLeft()>0?`Beluister de vier stukjes (nog ${playsLeft()}×)`:'Geen beluisterbeurten meer'));
   $('playBtn').disabled=!playing&&playsLeft()<=0;
 }
 
@@ -201,13 +202,14 @@ $('cards').addEventListener('focusin',e=>{if(e.target.classList.contains('num'))
 $('checkBtn').addEventListener('click',()=>{
   const v=S.vals;
   if(v.includes(null)){setFeedback('Vul onder elk stukje een getal in van 1 tot 4.','bad');return}
+  if(new Set(v).size<4){setFeedback('Elk getal mag maar één keer voorkomen: de stukjes klinken één voor één.','bad');return}
   S.tried=true;
   const good=v.filter((n,k)=>n===S.answers[k]).length;
   updatePlay();
   if(good===4){document.querySelectorAll('.card').forEach(c=>c.classList.add('ok'));
     if(!S.shown){doneEx[ex]=true;renderChips()}
     setFeedback(S.shown?'Juist, maar je hebt de oplossing bekeken. Probeer de oefening later opnieuw!':'Helemaal juist! Ga naar de volgende oefening.','ok')}
-  else setFeedback(`${good} van de 4 getallen zijn juist. Welke juist zijn, moet je zelf ontdekken: luister opnieuw en verbeter.`,'bad');
+  else setFeedback(`${good} van de 4 stukjes staan op de juiste plaats. Welke juist zijn, moet je zelf ontdekken: luister opnieuw en verbeter.`,'bad');
 });
 $('clearBtn').addEventListener('click',()=>{S.vals=[null,null,null,null];document.querySelectorAll('.num').forEach(i=>i.value='');clearMarks();setFeedback('')});
 $('solveBtn').addEventListener('click',()=>{
@@ -215,7 +217,7 @@ $('solveBtn').addEventListener('click',()=>{
   S.vals=S.answers.slice();
   document.querySelectorAll('.num').forEach(i=>{i.value=S.vals[+i.dataset.k]});
   document.querySelectorAll('.card').forEach(c=>c.classList.add('ok'));
-  updatePlay();setFeedback('Dit zijn de juiste getallen: het aantal noten dat tegelijk klinkt. Luister nog eens mee.','info');
+  updatePlay();setFeedback('Dit is de juiste volgorde. Luister nog eens mee.','info');
 });
 
 /* ---------- audio ---------- */
@@ -235,7 +237,6 @@ function piano(t,d,midi,out){
 function stop(){
   if(!playing)return;const p=playing;playing=null;cancelAnimationFrame(p.raf);clearTimeout(p.timer);
   p.master.gain.setTargetAtTime(0.0001,ctx.currentTime,0.03);setTimeout(()=>p.master.disconnect(),300);
-  document.querySelectorAll('.card.now').forEach(c=>c.classList.remove('now'));
   updatePlay();
 }
 function play(){
@@ -246,8 +247,8 @@ function play(){
   const comp=c.createDynamicsCompressor();master.connect(comp);comp.connect(c.destination);
   const spb=60/TEMPO,unit=spb/2,t0=c.currentTime+0.15;
   for(let i=0;i<4;i++)click(t0+i*spb,i===0,master);
-  S.frags.forEach((f,pos)=>{
-    const base=t0+(4+pos*6)*spb;
+  S.order.forEach((k,pos)=>{
+    const f=S.frags[k],base=t0+(4+pos*6)*spb;
     const cg=c.createGain();cg.gain.value=0.5;cg.connect(master);
     f.forEach(n=>piano(base+n[1]*unit,n[2]*unit*0.96,MIDI[n[0]],cg));
   });
@@ -260,11 +261,9 @@ function play(){
     const b=(ctx.currentTime-t0)/spb;let key,html;
     if(b<4){const n=b<0?1:Math.floor(b)+1;key='c'+n;html=`<span class="big">${n}</span> Aftellen…`}
     else{const pos=Math.min(3,Math.floor((b-4)/6)),off=(b-4)-pos*6;
-      if(off<4){key='p'+pos;html=`<span class="big">${LABELS[pos]}</span> Stukje ${LABELS[pos]} speelt…`}
+      if(off<4){key='p'+pos;html=`<span class="big">${pos+1}</span> Het ${pos+1}e stukje speelt…`}
       else{key='r'+pos;html=pos<3?'Korte pauze…':'Laatste stukje afgelopen.'}}
-    if(key!==last){$('status').innerHTML=html;last=key;
-      document.querySelectorAll('.card.now').forEach(c=>c.classList.remove('now'));
-      if(key[0]==='p'){const cd=document.querySelector(`.card[data-k="${key.slice(1)}"]`);if(cd)cd.classList.add('now')}}
+    if(key!==last){$('status').innerHTML=html;last=key}
     playing.raf=requestAnimationFrame(tick);
   };
   playing.raf=requestAnimationFrame(tick);
