@@ -72,6 +72,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16p
 .door.soon .icon,.door.soon h2 span.hl{color:var(--muted)}
 .door.soon .icon{opacity:.55}
 .door .badge{font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--surface-2);color:var(--muted)}
+.door.harmony:hover{border-color:var(--accent)}
+.door.harmony .icon,.door.harmony h2 span.hl{color:var(--accent)}
 .door.play:hover{border-color:var(--accent)}
 .door.play .icon,.door.play h2 span.hl{color:var(--accent)}
 @media (max-width:980px){.doors{grid-template-columns:repeat(3,1fr)}}
@@ -137,13 +139,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16p
       <p>Nasaal &ndash; schel &ndash; dof &ndash; warm</p>
       <span class="badge">binnenkort</span>
     </div>
-    <div class="door soon" aria-label="Samenklank (binnenkort)">
+    <a class="door harmony" href="samenklank.html">
       <span class="bs">Samenklank</span>
       <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true"><g stroke="currentColor" stroke-width="1.2" opacity=".5"><line x1="20" y1="14" x2="90" y2="14"/><line x1="20" y1="24" x2="90" y2="24"/><line x1="20" y1="34" x2="90" y2="34"/><line x1="20" y1="44" x2="90" y2="44"/><line x1="20" y1="54" x2="90" y2="54"/></g><ellipse cx="55" cy="49" rx="7" ry="5" fill="currentColor"/><ellipse cx="55" cy="39" rx="7" ry="5" fill="currentColor"/><ellipse cx="55" cy="29" rx="7" ry="5" fill="currentColor"/></svg></div>
       <h2>Let's Make<span class="hl">Harmony</span></h2>
       <p>Akkoorden &ndash; meerstemmigheid</p>
-      <span class="badge">binnenkort</span>
-    </div>
+    </a>
     <a class="door form" href="form.html">
       <span class="bs">Vorm</span>
       <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.6"><rect x="6" y="18" width="28" height="30" rx="5"/><rect x="41" y="18" width="28" height="30" rx="5"/><rect x="76" y="18" width="28" height="30" rx="5"/></g><g font-family="sans-serif" font-weight="800" font-size="18" fill="currentColor" text-anchor="middle"><text x="20" y="40">A</text><text x="55" y="40">B</text><text x="90" y="40">A</text></g></svg></div>
