@@ -89,6 +89,8 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
 .sc.bad{background:var(--bad-soft);color:var(--bad);border-color:var(--bad)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+<style>/* noten op de toetsen verbergen: de leerling moet ze zelf kennen */
+#piano .me-piano button{color:transparent!important;text-shadow:none!important}</style>
 </head>
 <body>
 
@@ -305,7 +307,7 @@ function nextActive(from){
 function onKey(m){
   if(phase!=='ask'||playing) return;
   const n=BY_MIDI[m];
-  if(!n){ setFeedback('Gebruik enkel de witte toetsen.','info'); return; }
+  if(!n){ setFeedback(m>72?'Speel een toets tussen de C en de hoge C.':'Gebruik enkel de witte toetsen.','info'); return; }
   if(active==null){ setFeedback('Alle vakjes zijn vol. Tik op een vakje om een noot te vervangen.','info'); return; }
   slots[active]=n; active=nextActive(active); dirty=true; setFeedback('','info'); render();
 }
@@ -343,7 +345,7 @@ $('resetBtn').addEventListener('click',start);
 $('upBtn').addEventListener('click',()=>{ if(lvl<LEVELS.length-1){ lvl++; try{localStorage.setItem('pw-level',lvl)}catch(_){ } start(); } });
 
 /* ---------- pianoklavier (invoer) ---------- */
-piano=window.MEPiano?MEPiano.mount($('piano'),{names:'sharp',low:60,octaves:1,computerKeys:true,onNote:m=>onKey(m)}):null;
+piano=window.MEPiano?MEPiano.mount($('piano'),{names:'sharp',low:60,octaves:2,computerKeys:true,onNote:m=>onKey(m)}):null;
 
 if(TEST){
   document.querySelectorAll('#steps,#solveBtn,#listenBtn,#nextBtn,#stopBtn,#rPanel,.board,#qPanel .hint').forEach(el=>el.classList.add('no-test'));
