@@ -89,7 +89,7 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
   <header>
     <a class="back" href="samenklank.html">&larr; Let's Make Harmony</a>
     <h1>Chord <span>Count</span></h1>
-    <p>Elke lijn is één noot. Hoe hoger de lijn, hoe hoger de noot. Lijnen die boven elkaar liggen, klinken tegelijk. Je hoort de stukjes A, B, C en D na elkaar. Hoeveel noten klinken er telkens samen?</p>
+    <p>Elke lijn is één noot. Hoe hoger de lijn, hoe hoger de noot. Lijnen die boven elkaar liggen, klinken tegelijk. De noten beginnen en eindigen niet altijd op hetzelfde moment, maar ze overlappen. Je hoort de stukjes A, B, C en D na elkaar. Hoeveel noten klinken er telkens samen?</p>
   </header>
 
   <section class="panel" aria-labelledby="pTitle">
@@ -107,7 +107,7 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
     <div class="status" id="status" aria-live="polite"><span>Druk op <em>Beluister</em>. Je hoort eerst 4 tikken, dan de stukjes A, B, C en D met een korte pauze ertussen.</span></div>
 
     <div class="cards" id="cards"></div>
-    <p class="hint" id="hint">Tel hoeveel lijnen boven elkaar liggen en hoeveel noten je tegelijk hoort. Typ onder elk stukje een getal van 1 tot 4. Hetzelfde getal mag meerdere keren voorkomen.</p>
+    <p class="hint" id="hint">Tel hoeveel lijnen er in het midden boven elkaar liggen: zoveel noten klinken er samen. Typ onder elk stukje een getal van 1 tot 4. Hetzelfde getal mag meerdere keren voorkomen.</p>
 
     <div class="actions">
       <button class="btn btn-primary" id="checkBtn">Controleer</button>
@@ -123,24 +123,37 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
 <script>
 (function(){
 /* ---------- muziek ---------- */
-/* Niveau 1, drie oefeningen. Elk stukje: de toonhoogtes die samen klinken
-   (0 = C4, 1 = E4, 2 = G4, 3 = C5). Alle noten starten samen en klinken even lang.
-   Het juiste getal = hoeveel noten er samen klinken. */
+/* Niveau 1, drie oefeningen. Noot = [hoogte, start, lengte] in achtsten; een stukje duurt 8 achtsten.
+   Hoogte: 0 = C4, 1 = E4, 2 = G4, 3 = C5. De noten van één stukje beginnen en eindigen niet precies
+   samen, maar overlappen allemaal in het midden. Het juiste getal = het aantal noten dat samen klinkt.
+   Maar één stukje in de drie oefeningen heeft één enkele noot. */
 const MIDI=[60,64,67,72];
 const EX=[
-  [[2],[0,1,3],[0,2],[1,2,3]],
-  [[1,3],[0,1,2,3],[0],[0,2]],
-  [[0,1,2,3],[3],[0,2,3],[1,2,3,0]]
+  [ [[1,0,7],[3,1,7]],
+    [[0,0,8],[1,1,6],[3,2,6]],
+    [[2,0,7],[0,1,7]],
+    [[0,0,7],[1,1,7],[2,2,6],[3,0,8]] ],
+  [ [[0,1,7],[2,0,8],[3,2,6]],
+    [[1,0,6],[2,2,6]],
+    [[0,0,8],[1,1,7],[2,0,7],[3,2,6]],
+    [[2,1,6]] ],
+  [ [[0,0,7],[1,1,7],[2,0,8],[3,2,6]],
+    [[1,0,7],[2,1,7],[3,0,8]],
+    [[0,1,7],[3,0,7]],
+    [[0,0,8],[2,1,6],[3,2,6]] ]
 ];
 const LABELS=['A','B','C','D'];
 const TEMPO=72;
 
 /* ---------- lijngrafiek ---------- */
-function fragSVG(pitches){
-  const W=250,H=112,X1=14,X2=222,RY=r=>92-r*22;
+function fragSVG(f){
+  const W=250,H=112,XL=14,UW=26,RY=r=>92-r*22;
   let h='';
-  for(let r=0;r<4;r++)h+=`<line x1="${X1-6}" y1="${RY(r)}" x2="${X2+6}" y2="${RY(r)}" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/>`;
-  pitches.forEach(p=>{h+=`<line x1="${X1}" y1="${RY(p)}" x2="${X2}" y2="${RY(p)}" stroke="var(--accent)" stroke-width="12" stroke-linecap="round"/>`});
+  for(let r=0;r<4;r++)h+=`<line x1="${XL-6}" y1="${RY(r)}" x2="${XL+8*UW+6}" y2="${RY(r)}" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/>`;
+  f.forEach(n=>{
+    const x1=XL+n[1]*UW+6,x2=XL+(n[1]+n[2])*UW-6,y=RY(n[0]);
+    h+=`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="var(--accent)" stroke-width="12" stroke-linecap="round"/>`;
+  });
   h+=`<line x1="234" y1="14" x2="234" y2="98" stroke="currentColor" stroke-width="1.8"/><line x1="240" y1="14" x2="240" y2="98" stroke="currentColor" stroke-width="3.4"/>`;
   return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${h}</svg>`;
 }
@@ -159,7 +172,7 @@ function renderChips(){
 }
 function loadEx(i){
   stop();ex=i;
-  S={frags:EX[i],answers:EX[i].map(p=>p.length),vals:[null,null,null,null],plays:0,tried:false,shown:false};
+  S={frags:EX[i],answers:EX[i].map(f=>f.length),vals:[null,null,null,null],plays:0,tried:false,shown:false};
   $('pEyebrow').innerHTML='Niveau 1 &middot; Oefening '+(i+1);
   $('cards').innerHTML=S.frags.map((f,k)=>`<div class="card" data-k="${k}"><span class="lab">${LABELS[k]}</span>${fragSVG(f)}<label class="under">Aantal tegelijk<input class="num" data-k="${k}" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Aantal noten tegelijk in stukje ${LABELS[k]}"></label></div>`).join('');
   $('nextBtn').textContent=i<EX.length-1?'Volgende oefening':'Opnieuw beginnen';
@@ -231,12 +244,12 @@ function play(){
   S.plays++;
   const c=ac(),master=c.createGain();master.gain.value=0.8;
   const comp=c.createDynamicsCompressor();master.connect(comp);comp.connect(c.destination);
-  const spb=60/TEMPO,t0=c.currentTime+0.15;
+  const spb=60/TEMPO,unit=spb/2,t0=c.currentTime+0.15;
   for(let i=0;i<4;i++)click(t0+i*spb,i===0,master);
   S.frags.forEach((f,pos)=>{
     const base=t0+(4+pos*6)*spb;
     const cg=c.createGain();cg.gain.value=0.5;cg.connect(master);
-    f.forEach(p=>piano(base,spb*4*0.96,MIDI[p],cg));
+    f.forEach(n=>piano(base+n[1]*unit,n[2]*unit*0.96,MIDI[n[0]],cg));
   });
   const total=4+4*6-2;
   playing={master,raf:0,timer:setTimeout(()=>{stop();setStatus('Klaar. Typ de getallen onder de stukjes, of luister nog eens.')},(total*spb+0.6)*1000)};
