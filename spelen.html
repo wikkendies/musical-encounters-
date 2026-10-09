@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}</style>
+<title>Let's Play &middot; Musical Encounters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF5; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#16203A; --muted:#58637F;
+  --line:#D3D9E6; --accent:#3257E0; --accent5:#D97F06;
+  --shadow:0 1px 2px rgba(22,32,58,.06),0 10px 30px rgba(22,32,58,.08);
+  --display:"Bricolage Grotesque",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0E1322;--surface:#161E33;--surface-2:#1C2640;--ink:#E6EAF5;--muted:#9BA6C3;
+  --line:#2A3553;--accent:#8198FF;--accent5:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--bg:#0E1322;--surface:#161E33;--surface-2:#1C2640;--ink:#E6EAF5;--muted:#9BA6C3;
+  --line:#2A3553;--accent:#8198FF;--accent5:#F5B84F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:24px 56px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+.back{align-self:flex-start;color:var(--muted);font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
+.hero{text-align:center}
+.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(38px,7vw,60px);line-height:1;letter-spacing:-.03em;margin:0}
+.hero p{margin:14px auto 0;max-width:46ch;color:var(--muted);font-size:18px}
+.doors{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.door{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:260px;padding:26px 18px;border-radius:24px;text-decoration:none;color:var(--ink);background:var(--surface);box-shadow:var(--shadow);border:2px solid transparent;transition:transform .15s,border-color .15s}
+.door:hover{transform:translateY(-4px)}
+.door:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.door .icon{height:80px;display:flex;align-items:center}
+.door .icon svg{height:80px;width:auto}
+.door h2{font-family:var(--display);font-weight:800;font-size:25px;margin:0;letter-spacing:-.01em;text-align:center}
+.door h2 span.hl{display:block}
+.door p{margin:0;color:var(--muted);text-align:center;font-size:15px}
+.door.piano:hover{border-color:var(--accent)}
+.door.piano .icon,.door.piano h2 span.hl{color:var(--accent)}
+.door.drums:hover{border-color:var(--accent5)}
+.door.drums .icon,.door.drums h2 span.hl{color:var(--accent5)}
+@media (max-width:560px){.doors{grid-template-columns:1fr}.door{min-height:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">&larr; Musical Encounters</a>
+  <header class="hero">
+    <h1>Let's <span style="color:var(--accent)">Play</span></h1>
+    <p>Kies je instrument.</p>
+  </header>
+  <nav class="doors" aria-label="Kies een instrument">
+    <a class="door piano" href="piano.html">
+      <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true">
+        <rect x="6" y="8" width="98" height="48" rx="5" fill="none" stroke="currentColor" stroke-width="2.6"/>
+        <g stroke="currentColor" stroke-width="2"><line x1="26" y1="30" x2="26" y2="56"/><line x1="46" y1="30" x2="46" y2="56"/><line x1="66" y1="30" x2="66" y2="56"/><line x1="86" y1="30" x2="86" y2="56"/></g>
+        <g fill="currentColor"><rect x="20" y="8" width="12" height="26" rx="2"/><rect x="40" y="8" width="12" height="26" rx="2"/><rect x="72" y="8" width="12" height="26" rx="2"/></g>
+      </svg></div>
+      <h2>Let's Play<span class="hl">Piano</span></h2>
+      <p>Toetsen &ndash; noten &ndash; melodie</p>
+    </a>
+    <a class="door drums" href="beat-maker.html">
+      <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true">
+        <ellipse cx="55" cy="30" rx="30" ry="9" fill="none" stroke="currentColor" stroke-width="2.6"/>
+        <path d="M25 30 V46 C25 51 38 55 55 55 C72 55 85 51 85 46 V30" fill="none" stroke="currentColor" stroke-width="2.6"/>
+        <line x1="14" y1="6" x2="48" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="96" y1="6" x2="62" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg></div>
+      <h2>Let's Play<span class="hl">Drums</span></h2>
+      <p>Kick &ndash; snare &ndash; hi-hat</p>
+    </a>
+  </nav>
+</div>
+</body>
+</html>

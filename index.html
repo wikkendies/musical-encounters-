@@ -72,6 +72,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16p
 .door.soon .icon,.door.soon h2 span.hl{color:var(--muted)}
 .door.soon .icon{opacity:.55}
 .door .badge{font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--surface-2);color:var(--muted)}
+.door.play:hover{border-color:var(--accent)}
+.door.play .icon,.door.play h2 span.hl{color:var(--accent)}
 @media (max-width:980px){.doors{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:760px){.doors{grid-template-columns:1fr 1fr}}
 @media (max-width:560px){.doors{grid-template-columns:1fr}}
@@ -153,6 +155,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16p
       <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 50 H40 V36 H60 V22 H80 V10"/></g><g fill="currentColor"><circle cx="40" cy="36" r="5"/><circle cx="60" cy="22" r="5"/><circle cx="80" cy="10" r="5"/></g></svg></div>
       <h2>Oefen<span class="hl">reeksen</span></h2>
       <p>Haal 85% &ndash; open de volgende reeks</p>
+    </a>
+    <a class="door play" href="spelen.html">
+      <span class="bs">Spelen</span>
+      <div class="icon"><svg viewBox="0 0 110 64" aria-hidden="true"><rect x="6" y="8" width="98" height="48" rx="5" fill="none" stroke="currentColor" stroke-width="2.6"/><g stroke="currentColor" stroke-width="2"><line x1="26" y1="30" x2="26" y2="56"/><line x1="46" y1="30" x2="46" y2="56"/><line x1="66" y1="30" x2="66" y2="56"/><line x1="86" y1="30" x2="86" y2="56"/></g><g fill="currentColor"><rect x="20" y="8" width="12" height="26" rx="2"/><rect x="40" y="8" width="12" height="26" rx="2"/><rect x="72" y="8" width="12" height="26" rx="2"/></g></svg></div>
+      <h2>Let's<span class="hl">Play</span></h2>
+      <p>Piano &ndash; drums</p>
     </a>
     <a class="door teacher" href="leerkracht.html">
       <span class="bs">Leerkracht</span>
