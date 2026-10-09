@@ -49,8 +49,13 @@ header p{margin:8px 0 0;color:var(--muted);max-width:62ch}
 .tempo input{accent-color:var(--accent);width:150px}
 .tempo output{font-variant-numeric:tabular-nums;min-width:70px;color:var(--muted)}
 
-/* raster */
+/* raster: vier maten onder elkaar */
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.bar{display:flex;flex-direction:column;gap:8px;padding-bottom:16px;margin-bottom:16px;border-bottom:1.5px dashed var(--line)}
+.bar:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.barhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px}
+.barhead strong{font-family:var(--display);font-weight:800;font-size:20px}
+.barhead span{color:var(--muted);font-weight:600}
 .grid{display:grid;grid-template-columns:112px repeat(4,1fr);gap:10px;min-width:680px}
 .beat{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:6px;border-radius:12px;background:var(--surface-2)}
 .lab{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
@@ -69,7 +74,11 @@ header p{margin:8px 0 0;color:var(--muted);max-width:62ch}
 .row-ftom .cell.on{background:var(--ftom);border-color:var(--ftom)}
 .row-kick .cell.on{background:var(--kick);border-color:var(--kick)}
 .cell.now{box-shadow:0 0 0 3px var(--now);transform:scale(1.06)}
+.mirror .cell{cursor:default;opacity:.7}
+.mirror .cell:hover{border-color:var(--line)}
+.mirror .cell.on:hover{border-color:inherit}
 .hint{margin:0;color:var(--muted);font-size:14px}
+#presets{display:flex;flex-direction:column;gap:10px}
 .presets{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .presets span{font-weight:700;color:var(--muted);font-size:14px;margin-right:4px}
 .chip{border:1.5px solid var(--line);background:var(--surface-2);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
@@ -83,7 +92,7 @@ header p{margin:8px 0 0;color:var(--muted);max-width:62ch}
   <header>
     <a class="back" href="lets-play-drums.html">&larr; Let's Play Drums</a>
     <h1>Beat <span>Maker</span></h1>
-    <p>Eén maat van 4 tellen, elke tel in 4 blokjes. Tik op de blokjes om je eigen drumbeat te maken. Bovenaan staan de bekkens (crash en hi-hat), daaronder de toms, dan de snare en onderaan de baskick.</p>
+    <p>Vier maten van 4 tellen, elke tel in 4 blokjes. Maat 1 is een beat, maat 2 een ritme op de snare, maat 3 is dezelfde beat als maat 1 (die verandert vanzelf mee) en maat 4 is een fill. Tik op de blokjes om je eigen patroon te maken. Bovenaan staan de bekkens (crash en hi-hat), daaronder de toms, dan de snare en onderaan de baskick.</p>
   </header>
 
   <section class="panel">
@@ -94,12 +103,12 @@ header p{margin:8px 0 0;color:var(--muted);max-width:62ch}
     </div>
 
     <div class="scroll">
-      <div class="grid" id="grid"></div>
+      <div id="bars"></div>
     </div>
 
-    <p class="hint">De beat speelt steeds opnieuw (in een lus). Je kan blokjes aan- en uitzetten terwijl hij speelt.</p>
+    <p class="hint">De vier maten spelen steeds opnieuw (in een lus). Je kan blokjes aan- en uitzetten terwijl het speelt.</p>
 
-    <div class="presets" id="presets"><span>Voorbeelden:</span></div>
+    <div id="presets"></div>
   </section>
 </div>
 
@@ -118,44 +127,74 @@ const ROWS=[
   {key:'ftom',  name:'Floor tom',  color:'var(--ftom)'},
   {key:'kick',  name:'Baskick',    color:'var(--kick)'}
 ];
-const STEPS=16;   // 4 tellen x 4 blokjes
+const STEPS=16;   // per maat: 4 tellen x 4 blokjes
 const COUNT=['1','e','+','a'];   // telwoorden per blokje: 1 e + a, 2 e + a, ...
 
-/* voorbeelden: x = aan, . = uit (16 tekens, per tel 4). Een rij die ontbreekt blijft leeg. */
-const PRESETS={
-  'Rock':     {hat:'x.x.x.x.x.x.x.x.', snare:'....x.......x...', kick:'x.......x.x.....'},
-  'Pop':      {hat:'x.x.x.x.x.x.x.x.', snare:'....x.......x...', kick:'x.....x.x.......'},
-  'Disco':    {hat:'..x...x...x...x.', snare:'....x.......x...', kick:'x...x...x...x...'},
-  'Hip-hop':  {hat:'x.x.x.x.x.x.x.x.', snare:'....x.......x...', kick:'x......x..x.....'},
-  '16den':    {hat:'xxxxxxxxxxxxxxxx', snare:'....x.......x...', kick:'x.......x.......'},
-  'Rock met fill': {crash:'x...............', hat:'x.x.x.x.x.x.....', snare:'....x.......x...', kick:'x.......x.......', htom:'............x.x.', ltom:'..............x.', ftom:'...............x'}
-};
+/* de vier maten: welke rijen er zichtbaar zijn; mirror = deze maat is een kopie van een andere maat */
+const BEATROWS=['hat','snare','kick'];
+const BARS=[
+  {title:'Maat 1', sub:'Beat',                       rows:BEATROWS},
+  {title:'Maat 2', sub:'Ritme op de snare',          rows:['snare']},
+  {title:'Maat 3', sub:'Dezelfde beat als maat 1',   rows:BEATROWS, mirror:0},
+  {title:'Maat 4', sub:'Fill',                       rows:ROWS.map(r=>r.key)}
+];
+const NB=BARS.length, TOTAL=NB*STEPS;
+const src=b=>BARS[b].mirror!==undefined?BARS[b].mirror:b;   // welke maat de blokjes echt bewaart
 
-let pattern={}; ROWS.forEach(r=>pattern[r.key]=Array(STEPS).fill(false));
+/* voorbeelden per maat: x = aan, . = uit (16 tekens, per tel 4). Een rij die ontbreekt blijft leeg. */
+const PRESETS=[
+  {label:'Beat (maat 1):', bar:0, items:{
+    'Rock':     {hat:'x.x.x.x.x.x.x.x.', snare:'....x.......x...', kick:'x.......x.x.....'},
+    'Pop':      {hat:'x.x.x.x.x.x.x.x.', snare:'....x.......x...', kick:'x.....x.x.......'},
+    'Disco':    {hat:'..x...x...x...x.', snare:'....x.......x...', kick:'x...x...x...x...'},
+    'Hip-hop':  {hat:'x.x.x.x.x.x.x.x.', snare:'....x.......x...', kick:'x......x..x.....'},
+    '16den':    {hat:'xxxxxxxxxxxxxxxx', snare:'....x.......x...', kick:'x.......x.......'}
+  }},
+  {label:'Ritme op de snare (maat 2):', bar:1, items:{
+    'Kwarten':  {snare:'x...x...x...x...'},
+    'Achtsten': {snare:'x.x.x.x.x.x.x.x.'},
+    'Syncope':  {snare:'x..x..x.x..x..x.'}
+  }},
+  {label:'Fill (maat 4):', bar:3, items:{
+    'Rock met fill': {crash:'x...............', hat:'x.x.x.x.x.x.....', snare:'....x.......x...', kick:'x.......x.......', htom:'............x.x.', ltom:'..............x.', ftom:'...............x'},
+    'Tom-fill':      {hat:'x.x.x.x.........', snare:'....x...........', kick:'x...............', htom:'........xxxx....', ltom:'............xx..', ftom:'..............xx'},
+    'Snare-fill':    {hat:'x.x.x.x.........', snare:'....x...x.x.xxxx', kick:'x...............'}
+  }}
+];
+
+const emptyBar=()=>{const o={};ROWS.forEach(r=>o[r.key]=Array(STEPS).fill(false));return o};
+let pattern=BARS.map(emptyBar);   // pattern[maat][rij][blokje]
 let bpm=90, playing=false, step=0, nextTime=0, timer=null, ctx=null, master=null;
 const queue=[];   // (stap, tijd) voor de oplichtende blokjes
 
 /* ---------- raster tekenen ---------- */
 function build(){
-  let h='<div></div>';
-  for(let b=0;b<4;b++) h+=`<div class="count">${COUNT.map((c,i)=>`<span data-c="${b*4+i}">${i===0?b+1:c}</span>`).join('')}</div>`;
-  ROWS.forEach(r=>{
-    h+=`<div class="lab"><i style="background:${r.color}"></i>${r.name}</div>`;
-    for(let b=0;b<4;b++){
-      h+=`<div class="beat row-${r.key}">`;
-      for(let i=0;i<4;i++){const s=b*4+i;
-        h+=`<button type="button" class="cell${i===0?' first':''}${pattern[r.key][s]?' on':''}" data-r="${r.key}" data-s="${s}" aria-pressed="${pattern[r.key][s]}" aria-label="${r.name}, tel ${b+1}, blokje ${i+1}"></button>`;}
-      h+='</div>';
-    }
+  let h='';
+  BARS.forEach((B,b)=>{
+    const mir=B.mirror!==undefined;
+    h+=`<div class="bar${mir?' mirror':''}"><div class="barhead"><strong>${B.title}</strong><span>${B.sub}</span></div><div class="grid"><div></div>`;
+    for(let t=0;t<4;t++) h+=`<div class="count">${COUNT.map((c,i)=>`<span data-c="${b*STEPS+t*4+i}">${i===0?t+1:c}</span>`).join('')}</div>`;
+    ROWS.filter(r=>B.rows.includes(r.key)).forEach(r=>{
+      h+=`<div class="lab"><i style="background:${r.color}"></i>${r.name}</div>`;
+      for(let t=0;t<4;t++){
+        h+=`<div class="beat row-${r.key}">`;
+        for(let i=0;i<4;i++){const s=t*4+i, on=pattern[src(b)][r.key][s];
+          h+=`<button type="button" class="cell${i===0?' first':''}${on?' on':''}" data-b="${b}" data-r="${r.key}" data-s="${s}" data-g="${b*STEPS+s}" aria-pressed="${on}"${mir?' disabled tabindex="-1"':''} aria-label="${B.title}, ${r.name}, tel ${t+1}, blokje ${i+1}"></button>`;}
+        h+='</div>';
+      }
+    });
+    h+='</div></div>';
   });
-  $('grid').innerHTML=h;
+  $('bars').innerHTML=h;
 }
-$('grid').addEventListener('click',e=>{
-  const c=e.target.closest('.cell'); if(!c) return;
-  const r=c.dataset.r, s=+c.dataset.s;
-  pattern[r][s]=!pattern[r][s];
-  c.classList.toggle('on',pattern[r][s]); c.setAttribute('aria-pressed',pattern[r][s]);
-  if(pattern[r][s]&&!playing){ ac(); SOUNDS[r](ctx.currentTime+.01); }   // meteen horen
+$('bars').addEventListener('click',e=>{
+  const c=e.target.closest('.cell'); if(!c||c.disabled) return;
+  const b=+c.dataset.b, r=c.dataset.r, s=+c.dataset.s;
+  const v=!pattern[b][r][s]; pattern[b][r][s]=v;
+  document.querySelectorAll(`.cell[data-r="${r}"][data-s="${s}"]`).forEach(el=>{   // ook de kopie (maat 3) bijwerken
+    if(src(+el.dataset.b)===b){ el.classList.toggle('on',v); el.setAttribute('aria-pressed',v); }
+  });
+  if(v&&!playing){ ac(); SOUNDS[r](ctx.currentTime+.01); }   // meteen horen
 });
 
 /* ---------- drumklanken (Web Audio) ---------- */
@@ -214,13 +253,14 @@ const SOUNDS={
   }
 };
 
-/* ---------- afspelen (lus) ---------- */
+/* ---------- afspelen (lus over de vier maten) ---------- */
 const stepDur=()=>60/bpm/4;
 function scheduler(){
   while(nextTime<ctx.currentTime+.12){
-    ROWS.forEach(r=>{ if(pattern[r.key][step]) SOUNDS[r.key](nextTime); });
+    const b=Math.floor(step/STEPS), s=step%STEPS, p=pattern[src(b)];
+    BARS[b].rows.forEach(k=>{ if(p[k][s]) SOUNDS[k](nextTime); });
     queue.push({step,time:nextTime});
-    nextTime+=stepDur(); step=(step+1)%STEPS;
+    nextTime+=stepDur(); step=(step+1)%TOTAL;
   }
 }
 let lastShown=-1;
@@ -233,7 +273,7 @@ function show(s){
   if(s===lastShown) return; lastShown=s;
   document.querySelectorAll('.cell.now,.count span.now').forEach(el=>el.classList.remove('now'));
   if(s<0) return;
-  document.querySelectorAll(`.cell[data-s="${s}"]`).forEach(el=>el.classList.add('now'));
+  document.querySelectorAll(`.cell[data-g="${s}"]`).forEach(el=>el.classList.add('now'));
   const c=document.querySelector(`.count span[data-c="${s}"]`); if(c) c.classList.add('now');
 }
 function start(){
@@ -247,13 +287,22 @@ function stop(){
 }
 $('playBtn').addEventListener('click',()=>playing?stop():start());
 $('tempo').addEventListener('input',e=>{ bpm=+e.target.value; $('tempoOut').textContent=bpm+' BPM'; });
-$('clearBtn').addEventListener('click',()=>{ ROWS.forEach(r=>pattern[r.key].fill(false)); build(); });
+$('clearBtn').addEventListener('click',()=>{ pattern=BARS.map(emptyBar); build(); });
 
-/* voorbeelden */
-Object.keys(PRESETS).forEach(name=>{
-  const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=name;
-  b.addEventListener('click',()=>{ const p=PRESETS[name]; ROWS.forEach(r=>pattern[r.key]=(p[r.key]||'').padEnd(STEPS,'.').split('').map(ch=>ch==='x')); build(); });
-  $('presets').appendChild(b);
+/* voorbeelden: elk voorbeeld vult enkel de maat waar het bij hoort */
+PRESETS.forEach(g=>{
+  const row=document.createElement('div'); row.className='presets';
+  const lab=document.createElement('span'); lab.textContent=g.label; row.appendChild(lab);
+  Object.keys(g.items).forEach(name=>{
+    const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=name;
+    b.addEventListener('click',()=>{
+      const p=g.items[name];
+      BARS[g.bar].rows.forEach(k=>pattern[g.bar][k]=(p[k]||'').padEnd(STEPS,'.').split('').map(ch=>ch==='x'));
+      build();
+    });
+    row.appendChild(b);
+  });
+  $('presets').appendChild(row);
 });
 
 build();
